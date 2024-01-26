@@ -332,6 +332,16 @@ Acts as a separate entity from the views, decoupling the navigation logic from t
       <td>Cleans the navigation stack and runs the navigation flow.</td>
     </tr>
     <tr>
+      <td><code style="color: blue;">finishFlow(_)</code></td>
+      <td> 
+        <ul>
+          <li><b>animated:</b> <code>Bool?</code>, default <code style="color: #ec6b6f;">true</code>,</li>
+          <li><b>completion:</b> <code>(() -> Void)?</code>, default: <code style="color: #ec6b6f;">nil</code></li>
+        </ul>
+      </td>
+      <td>Pops all the views on the stack including the root view, dismisses all the modal view and remove the current coordinator from the coordinator stack.</td>
+    </tr>
+    <tr>
       <td><code style="color: blue;">forcePresentation(_)</code></td>
       <td> 
         <ul>
@@ -438,21 +448,4 @@ Contributions to the SUICoordinator library are welcome! To contribute, simply f
 License
 
 The SUICoordinator library is released under the MIT license. See the LICENSE file for more information.
-
-<style>
-table th:first-of-type, td:first-of-type {
-    width: 20% !important;
-}
-table th:nth-of-type(2), td:nth-of-type(2) {
-    width: 40% !important;
-}
-table th:nth-of-type(3), td:nth-of-type(3) {
-    width: 40% !important;
-}
-
-
-table colgroup col {
-  width: auto !important;
-}
-</style>
 
