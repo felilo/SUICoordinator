@@ -398,7 +398,8 @@ It works the same as Coordinator but has the following additional features:
   <tbody>
     <tr>
       <td><code style="color: blue;">currentPage</code></td>
-      <td> Returns the current page selected.</td>
+      <td></td>
+      <td>Variable of <code style="color: #ec6b6f;">Page</code> type which allow set and get the tab selected</td>
     </tr>
     <tr>
       <td><code style="color: blue;">getCoordinatorSelected()</code></td>
@@ -428,7 +429,15 @@ It works the same as Coordinator but has the following additional features:
       </td>
       <td>Returns the coordinator at the position given as parameter</td>
     </tr>
-    
+    <tr>
+      <td><code style="color: blue;">setBadge</code></td>
+      <td>
+        <ul>
+          <li><b>PassthroughSubject:</b> <code>(String?, Page)?</code></li>
+        </ul>
+      </td>
+      <td>Variable that allows set the badge of a tab</td>
+    </tr>
   </tbody>
 </table>
 
