@@ -198,7 +198,7 @@ struct SUICoordinatorDemoApp: App {
 }
 ```
 
-#### You can find an example here <https://github.com/felilo/TestCoordinatorLibrary>
+#### You can find an example here <https://github.com/felilo/SUICoordinator/tree/main/SUICoordinatorDemo>
 
 _____
 
