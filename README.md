@@ -460,4 +460,3 @@ Contributions to the SUICoordinator library are welcome! To contribute, simply f
 License
 
 The SUICoordinator library is released under the MIT license. See the LICENSE file for more information.
-
