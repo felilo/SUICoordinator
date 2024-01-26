@@ -384,7 +384,7 @@ Acts as a separate entity from the views, decoupling the navigation logic from t
 
 #### TabbarCoordinator
 
-Acts as a separate entity from the views, decoupling the navigation logic from the presentation logic. This separation of concerns allows the views to focus solely on their specific functionalities, while the Coordinator takes charge of the app's overall navigation flow. Some features are:
+It works the same as Coordinator but has the following additional features:
 
 <br>
 <table>
