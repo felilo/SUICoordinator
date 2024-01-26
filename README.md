@@ -5,8 +5,7 @@ _____
 
 ## Getting Started
 
-To use the SUICoordinator library in your iOS project, you'll need to add the library files to your project and set up a Coordinator object.
-Here are the basic steps:
+To use the SUICoordinator library in your iOS project, you'll need to add the library files to your project. Here are the basic steps:
 _____
 
 ## Defining the coordinator
