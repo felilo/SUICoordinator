@@ -31,17 +31,17 @@ import Combine
  The `TabbarCoordinator` class conforms to the `Coordinator` protocol and the `TabbarCoordinatorType` protocol, providing functionality for handling a tab bar interface with multiple pages. It supports the selection of different pages and provides customization options for presentation styles.
  - Important: This coordinator provides a flexible and customizable solution for managing a tab bar interface in a coordinated app architecture.
  */
-open class TabbarCoordinator<PAGE>: Coordinator<RouteBase>, TabbarCoordinatorType where PAGE: TabbarPage {
+open class TabbarCoordinator<Page>: Coordinator<RouteBase>, TabbarCoordinatorType where Page: TabbarPage {
 	
 	// --------------------------------------------------------------------
 	// MARK: Wrapper properties
 	// --------------------------------------------------------------------
 	
 	/// An array of pages managed by the tab bar coordinator.
-	@Published public var pages: [PAGE] = []
+	@Published public var pages: [Page] = []
 	
 	/// The currently selected page in the tab bar.
-	@Published public var currentPage: PAGE
+	@Published public var currentPage: Page
 	
 	// --------------------------------------------------------------------
 	// MARK: Properties
@@ -51,9 +51,9 @@ open class TabbarCoordinator<PAGE>: Coordinator<RouteBase>, TabbarCoordinatorTyp
 	private var presentationStyle: TransitionPresentationStyle
 	
 	
-	public var setBadge: PassthroughSubject<(String?, PAGE), Never> = .init()
+	public var setBadge: PassthroughSubject<(String?, Page), Never> = .init()
 	
-	var customView: PAGE.View?
+	var customView: Page.View?
 	
 	// ---------------------------------------------------------
 	// MARK: Constructor
@@ -78,10 +78,10 @@ open class TabbarCoordinator<PAGE>: Coordinator<RouteBase>, TabbarCoordinatorTyp
 			- parent: The parent coordinator, if any. Default is nil.
 	*/
 	public init(
-		pages: [PAGE],
-		currentPage: PAGE,
+		pages: [Page],
+		currentPage: Page,
 		presentationStyle: TransitionPresentationStyle = .sheet,
-		customView: PAGE.View? = nil
+		customView: Page.View? = nil
 	) {
 		self.presentationStyle = presentationStyle
 		self.currentPage = currentPage
@@ -154,7 +154,7 @@ open class TabbarCoordinator<PAGE>: Coordinator<RouteBase>, TabbarCoordinatorTyp
 			- currentPage: The new currently selected page. Default is nil.
 			- completion: A closure to be executed after setting the new pages. Default is nil.
 	*/
-	open func setPages(_ values: [PAGE], currentPage: PAGE? = nil, completion: (() -> Void)? = nil) {
+	open func setPages(_ values: [Page], currentPage: Page? = nil, completion: (() -> Void)? = nil) {
 		handleUpdatePages(currentPage: currentPage) { [weak self] in
 			self?.setupPages(values)
 			self?.pages = values
@@ -174,7 +174,7 @@ open class TabbarCoordinator<PAGE>: Coordinator<RouteBase>, TabbarCoordinatorTyp
 		- Parameters:
 		   - value: The initial array of pages to set up for the tab bar coordinator.
 	*/
-	private func setupPages(_ value: [PAGE]) {
+	private func setupPages(_ value: [Page]) {
 		value.forEach({
 			let item = $0.coordinator()
 			startChildCoordinator(item)
@@ -238,7 +238,7 @@ open class TabbarCoordinator<PAGE>: Coordinator<RouteBase>, TabbarCoordinatorTyp
 			- completion: A closure to be executed after updating the pages. Default is nil.
 	*/
 	private func handleUpdatePages(
-		currentPage: PAGE? = nil,
+		currentPage: Page? = nil,
 		completion: (() -> Void)? = nil
 	) {
 		removeChildren(completion)
