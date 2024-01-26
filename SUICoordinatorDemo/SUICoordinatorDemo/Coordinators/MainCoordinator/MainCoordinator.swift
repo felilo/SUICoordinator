@@ -32,6 +32,10 @@ class MainCoordinator: Coordinator<MainRoute> {
         startFlow(route: .splash)
     }
     
+    // ---------------------------------------------------------------------
+    // MARK: Coordinator
+    // ---------------------------------------------------------------------
+    
     override func start(animated: Bool = true, completion sucompletion: Completion? = nil) {
         let coordinator = HomeCoordinator()
         navigate(to: coordinator, presentationStyle: .fullScreenCover)

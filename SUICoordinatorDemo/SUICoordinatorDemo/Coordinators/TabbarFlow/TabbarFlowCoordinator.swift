@@ -27,6 +27,10 @@ import SUICoordinator
 
 class TabbarFlowCoordinator: Coordinator<RouteBase> {
     
+    // ---------------------------------------------------------------------
+    // MARK: Coordinator
+    // ---------------------------------------------------------------------
+    
     override func start(animated: Bool = true, completion: Completion? = nil) {
         let viewModel = TabbarActionListViewModel(coordinator: self)
         
@@ -37,6 +41,10 @@ class TabbarFlowCoordinator: Coordinator<RouteBase> {
         
         startFlow(route: route )
     }
+    
+    // ---------------------------------------------------------------------
+    // MARK: Adiotional flows
+    // ---------------------------------------------------------------------
     
     func presentDefaultTabbarCoordinator() {
         let coordinator = DefaultTabbarCoordinator()

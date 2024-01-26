@@ -131,7 +131,7 @@
 		D9AAB20B2B61DB67007EAAC7 /* Modules */ = {
 			isa = PBXGroup;
 			children = (
-				D9AAB2342B61ED5B007EAAC7 /* Tabbar */,
+				D9AAB2342B61ED5B007EAAC7 /* TabbarFlow */,
 				D9AAB20D2B61DB7D007EAAC7 /* Home */,
 				D9AAB20C2B61DB73007EAAC7 /* Main */,
 			);
@@ -223,12 +223,12 @@
 			path = ActionList;
 			sourceTree = "<group>";
 		};
-		D9AAB2342B61ED5B007EAAC7 /* Tabbar */ = {
+		D9AAB2342B61ED5B007EAAC7 /* TabbarFlow */ = {
 			isa = PBXGroup;
 			children = (
 				D9AAB2442B61FC75007EAAC7 /* TabbarActionList */,
 			);
-			path = Tabbar;
+			path = TabbarFlow;
 			sourceTree = "<group>";
 		};
 		D9AAB2442B61FC75007EAAC7 /* TabbarActionList */ = {

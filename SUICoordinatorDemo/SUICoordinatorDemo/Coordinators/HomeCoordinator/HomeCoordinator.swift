@@ -27,10 +27,18 @@ import Foundation
 
 class HomeCoordinator: Coordinator<HomeRoute> {
     
-    override func start(animated: Bool = true, completion: Completion? = nil) {
+    // ---------------------------------------------------------------------
+    // MARK: Coordinator
+    // ---------------------------------------------------------------------
+    
+    override func start(animated: Bool = true, completion: (() -> Void)? = nil) {
         let viewModel = ActionListViewModel(coordinator: self)
-        startFlow(route: .actionListView(viewModel: viewModel))
+        startFlow(route: .actionListView(viewModel: viewModel), completion: completion)
     }
+    
+    // ---------------------------------------------------------------------
+    // MARK: Adiotional flows
+    // ---------------------------------------------------------------------
     
     func navigateToPushView() {
         let viewModel = PushViewModel(coordinator: self)

@@ -30,7 +30,7 @@ enum MainRoute: RouteType {
     case splash
     
     // ---------------------------------------------------------
-    // MARK: RouteNavigation
+    // MARK: RouteType
     // ---------------------------------------------------------
     
     public var presentationStyle: TransitionPresentationStyle {

@@ -27,9 +27,14 @@ import SUICoordinator
 
 class DefaultTabbarCoordinator: TabbarCoordinator<MyTabbarPage> {
     
+    // ---------------------------------------------------------------------
+    // MARK: Init
+    // ---------------------------------------------------------------------
+    
     init() {
         super.init(pages: PAGE.allCases, currentPage: .second)
         
+        /// Set badge of a tap
         DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
             self?.setBadge.send(( "2", .first ))
         }

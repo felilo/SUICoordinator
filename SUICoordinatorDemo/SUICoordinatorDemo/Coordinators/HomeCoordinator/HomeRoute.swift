@@ -33,6 +33,10 @@ enum HomeRoute: RouteType {
     case detents(viewModel: DetentsViewModel)
     case actionListView(viewModel: ActionListViewModel)
     
+    // ---------------------------------------------------------------------
+    // MARK: RouteType
+    // ---------------------------------------------------------------------
+    
     var presentationStyle: TransitionPresentationStyle {
         switch self {
             case .push:

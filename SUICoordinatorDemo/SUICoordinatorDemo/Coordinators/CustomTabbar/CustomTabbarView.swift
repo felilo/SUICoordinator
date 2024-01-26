@@ -30,7 +30,6 @@ struct CustomTabbarView: View {
     // MARK: Typealias
     // ---------------------------------------------------------------------
     
-    
     typealias Page = MyTabbarPage
     
     
@@ -44,7 +43,7 @@ struct CustomTabbarView: View {
     
     
     // ---------------------------------------------------------------------
-    // MARK: Constructor
+    // MARK: Init
     // ---------------------------------------------------------------------
     
     

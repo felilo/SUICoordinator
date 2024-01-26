@@ -28,9 +28,16 @@ import SUICoordinator
 
 public class CustomTabbarCoordinator: TabbarCoordinator<MyTabbarPage> {
     
+    // ---------------------------------------------------------------------
+    // MARK: Properties
+    // ---------------------------------------------------------------------
+    
     private var cancelables = Set<AnyCancellable>()
     let viewModel: CustomTabbarViewModel
     
+    // ---------------------------------------------------------------------
+    // MARK: Init
+    // ---------------------------------------------------------------------
     
     public init(
         currentPage: MyTabbarPage = .first,
@@ -49,6 +56,9 @@ public class CustomTabbarCoordinator: TabbarCoordinator<MyTabbarPage> {
         setupObservers()
     }
     
+    // ---------------------------------------------------------------------
+    // MARK: Helper funcs
+    // ---------------------------------------------------------------------
     
     private func setupObservers() {
         viewModel.$currentPage
@@ -61,5 +71,3 @@ public class CustomTabbarCoordinator: TabbarCoordinator<MyTabbarPage> {
         }
     }
 }
-
-
