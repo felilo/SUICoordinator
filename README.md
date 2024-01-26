@@ -198,7 +198,10 @@ struct SUICoordinatorDemoApp: App {
 }
 ```
 
-#### You can find an example here <https://github.com/felilo/SUICoordinator/tree/main/SUICoordinatorDemo>
+
+### Example project
+
+For better understanding, I recommend that you take a look at the example project located in the [Example folder](https://github.com/felilo/SUICoordinator/tree/main/SUICoordinatorDemo).
 
 _____
 
