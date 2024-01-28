@@ -32,15 +32,15 @@ class TabbarActionListViewModel: ObservableObject {
         self.coordinator = coordinator
     }
     
-    func presentDefaultTabbarCoordinator() {
-        coordinator.presentDefaultTabbarCoordinator()
+    func presentDefaultTabbarCoordinator() async {
+        await coordinator.presentDefaultTabbarCoordinator()
     }
     
-    func presentCustomTabbarCoordinator() {
-        coordinator.presentCustomTabbarCoordinator()
+    func presentCustomTabbarCoordinator() async {
+        await coordinator.presentCustomTabbarCoordinator()
     }
     
-    func finsh() {
-        coordinator.finish()
+    func finsh() async {
+        await coordinator.finish()
     }
 }

@@ -9,36 +9,36 @@ import Foundation
 import SwiftUI
 
 public struct RouteBase: RouteType {
-	
-	// ---------------------------------------------------------
-	// MARK: Properties
-	// ---------------------------------------------------------
-	
-	private let _presentationStyle: TransitionPresentationStyle
-	public var content: any View
-	
-	// ---------------------------------------------------------
-	// MARK: Constructor
-	// ---------------------------------------------------------
-	
-	public init(
+    
+    // ---------------------------------------------------------
+    // MARK: Properties
+    // ---------------------------------------------------------
+    
+    private let _presentationStyle: TransitionPresentationStyle
+    public var content: any View
+    
+    // ---------------------------------------------------------
+    // MARK: Constructor
+    // ---------------------------------------------------------
+    
+    public init(
         presentationStyle: TransitionPresentationStyle,
-		content: (any View)
-	) {
-		self.content = content
-		self._presentationStyle = presentationStyle
-	}
-	
-	// ---------------------------------------------------------
-	// MARK: RouteNavigation
-	// ---------------------------------------------------------
-	
-	public var presentationStyle: TransitionPresentationStyle {
-		_presentationStyle
-	}
-	
-	@ViewBuilder
-	public var view: any View {
-		content
-	}
+        content: (any View)
+    ) {
+        self.content = content
+        self._presentationStyle = presentationStyle
+    }
+    
+    // ---------------------------------------------------------
+    // MARK: RouteNavigation
+    // ---------------------------------------------------------
+    
+    public var presentationStyle: TransitionPresentationStyle {
+        _presentationStyle
+    }
+    
+    @ViewBuilder
+    public var view: any View {
+        content
+    }
 }

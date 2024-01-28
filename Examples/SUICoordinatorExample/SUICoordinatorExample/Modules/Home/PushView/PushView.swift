@@ -38,11 +38,11 @@ struct PushView: View {
                 
                 VStack {
                     Button("Presents SheetView") {
-                        viewModel.navigateToNextView()
+                        Task { await  viewModel.navigateToNextView() }
                     }.buttonStyle(.borderedProminent)
                     
                     Button("Close view") {
-                        viewModel.close()
+                        Task { await  viewModel.close() }
                     }.buttonStyle(.borderedProminent)
                 }
             }

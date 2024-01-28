@@ -31,7 +31,7 @@ class TabbarFlowCoordinator: Coordinator<RouteBase> {
     // MARK: Coordinator
     // ---------------------------------------------------------------------
     
-    override func start(animated: Bool = true, completion: Completion? = nil) {
+    override func start(animated: Bool = true) async {
         let viewModel = TabbarActionListViewModel(coordinator: self)
         
         let route = RouteBase(
@@ -39,28 +39,28 @@ class TabbarFlowCoordinator: Coordinator<RouteBase> {
             content: TabbarActionListView(viewModel: viewModel)
         )
         
-        startFlow(route: route )
+        await startFlow(route: route )
     }
     
     // ---------------------------------------------------------------------
     // MARK: Adiotional flows
     // ---------------------------------------------------------------------
     
-    func presentDefaultTabbarCoordinator() {
+    func presentDefaultTabbarCoordinator() async {
         let coordinator = DefaultTabbarCoordinator()
-        navigate(to: coordinator, presentationStyle: .fullScreenCover)
+        await navigate(to: coordinator, presentationStyle: .fullScreenCover)
     }
     
-    func presentCustomTabbarCoordinator() {
+    func presentCustomTabbarCoordinator() async {
         let coordinator = CustomTabbarCoordinator()
-        navigate(to: coordinator, presentationStyle: .sheet)
+        await navigate(to: coordinator, presentationStyle: .sheet)
     }
     
-    func close() {
-        router.close(completion: nil)
+    func close() async {
+        await router.close()
     }
     
-    func finish() {
-        finishFlow(animated: true, completion: nil)
+    func finish() async {
+        await finishFlow(animated: true)
     }
 }

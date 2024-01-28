@@ -25,42 +25,37 @@
 import Foundation
 import Combine
 
-/**
- Protocol defining the requirements for a tab bar coordinator in the Coordinator pattern.
-
- TabbarCoordinatorType represents coordinators that are associated with a tab bar interface within an application. It facilitates the coordination and management of multiple pages or views accessible through a tab bar.
-
- Conforming types must provide an associated type `PAGE`, which represents the type of pages or views managed by the tab bar coordinator.
- */
+/// A protocol representing a type for managing and coordinating a tabbar-based navigation.
+///
+/// Tabbar coordinator types define the interface for handling the selected page and badge updates.
 public protocol TabbarCoordinatorType {
-	
-	// ---------------------------------------------------------
-	// MARK: typealias
-	// ---------------------------------------------------------
-	
-	/// The associated type representing the type of pages or views managed by the tab
-	associatedtype PAGE
-	
-	// ---------------------------------------------------------
-	// MARK: Properties
-	// ---------------------------------------------------------
-	
-	/// The current page or view associated with the tab bar coordinator.
-	var currentPage: PAGE { get set }
-	
-	var setBadge: PassthroughSubject<(String?, PAGE), Never> { get set }
-	
-	// ---------------------------------------------------------
-	// MARK: Funcs
-	// ---------------------------------------------------------
-	
-	/**
-	Retrieves the selected coordinator associated with the current page.
-
-	 - Throws: An error if the selected coordinator cannot be retrieved.
-	 - Returns: The type-erased coordinator associated with the current page.
-	*/
-	func getCoordinatorSelected() throws -> (any CoordinatorType)
+    
+    // ---------------------------------------------------------
+    // MARK: Associated Type
+    // ---------------------------------------------------------
+    
+    /// The associated type representing the page associated with the tabbar coordinator.
+    associatedtype PAGE
+    
+    // ---------------------------------------------------------
+    // MARK: Properties
+    // ---------------------------------------------------------
+    
+    /// The current page associated with the tabbar coordinator.
+    var currentPage: PAGE { get set }
+    
+    /// A subject for setting badge values.
+    var setBadge: PassthroughSubject<(String?, PAGE), Never> { get set }
+    
+    // ---------------------------------------------------------
+    // MARK: Functions
+    // ---------------------------------------------------------
+    
+    /// Retrieves the selected coordinator within the tabbar coordinator.
+    ///
+    /// - Returns: The selected coordinator.
+    func getCoordinatorSelected() throws -> (any CoordinatorType)
 }
 
+/// A type alias representing a coordinator that conforms to both `CoordinatorType` and `TabbarCoordinatorType`.
 public typealias TabbarCoordinatable = CoordinatorType & TabbarCoordinatorType

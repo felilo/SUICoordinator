@@ -64,7 +64,7 @@ enum HomeRoute: RouteType {
             case .detents(let viewModel):
                 return DetentsView(viewModel: viewModel)
             case .actionListView(let viewModel):
-                return ActionListView(viewModel: viewModel)
+                return NavigationActionListView(viewModel: viewModel)
         }
     }
 }
