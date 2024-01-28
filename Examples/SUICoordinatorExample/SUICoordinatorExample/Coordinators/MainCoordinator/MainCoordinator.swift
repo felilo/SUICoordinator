@@ -23,7 +23,6 @@
 //
 
 import SUICoordinator
-import Foundation
 
 class MainCoordinator: Coordinator<MainRoute> {
     

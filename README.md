@@ -40,7 +40,7 @@ enum HomeRoute: RouteType {
         }
     }
     
-    var view: View {
+    var view: Body {
         switch self {
             case .push(let viewModel):
                 return PushView(viewModel: viewModel)
@@ -51,7 +51,7 @@ enum HomeRoute: RouteType {
             case .detents(let viewModel):
                 return DetentsView(viewModel: viewModel)
             case .actionListView(let viewModel):
-                return ActionListView(viewModel: viewModel)
+                return NavigationActionListView(viewModel: viewModel)
         }
     }
 }
@@ -69,37 +69,37 @@ class HomeCoordinator: Coordinator<HomeRoute> {
         startFlow(route: .actionListView(viewModel: viewModel))
     }
     
-    func navigateToFirstView() {
+    func navigateToPushView() async {
         let viewModel = PushViewModel(coordinator: self)
-        router.navigate(to: .push(viewModel: viewModel))
+        await router.navigate(to: .push(viewModel: viewModel))
     }
     
-    func presentSheet() {
+    func presentSheet() async {
         let viewModel = SheetViewModel(coordinator: self)
-        router.navigate(to: .sheet(viewModel: viewModel))
+        await router.navigate(to: .sheet(viewModel: viewModel))
     }
     
-    func presentFullscreen() {
+    func presentFullscreen() async {
         let viewModel = FullscreenViewModel(coordinator: self)
-        router.navigate(to: .fullscreen(viewModel: viewModel))
+        await router.navigate(to: .fullscreen(viewModel: viewModel))
     }
     
-    func presentDetents() {
+    func presentDetents() async {
         let viewModel = DetentsViewModel(coordinator: self)
-        router.navigate(to: .detents(viewModel: viewModel))
+        await router.navigate(to: .detents(viewModel: viewModel))
     }
     
-    func presentTabbarCoordinator() {
+    func presentTabbarCoordinator() async {
         let coordinator = TabbarFlowCoordinator()
-        navigate(to: coordinator, presentationStyle: .sheet)
+        await navigate(to: coordinator, presentationStyle: .sheet)
     }
     
-    func close() {
-        router.close(completion: nil)
+    func close() async {
+        await router.close()
     }
     
-    func finsh() {
-        finishFlow(animated: true, completion: nil)
+    func finsh() async {
+        await finishFlow(animated: true)
     }
 }
 ```
@@ -115,12 +115,12 @@ class MainCoordinator: Coordinator<MainRoute> {
     
     override init() {
         super.init()
-        startFlow(route: .splash)
     }
     
-    override func start(animated: Bool = true, completion sucompletion: Completion? = nil) {
+    override func start(animated: Bool = true) async {
         let coordinator = HomeCoordinator()
-        navigate(to: coordinator, presentationStyle: .fullScreenCover)
+        async let _ = startFlow(route: .splash, animated: false)
+        await navigate(to: coordinator, presentationStyle: .fullScreenCover, animated: false)
     }
 }
 ```
@@ -231,10 +231,9 @@ The router is encharge to manage the navigation stack and coordinate the transit
           <li><b>to:</b> <code>Route</code>,</li>
           <li><b>presentationStyle:</b> <code>TransitionPresentationStyle?</code>, default: <code style="color: #ec6b6f;">nil</code>,</li>
           <li><b>animated:</b> <code>Bool?</code>, default <code style="color: #ec6b6f;">true</code>,</li>
-          <li><b>completion:</b> <code>(() -> Void)?</code>, default: <code style="color: #ec6b6f;">nil</code></li>
         </ul>
       </td>
-      <td>Allows you to navigate among the views that were defined in the Route. The types of presentation are Push, Sheet, Fullscreen and Detents</td>
+      <td>Is an async function, allows you to navigate among the views that were defined in the Route. The types of presentation are Push, Sheet, Fullscreen and Detents</td>
     </tr>
     <tr>
       <td><code style="color: blue;">present(_)</code></td>
@@ -243,40 +242,36 @@ The router is encharge to manage the navigation stack and coordinate the transit
           <li><b>_ view:</b> <code>ViewType</code></li>
           <li><b>presentationStyle:</b> <code>TransitionPresentationStyle?</code>, default: <code style="color: #ec6b6f;">nil</code>,</li>
           <li><b>animated:</b> <code>Bool?</code>, default <code style="color: #ec6b6f;">true</code>,</li>
-          <li><b>completion:</b> <code>(() -> Void)?</code>, default: <code style="color: #ec6b6f;">nil</code></li>
         </ul>
       </td>
-      <td>Presents a view such as Sheet, Fullscreen or Detents</td>
+      <td>Is an async function, presents a view such as Sheet, Fullscreen or Detents</td>
     </tr>
     <tr>
       <td><code style="color: blue;">pop(_)</code></td>
       <td> 
         <ul>
           <li><b>animated:</b> <code>Bool?</code>, default <code style="color: #ec6b6f;">true</code>,</li>
-          <li><b>completion:</b> <code>(() -> Void)?</code>, default: <code style="color: #ec6b6f;">nil</code></li>
         </ul>
       </td>
-      <td>Pops the top view from the navigation stack and updates the display.</td>
+      <td>Is an async function, pops the top view from the navigation stack and updates the display.</td>
     </tr>
     <tr>
       <td><code style="color: blue;">popToRoot(_)</code></td>
       <td> 
         <ul>
           <li><b>animated:</b> <code>Bool?</code>, default <code style="color: #ec6b6f;">true</code>,</li>
-          <li><b>completion:</b> <code>(() -> Void)?</code>, default: <code style="color: #ec6b6f;">nil</code></li>
         </ul>
       </td>
-      <td>Pops all the views on the stack except the root view and updates the display.</td>
+      <td>Is an async function, pops all the views on the stack except the root view and updates the display.</td>
     </tr>
     <tr>
       <td><code style="color: blue;">dismiss(_)</code></td>
       <td> 
         <ul>
           <li><b>animated:</b> <code>Bool?</code>, default <code style="color: #ec6b6f;">true</code>,</li>
-          <li><b>completion:</b> <code>(() -> Void)?</code>, default: <code style="color: #ec6b6f;">nil</code></li>
         </ul>
       </td>
-      <td>Dismisses the view that was presented modally by the view.</td>
+      <td>Is an async function, dismisses the view that was presented modally by the view.</td>
     </tr>
     <tr>
       <td><code style="color: blue;">popToView(_)</code></td>
@@ -284,20 +279,18 @@ The router is encharge to manage the navigation stack and coordinate the transit
         <ul>
           <li><b>_ view:</b> <code>T</code></li>
           <li><b>animated:</b> <code>Bool?</code>, default <code style="color: #ec6b6f;">true</code>,</li>
-          <li><b>completion:</b> <code>(() -> Void)?</code>, default: <code style="color: #ec6b6f;">nil</code></li>
         </ul>
       </td>
-      <td>Pops views until the specified view is at the top of the navigation stack. Example: <code>router.popToView(MyView.self)</code></td>
+      <td>Is an async function, pops views until the specified view is at the top of the navigation stack. Example: <code>router.popToView(MyView.self)</code></td>
     </tr>
     <tr>
       <td><code style="color: blue;">close(_)</code></td>
       <td> 
         <ul>
           <li><b>animated:</b> <code>Bool?</code>, default <code style="color: #ec6b6f;">true</code>,</li>
-          <li><b>completion:</b> <code>(() -> Void)?</code>, default: <code style="color: #ec6b6f;">nil</code></li>
         </ul>
       </td>
-      <td>Dismiss or pops the last view presented in the Coordinator.</td>
+      <td>Is an async function, dismiss or pops the last view presented in the Coordinator.</td>
     </tr>
   </tbody>
 </table>
@@ -329,20 +322,18 @@ Acts as a separate entity from the views, decoupling the navigation logic from t
           <li><b>to:</b> <code>Route</code></li>
           <li><b>transitionStyle:</b> <code>TransitionPresentationStyle?</code>, default: <code style="color: #ec6b6f;">automatic</code>,</li>
           <li><b>animated:</b> <code>Bool?</code>, default <code style="color: #ec6b6f;">true</code></li>
-          <li><b>completion:</b> <code>(() -> Void)?</code>, default: <code style="color: #ec6b6f;">nil</code></li>
         </ul>
       </td>
-      <td>Cleans the navigation stack and runs the navigation flow.</td>
+      <td>Is an async function, cleans the navigation stack and runs the navigation flow.</td>
     </tr>
     <tr>
       <td><code style="color: blue;">finishFlow(_)</code></td>
       <td> 
         <ul>
           <li><b>animated:</b> <code>Bool?</code>, default <code style="color: #ec6b6f;">true</code>,</li>
-          <li><b>completion:</b> <code>(() -> Void)?</code>, default: <code style="color: #ec6b6f;">nil</code></li>
         </ul>
       </td>
-      <td>Pops all the views on the stack including the root view, dismisses all the modal view and remove the current coordinator from the coordinator stack.</td>
+      <td>Is an async function, pops all the views on the stack including the root view, dismisses all the modal view and remove the current coordinator from the coordinator stack.</td>
     </tr>
     <tr>
       <td><code style="color: blue;">forcePresentation(_)</code></td>
@@ -352,10 +343,9 @@ Acts as a separate entity from the views, decoupling the navigation logic from t
           <li><b>presentationStyle:</b> <code>TransitionPresentationStyle?</code>, default: <code style="color: #ec6b6f;">automatic</code>,</li>
           <li><b>animated:</b> <code>Bool?</code>, default <code style="color: #ec6b6f;">true</code>,</li>
           <li><b>mainCoordinator:</b> <code>Coordinator?</code>, default: <code style="color: #ec6b6f;">mainCoordinator</code></li>
-          <li><b>completion:</b> <code>(() -> Void)?</code>, default: <code style="color: #ec6b6f;">nil</code></li>
         </ul>
       </td>
-      <td>Puts the current coordinator at the top of the coordinator stack, making it the active and visible coordinator. This feature is very useful to start the navigation flow from push notifications, notification center, atypical flows, etc.</td>
+      <td>Is an async function, puts the current coordinator at the top of the coordinator stack, making it the active and visible coordinator. This feature is very useful to start the navigation flow from push notifications, notification center, atypical flows, etc.</td>
     </tr>
     <tr>
       <td><code style="color: blue;">navigate(_)</code></td>
@@ -364,20 +354,18 @@ Acts as a separate entity from the views, decoupling the navigation logic from t
           <li><b>to:</b> <code>Coordinator</code></li>
           <li><b>presentationStyle:</b> <code>TransitionPresentationStyle?</code>, default: <code style="color: #ec6b6f;">automatic</code>,</li>
           <li><b>animated:</b> <code>Bool?</code>, default <code style="color: #ec6b6f;">true</code>,</li>
-          <li><b>completion:</b> <code>(() -> Void)?</code>, default: <code style="color: #ec6b6f;">nil</code></li>
         </ul>
       </td>
-      <td>Allows you to navigate among the Coordinators. It calls the <code>start()</code> function.</td>
+      <td>Is an async function, allows you to navigate among the Coordinators. It calls the <code>start()</code> function.</td>
     </tr>
     <tr>
       <td><code style="color: blue;">finishFlow(_)</code></td>
       <td> 
         <ul>
           <li><b>animated:</b> <code>Bool?</code>, default <code style="color: #ec6b6f;">true</code>,</li>
-          <li><b>completion:</b> <code>(() -> Void)?</code>, default: <code style="color: #ec6b6f;">nil</code></li>
         </ul>
       </td>
-      <td>Pops all the views on the stack including the root view, dismisses all the modal view and remove the current coordinator from the coordinator stack.</td>
+      <td>Is an async function, pops all the views on the stack including the root view, dismisses all the modal view and remove the current coordinator from the coordinator stack.</td>
     </tr>
   </tbody>
 </table>
@@ -416,10 +404,9 @@ It works the same as Coordinator but has the following additional features:
       <td> 
         <ul>
           <li><b>_values:</b> <code>[PAGE]?</code>, default <code style="color: #ec6b6f;">mainCoordinator</code>,</li>
-          <li><b>completion:</b> <code>(() -> Void)?</code>, default: <code style="color: #ec6b6f;">nil</code></li>
         </ul>
       </td>
-      <td>Updates the page set.</td>
+      <td>Is an async function, updates the page set.</td>
     </tr>
     <tr>
       <td><code style="color: blue;">getCoordinator(_)</code></td>
