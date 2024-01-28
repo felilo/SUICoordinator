@@ -104,6 +104,85 @@ class HomeCoordinator: Coordinator<HomeRoute> {
 }
 ```
 
+Then let's create a View and its ViewModel
+
+
+```swift
+import Foundation
+
+class ActionListViewModel: ObservableObject {
+    
+    let coordinator: HomeCoordinator
+    
+    init(coordinator: HomeCoordinator) {
+        self.coordinator = coordinator
+    }
+    
+    func navigateToPushView() async {
+        await coordinator.navigateToPushView()
+    }
+    
+    func presentSheet() async {
+        await coordinator.presentSheet()
+    }
+    
+    func presentFullscreen() async {
+        await coordinator.presentFullscreen()
+    }
+    
+    func presentDetents() async {
+        await coordinator.presentDetents()
+    }
+    
+    func presentTabbarCoordinator() async {
+        await coordinator.presentTabbarCoordinator()
+    }
+    
+    func finsh() async {
+        await coordinator.finsh()
+    }
+    
+    func showFinishButton() -> Bool {
+        !(coordinator.parent is MainCoordinator)
+    }
+}
+```
+
+```swift
+import SwiftUI
+
+struct NavigationActionListView: View {
+    
+    typealias ViewModel = ActionListViewModel
+    @StateObject var viewModel: ViewModel
+    
+    var body: some View {
+        List {
+            Button("Push NavigationView") {
+                Task { await viewModel.navigateToPushView() }
+            }
+            
+            Button("Presents SheetView") {
+                Task { await viewModel.presentSheet() }
+            }
+            
+            Button("Presents FullscreenView") {
+                Task { await viewModel.presentFullscreen() }
+            }
+            
+            Button("Presents DetentsView") {
+                Task { await viewModel.presentDetents() }
+            }
+            
+            Button("Presents Tabbar Coordinator") {
+                Task { await viewModel.presentTabbarCoordinator() }
+            }
+        }
+        .navigationTitle("Navigation Action List")
+    }
+}
+```
+
 _____
 
 ### 3. Create MainCoordinator and its Routes
