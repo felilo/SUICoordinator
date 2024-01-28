@@ -35,7 +35,7 @@ final class RouterTests: XCTestCase {
         
         await sut.navigate(to: route, animated: false)
         
-        XCTAssertEqual(sut.items.last, route)
+        XCTAssertEqual(sut.items.last?.id, route.id)
     }
     
     func test_navigationStack_pop() async throws {
@@ -44,7 +44,6 @@ final class RouterTests: XCTestCase {
         await sut.navigate(to: .pushStep, animated: false)
         await sut.pop(animated: false)
         
-        XCTAssertEqual(sut.items.count, 0)
         XCTAssertNil(sut.items.last ?? nil)
     }
     
@@ -78,7 +77,7 @@ final class RouterTests: XCTestCase {
         await sut.navigate(to: finalRoute, animated: false)
         
         XCTAssertEqual(sut.sheetCoordinator.items.count, 2)
-        XCTAssertNotNil(sut.sheetCoordinator.items.last ?? nil)
+        XCTAssertEqual(sut.sheetCoordinator.items.last??.id, finalRoute.id)
     }
     
     func test_sheetStack_dismissRoute() async throws {

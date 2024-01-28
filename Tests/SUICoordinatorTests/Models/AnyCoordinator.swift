@@ -36,3 +36,10 @@ class OtherCoordinator: Coordinator<AnyStructRoute> {
         await startFlow(route: .init(presentationStyle: .detents([.medium])))
     }
 }
+
+class BaseCoordinator: Coordinator<RouteBase> {
+    override func start(animated: Bool = true) async {
+        let route = RouteBase(presentationStyle: .detents([.medium]), content: Text("Hello, RouteBase"))
+        await startFlow(route: route)
+    }
+}
