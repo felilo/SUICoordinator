@@ -57,5 +57,5 @@ struct TabbarActionListView: View {
 }
 
 #Preview {
-    ActionListView(viewModel: .init(coordinator: .init()))
+    NavigationActionListView(viewModel: .init(coordinator: .init()))
 }

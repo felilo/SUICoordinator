@@ -62,7 +62,7 @@ struct NavigationActionListView: View {
                 }
             }
         }
-        .navigationTitle("Navigation List")
+        .navigationTitle("Navigation Action List")
     }
 }
 

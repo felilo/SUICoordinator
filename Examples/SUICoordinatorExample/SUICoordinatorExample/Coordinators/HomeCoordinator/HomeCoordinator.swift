@@ -42,7 +42,7 @@ class HomeCoordinator: Coordinator<HomeRoute> {
     
     func navigateToPushView() async {
         let viewModel = PushViewModel(coordinator: self)
-        await router.navigate(to: .push(viewModel: viewModel), animated: false)
+        await router.navigate(to: .push(viewModel: viewModel))
     }
     
     func presentSheet() async {
@@ -52,7 +52,7 @@ class HomeCoordinator: Coordinator<HomeRoute> {
     
     func presentFullscreen() async {
         let viewModel = FullscreenViewModel(coordinator: self)
-        await router.navigate(to: .fullscreen(viewModel: viewModel), animated: false)
+        await router.navigate(to: .fullscreen(viewModel: viewModel))
     }
     
     func presentDetents() async {
