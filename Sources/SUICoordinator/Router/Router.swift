@@ -72,39 +72,34 @@ public class Router<Route: RouteType>: ObservableObject, RouterType {
 	// --------------------------------------------------------------------
 	
 	/// Navigates to a specific route with the specified transition style and animation
-	public func navigate(
+    @MainActor public func navigate(
 		to route: Route,
         presentationStyle: TransitionPresentationStyle? = nil,
-		animated: Bool = true,
-		completion: Completion? = nil
-	) -> Void {
+		animated: Bool = true
+	) async -> Void {
 		if (presentationStyle ?? route.presentationStyle) == .push {
-			return runActionWithAnimation(animated) { [weak self] in
-				self?.items.append(route)
-                completion?()
+			return await runActionWithAnimation(animated) { [weak self] in
+                return { self?.items.append(route) }
 			}
 		}
-		present(
+		await present(
 			route, 
             presentationStyle: presentationStyle,
-			animated: animated,
-			completion: completion)
+			animated: animated)
 	}
 	
 	/// Presents a view with the specified transition style and animation settings.
-	public func present(
+    @MainActor public func present(
 		_ view: Route,
         presentationStyle: TransitionPresentationStyle? = .sheet,
-		animated: Bool = true,
-		completion: Completion? = nil
-	) -> Void {
+		animated: Bool = true
+	) async -> Void {
 		
 		if (presentationStyle ?? view.presentationStyle) == .push {
-			return navigate(
+			return await navigate(
 				to: view,
                 presentationStyle: presentationStyle,
-				animated: animated,
-				completion: completion)
+				animated: animated)
 		}
 		
 		let item = SheetItem(
@@ -113,97 +108,82 @@ public class Router<Route: RouteType>: ObservableObject, RouterType {
 			animated: animated,
             presentationStyle: presentationStyle ?? view.presentationStyle)
 		
-		presentSheet(item: item, completion: completion)
+        await presentSheet(item: item)
 	}
 	
 	/// Pops the top view from the navigation stack.
-	public func pop(animated: Bool, completion: Completion? = nil) -> Void {
-		runActionWithAnimation(animated) { [weak self] in
-			self?.handlePopAction()
-			completion?()
+    @MainActor public func pop(animated: Bool) async -> Void {
+        await runActionWithAnimation(animated) { [weak self] in
+            return { self?.handlePopAction() }
 		}
 	}
 	
 	/// Pops to the root view in the navigation stack.
-	public func popToRoot(animated: Bool = true, completion: Completion? = nil) -> Void {
-		runActionWithAnimation(animated) { [weak self] in
-			self?.items.removeAll()
-			completion?()
+    @MainActor public func popToRoot(animated: Bool = true) async -> Void {
+		await runActionWithAnimation(animated) { [weak self] in
+            return { self?.items.removeAll() }
 		}
 	}
 	
 	/// Pops to a specific view in the navigation stack.
-	public func popToView<T>(
-		_ view: T,
-		animated: Bool = true,
-		completion: ((Bool) -> Void)? = nil
-	) -> Void {
-		
+    @MainActor public func popToView<T>(_ view: T, animated: Bool = true) async -> Bool {
 		let name: (Any) -> String = { String(describing: $0.self) }
-		guard let index = items.firstIndex(where: { name($0) == name(view) }) else {
-			completion?(false)
-			return
-		}
+        guard let index = items.firstIndex(where: { name($0) == name(view) }) else { return false }
         
         let position = index + 1
-        
-        if position >= items.count {
-            completion?(true)
-            return
-        }
-        
         let range = position..<items.count
-		runActionWithAnimation(animated) { [weak self] in
-            self?.items.remove(atOffsets: IndexSet.init(integersIn: range))
-			completion?(true)
+        if position >= items.count { return true }
+        
+		await runActionWithAnimation(animated) { [weak self] in
+            return { self?.items.remove(atOffsets: IndexSet.init(integersIn: range)) }
 		}
+        
+        return true
 	}
 	
 	/// Dismisses the top view or coordinator in the navigation stack.
-	public func dismiss(animated: Bool = true, completion: Completion?) -> Void {
-		runActionWithAnimation(animated) { [weak self] in
-			self?.sheetCoordinator.removeLastSheet(animated: animated, action: completion)
+    @MainActor public func dismiss(animated: Bool = true) async -> Void {
+		await runActionWithAnimation(animated) { [weak self] in
+			await self?.sheetCoordinator.removeLastSheet(animated: animated)
+            return { }
 		}
 	}
 	
 	/// Closes the top view or coordinator in the navigation stack.
-	public func close(animated: Bool = true, finishFlow: Bool = false, completion: Completion?) -> Void {
+    @MainActor public func close(animated: Bool = true, finishFlow: Bool = false) async -> Void {
 		if finishFlow {
 			if let parent = coordinator?.parent {
-				parent.dismissLastSheet(animated: animated, completion: completion)
-			} else {
-				completion?()
+				await parent.dismissLastSheet(animated: animated)
 			}
 			
 		} else if sheetCoordinator.items.isEmpty {
-			pop(animated: animated, completion: completion)
+            await pop(animated: animated)
 		} else {
-			dismiss(animated: animated, completion: completion)
+			await dismiss(animated: animated)
 		}
 	}
 	
 	/// Cleans up the navigation stack and associated views or coordinators.
-    public func clean(animated: Bool, withMainView: Bool = true, completion: Completion? = nil) -> Void {
-        runActionWithAnimation(animated) { [weak self] in
-            self?.sheetCoordinator.clean(animated: animated) {
+    @MainActor public func clean(animated: Bool, withMainView: Bool = true) async -> Void {
+        await runActionWithAnimation(animated) { [weak self] in
+            await self?.sheetCoordinator.clean(animated: animated)
+            return { 
                 self?.items = []
                 self?.coordinator = nil
                 if withMainView { self?.mainView = nil }
-                completion?()
             }
         }
 	}
 	
 	/// Restarts the navigation flow with the specified animation settings.
-	public func restart(animated: Bool, completion: Completion? = nil) -> Void {
-		popToRoot(animated: animated) { [weak self] in
-			self?.sheetCoordinator.clean(animated: animated, action: completion)
-		}
+    @MainActor public func restart(animated: Bool) async -> Void {
+		await popToRoot(animated: animated)
+        await sheetCoordinator.clean(animated: animated)
 	}
 	
 	/// Presents a sheet with the specified item and completion action.
-	func presentSheet(item: SheetItem<(any View)>, completion: Completion? = nil) {
-        sheetCoordinator.presentSheet(item, animated: item.animated, action: completion)
+    @MainActor func presentSheet(item: SheetItem<(any View)>) async -> Void {
+        await sheetCoordinator.presentSheet(item, animated: item.animated)
 	}
 }
 
@@ -214,19 +194,12 @@ fileprivate extension Router {
 	// MARK: Helper funcs
 	// --------------------------------------------------------------------
 	
-	/// Executes the specified action on the main thread.
-	private func runInMainThread(_ action: @escaping Completion) {
-		guard !Thread.isMainThread  else { return action() }
-		DispatchQueue.main.async { action() }
-	}
-	
 	/// Executes the specified action with animation based on the provided settings.
-	private func runActionWithAnimation(_ animated: Bool, action: @escaping Completion ) {
-		runInMainThread {
-			var transaction = Transaction()
-			transaction.disablesAnimations = !animated
-			withTransaction(transaction) { action() }
-		}
+    @MainActor private func runActionWithAnimation(_ animated: Bool, action: @escaping () async -> (() -> Void) ) async {
+        var transaction = Transaction()
+        transaction.disablesAnimations = !animated
+        let customAction = await action()
+        withTransaction(transaction, customAction)
 	}
 	
 	/// Handles the pop action by updating the navigation stack.

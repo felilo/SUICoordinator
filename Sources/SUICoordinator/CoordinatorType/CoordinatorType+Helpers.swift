@@ -40,14 +40,12 @@ extension CoordinatorType {
 	 
 	 - Parameters:
 			- animated: A flag indicating whether the empty action should be animated.
-			- completion: A closure to be executed upon completion.
 	 */
 	func cleanView(
         animated: Bool = false,
-        withMainView: Bool = true,
-        completion: Completion? = nil
-    ) {
-		router.clean(animated: animated, withMainView: withMainView, completion: completion)
+        withMainView: Bool = true
+    ) async {
+		await router.clean(animated: animated, withMainView: withMainView)
 		parent = nil
 	}
 	
@@ -77,17 +75,14 @@ extension CoordinatorType {
 	 
 	 - Parameters:
 			- coordinator: The type-erased coordinator to be removed.
-			- completion: A closure to be executed upon completion.
 	 */
-	func removeChild(coordinator : TCoordinatorType, completion: Completion? = nil) {
+	func removeChild(coordinator : TCoordinatorType) async {
 		guard let index = children.firstIndex(where: {$0.uuid == coordinator.uuid}) else {
-			completion?()
 			return
 		}
 		children.remove(at: index)
-		coordinator.removeChildren { [weak self] in
-			self?.removeChild(coordinator: coordinator, completion: completion)
-		}
+		await coordinator.removeChildren()
+        await removeChild(coordinator: coordinator)
 	}
 	
 	/**
@@ -95,16 +90,11 @@ extension CoordinatorType {
 	 
 	 - Parameters:
 			- animated: A flag indicating whether the removal action should be animated.
-			- completion: A closure to be executed upon completion.
 	 */
-	func removeChildren(animated: Bool = false, _ completion: Completion? = nil){
-		guard let first = children.first else {
-			completion?()
-			return
-		}
-		first.handleFinish(animated: animated, withDissmis: false) { [weak self] in
-			self?.removeChildren(completion)
-		}
+	func removeChildren(animated: Bool = false) async {
+		guard let first = children.first else { return }
+		await first.handleFinish(animated: animated, withDissmis: false)
+        await removeChildren()
 	}
 	
 	/**
@@ -137,28 +127,25 @@ extension CoordinatorType {
 	 
 	 - Parameters:
 			- animated: A flag indicating whether the dismissal action should be animated.
-			- completion: A closure to be executed upon completion.
 	 */
-	func dismissLastSheet(animated: Bool = true, completion: Completion? = nil) {
-		router.dismiss(animated: animated, completion: completion)
+	func dismissLastSheet(animated: Bool = true) async {
+		await router.dismiss(animated: animated)
 	}
 	
 	/**
 	 Empties the current coordinator.
 	 
 	 - Parameters:
-			- completion: A closure to be executed upon completion.
+        - animated: A flag indicating whether the dismissal action should be animated.
 	 */
-	func emptyCoordinator(animated: Bool, completion: Completion?) {
+	func emptyCoordinator(animated: Bool) async {
 		guard let parent = parent else {
-            return removeChildren() { [weak self] in
-                self?.router.restart(animated: animated, completion: completion)
-            }
+            await removeChildren()
+            return await router.restart(animated: animated)
 		}
 		
-		parent.removeChild(coordinator: self) { [weak self] in
-			self?.cleanView(animated: false, completion: completion)
-		}
+		await parent.removeChild(coordinator: self)
+        await cleanView(animated: false)
 	}
 	
 	/**
@@ -167,15 +154,13 @@ extension CoordinatorType {
 	 - Parameters:
 			- animated: A flag indicating whether the finish action should be animated.
 			- withDissmis: A flag indicating whether the dismissal action should be included.
-			- completion: A closure to be executed upon completion.
 	 */
-	func handleFinish(animated: Bool = true, withDissmis: Bool = true, completion: Completion?) {
+	func handleFinish(animated: Bool = true, withDissmis: Bool = true) async {
 		guard withDissmis else {
-            return emptyCoordinator(animated: animated, completion: completion)
+            return await emptyCoordinator(animated: animated)
 		}
-		router.close(animated: animated, finishFlow: true) { [weak self] in
-            self?.emptyCoordinator(animated: animated, completion: completion)
-		}
+		await router.close(animated: animated, finishFlow: true)
+        await emptyCoordinator(animated: animated)
 	}
     
     /**
@@ -184,25 +169,23 @@ extension CoordinatorType {
      - Parameters:
             - animated: A flag indicating whether the finish action should be animated.
             - withDissmis: A flag indicating whether the dismissal action should be included.
-            - completion: A closure to be executed upon completion.
      */
     func finish(
         animated: Bool = true,
-        withDissmis: Bool = true,
-        completion: Completion?
-    ) -> Void {
-        let handleFinish: (TCoordinatorType) -> Void = { coordinator in
-            coordinator.handleFinish(
+        withDissmis: Bool = true
+    ) async -> Void {
+        let handleFinish = { (coordinator: TCoordinatorType) async -> Void in
+            await coordinator.handleFinish(
                 animated: animated,
-                withDissmis: withDissmis,
-                completion: completion
+                withDissmis: withDissmis
             )
         }
         
         if (parent is (any TabbarCoordinatable)) {
-            router.close(animated: animated, finishFlow: true) { handleFinish(self.parent) }
+            await router.close(animated: animated, finishFlow: true)
+            await handleFinish(parent)
         } else {
-            handleFinish(self)
+            await handleFinish(self)
         }
     }
 }

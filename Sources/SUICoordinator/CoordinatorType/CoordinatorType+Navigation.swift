@@ -48,14 +48,12 @@ public extension CoordinatorType {
 	       - coordinator: The type-erased coordinator to navigate to.
 		   - transitionStyle: The transition style for the navigation.
 		   - animated: A flag indicating whether the navigation should be animated.
-		   - completion: A closure to be executed upon completion.
 	 */
 	func navigate(
 		to coordinator: TCoordinatorType,
         presentationStyle: TransitionPresentationStyle,
-		animated: Bool = true,
-		completion: Completion? = nil
-	) -> Void {
+		animated: Bool = true
+	) async -> Void {
 		startChildCoordinator(coordinator)
 		
 		let item = SheetItem(
@@ -63,7 +61,7 @@ public extension CoordinatorType {
 			animated: animated,
             presentationStyle: (presentationStyle != .push) ? presentationStyle :  .sheet)
 		
-		router.presentSheet(item: item, completion: completion)
+		await router.presentSheet(item: item)
 	}
     
     /**
@@ -71,13 +69,9 @@ public extension CoordinatorType {
      
         - Parameters:
             - animated: A flag indicating whether the finish action should be animated.
-            - completion: A closure to be executed upon completion.
      */
-    func finishFlow(animated: Bool, completion: Completion?) {
-        finish(
-            animated: animated,
-            withDissmis: true,
-            completion: completion)
+    @MainActor func finishFlow(animated: Bool) async -> Void {
+        await finish(animated: animated, withDissmis: true)
     }
     
     
@@ -89,15 +83,12 @@ public extension CoordinatorType {
             - transitionStyle: The transition style for the navigation. Default is nil.
             - animated: A flag indicating whether the navigation should be animated.
      */
-    func startFlow(
+    @MainActor func startFlow(
         route: Route,
         transitionStyle: TransitionPresentationStyle? = nil,
-        animated: Bool = true,
-        completion: (() -> Void)? = nil
-    ) {
-        router.restart(animated: animated) { [weak self] in
-            self?.router.mainView = route
-            completion?()
-        }
+        animated: Bool = true
+    ) async -> Void {
+        await router.restart(animated: animated)
+        router.mainView = route
     }
 }

@@ -26,13 +26,13 @@ import SwiftUI
 @testable import SUICoordinator
 
 class AnyCoordinator: Coordinator<AnyEnumRoute> {
-    override func start(animated: Bool = true, completion: Completion? = nil) {
-        startFlow(route: .pushStep, completion: completion)
+    override func start(animated: Bool = true) async {
+        await startFlow(route: .pushStep)
     }
 }
 
 class OtherCoordinator: Coordinator<AnyStructRoute> {
-    override func start(animated: Bool = true, completion: Completion? = nil) {
-        startFlow(route: .init(presentationStyle: .detents([.medium])), completion: completion)
+    override func start(animated: Bool = true) async {
+        await startFlow(route: .init(presentationStyle: .detents([.medium])))
     }
 }

@@ -34,9 +34,7 @@ import SwiftUI
  Example usage:
  ```swift
  let sheetCoordinator = SheetCoordinator<MyViewType>()
- sheetCoordinator.presentSheet(mySheetItem, animated: true) {
-	 // Completion block after presenting the sheet
- }
+ sheetCoordinator.presentSheet(mySheetItem, animated: true)
  */
 final public class SheetCoordinator<T>: ObservableObject {
 	
@@ -46,9 +44,6 @@ final public class SheetCoordinator<T>: ObservableObject {
 	
 	/// A type alias representing the sheet item containing a view conforming to the `View` protocol.
 	public typealias Item = SheetItem<T>
-	
-	/// A type alias representing a closure type for actions to be executed.
-	public typealias Completion = () -> Void
 	
 	// ---------------------------------------------------------
 	// MARK: Properties
@@ -99,9 +94,7 @@ final public class SheetCoordinator<T>: ObservableObject {
 
 		 Example usage:
 		 ```swift
-		 sheetCoordinator.presentSheet(mySheetItem, animated: true) {
-			 // Completion block after presenting the sheet
-		 }
+		 sheetCoordinator.presentSheet(mySheetItem, animated: true)
 		 ```
 
 		 - Parameters:
@@ -109,26 +102,24 @@ final public class SheetCoordinator<T>: ObservableObject {
 			- animated: A flag indicating whether the presentation should be animated. Default is true.
 			- action: A closure to be executed after presenting the sheet.
 	*/
-	public func presentSheet(
+    @MainActor public func presentSheet(
 		_ sheet: Item,
-		animated: Bool = true,
-		action: Completion? = nil
-	) -> Void {
+		animated: Bool = true
+	) async -> Void {
 		lastPresentationStyle = sheet.presentationStyle
 		
 		let runAction = { [weak self] () -> Void in
 			self?.items.append(sheet)
 			self?.removeAllNilItems()
-			action?()
 		}
 		
 		if animated {
 			items.append(nil)
-			return makeDelay(
+			await makeDelay(
 				animated: animated,
-				customTime: 60 / 1000, // 0.6 millisecon
-				action: runAction
+				customTime: 60 / 1000
 			)
+            return runAction()
 		}
 		
 		runAction()
@@ -139,25 +130,19 @@ final public class SheetCoordinator<T>: ObservableObject {
 
 		Example usage:
 		```swift
-		sheetCoordinator.removeLastSheet(animated: true) {
-			// Completion block after removing the last sheet
-		}
+		sheetCoordinator.removeLastSheet(animated: true)
 		```
 
 		- Parameters:
 		   - animated: A flag indicating whether the removal should be animated. Default is true.
 		   - action: A closure to be executed after removing the last sheet.
 	*/
-	func removeLastSheet(animated: Bool = true, action: Completion? = nil) -> Void {
-		guard !items.isEmpty, !isCleaning else {
-			action?()
-			return
-		}
+    @MainActor func removeLastSheet(animated: Bool = true) async -> Void {
+		guard !items.isEmpty, !isCleaning else { return }
+        
 		removeNilItems(at: totalItems)
-		makeDelay(animated: animated) { [weak self] in
-			self?.removeAllNilItems()
-			action?()
-		}
+		await makeDelay(animated: animated)
+        removeAllNilItems()
 	}
 	
 	/**
@@ -171,7 +156,7 @@ final public class SheetCoordinator<T>: ObservableObject {
 		 - Parameters:
 			- index: The index of the sheet item to be removed.
 	*/
-	func remove(at index: Int) {
+    @MainActor func remove(at index: Int) {
 		guard totalItems >= index, !isCleaning else { return }
 		items.remove(at: index)
 	}
@@ -181,27 +166,20 @@ final public class SheetCoordinator<T>: ObservableObject {
 
 		 Example usage:
 		 ```swift
-		 sheetCoordinator.clean(animated: true) {
-			 // Completion block after cleaning up the sheet items
-		 }
+		 sheetCoordinator.clean(animated: true)
 		 ```
 
 		 - Parameters:
 			- animated: A flag indicating whether the cleanup should be animated. Default is true.
 			- action: A closure to be executed after cleaning up the sheet items.
 	*/
-	func clean(animated: Bool = true, action: Completion? = nil) -> Void {
-		
-		guard !items.isEmpty, !isCleaning else {
-			action?()
-			return
-		}
+    @MainActor func clean(animated: Bool = true) async -> Void {
+		guard !items.isEmpty, !isCleaning else { return }
+        
 		isCleaning = true
 		removeNilItems(at: 0)
-		makeDelay(animated: animated){ [weak self] in
-			self?.resetValues()
-			action?()
-		}
+		await makeDelay(animated: animated)
+        resetValues()
 	}
 	
 	// ---------------------------------------------------------
@@ -268,16 +246,13 @@ final public class SheetCoordinator<T>: ObservableObject {
 			- customTime: A custom time interval for the delay. If nil, a default time interval is used.
 			- action: A closure to be executed after the delay.
 	*/
-	private func makeDelay(animated: Bool, customTime: Double? = nil, action: @escaping Completion) -> Void {
+    private func makeDelay(animated: Bool, customTime: Double? = nil) async -> Void {
 		var milliSeconds: Double
 		if let customTime {
 			milliSeconds = customTime
 		} else {
 			milliSeconds = (animated ? 600 : 300) / 1000
 		}
-        
-		DispatchQueue.main.asyncAfter(
-			deadline: .now() + ( milliSeconds )
-        ) { action() }
+        try? await Task.sleep(for: .seconds(milliSeconds))
 	}
 }

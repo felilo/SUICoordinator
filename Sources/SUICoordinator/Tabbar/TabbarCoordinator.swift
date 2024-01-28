@@ -87,7 +87,11 @@ open class TabbarCoordinator<Page>: Coordinator<RouteBase>, TabbarCoordinatorTyp
 		self.currentPage = currentPage
 		self.customView = customView
 		super.init()
-		setPages(pages, currentPage: currentPage, completion: nil)
+        
+        Task { [weak self] in
+            await self?.setPages(pages, currentPage: currentPage)
+        }
+		
 	}
 	
 	// ---------------------------------------------------------
@@ -105,17 +109,16 @@ open class TabbarCoordinator<Page>: Coordinator<RouteBase>, TabbarCoordinatorTyp
 		- Parameters:
 		   - animated: A flag indicating whether the start should be animated. Default is true.
 	*/
-    open override func start(animated: Bool = true, completion: Completion? = nil) {
+    open override func start(animated: Bool = true) async {
         let route = RouteBase(
             presentationStyle: presentationStyle,
             content: customView ?? TabbarCoordinatorView(viewModel: self)
         )
         
-        return startFlow(
+        await startFlow(
             route: route,
             transitionStyle: presentationStyle,
-            animated: animated,
-            completion: completion)
+            animated: animated)
 	}
 	
 	// ---------------------------------------------------------
@@ -140,27 +143,22 @@ open class TabbarCoordinator<Page>: Coordinator<RouteBase>, TabbarCoordinatorTyp
 	}
 	
 	/**
-		 Sets the pages for the tab bar coordinator with optional completion.
+		 Sets the pages for the tab bar coordinator.
 
 		 Example usage:
 		 ```swift
-		 tabbarCoordinator.setPages(myNewPages) {
-			 // Completion block after setting new pages
-		 }
+		 tabbarCoordinator.setPages(myNewPages)
 		 ```
 
 		 - Parameters:
 			- values: The new array of pages to set for the tab bar coordinator.
 			- currentPage: The new currently selected page. Default is nil.
-			- completion: A closure to be executed after setting the new pages. Default is nil.
 	*/
-	open func setPages(_ values: [Page], currentPage: Page? = nil, completion: (() -> Void)? = nil) {
-		handleUpdatePages(currentPage: currentPage) { [weak self] in
-			self?.setupPages(values)
-			self?.pages = values
-			self?.setCurrentPage(currentPage)
-            completion?()
-		}
+	open func setPages(_ values: [Page], currentPage: Page? = nil) async {
+		await removeChildren()
+        setupPages(values)
+        pages = values
+        setCurrentPage(currentPage)
 	}
 	
 	/**
@@ -221,26 +219,5 @@ open class TabbarCoordinator<Page>: Coordinator<RouteBase>, TabbarCoordinatorTyp
 		else { return  }
 		
 		currentPage = item
-	}
-	
-	/**
-		 Handles updates to the pages with optional completion.
-
-		 Example usage:
-		 ```swift
-		 tabbarCoordinator.handleUpdatePages(currentPage: myNewPage) {
-			 // Completion block after updating pages
-		 }
-		 ```
-
-		 - Parameters:
-			- currentPage: The new currently selected page. Default is nil.
-			- completion: A closure to be executed after updating the pages. Default is nil.
-	*/
-	private func handleUpdatePages(
-		currentPage: Page? = nil,
-		completion: (() -> Void)? = nil
-	) {
-		removeChildren(completion)
 	}
 }

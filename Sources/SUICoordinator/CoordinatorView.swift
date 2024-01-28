@@ -37,7 +37,7 @@ public struct CoordinatorView<Route: RouteType>: CoordinatorViewType, View {
 	// MARK: Properties
 	// --------------------------------------------------------------------
 	
-	var onClean: (() -> Void)?
+	var onClean: (() async -> Void)?
 	var onSetTag: ((String) -> Void)?
 	
 	// --------------------------------------------------------------------
@@ -46,7 +46,7 @@ public struct CoordinatorView<Route: RouteType>: CoordinatorViewType, View {
 	
 	init(
 		viewModel: Coordinator<Route>,
-		onClean: (() -> Void)? = nil,
+		onClean: (() async -> Void)? = nil,
 		onSetTag: ((String) -> Void)? = nil
 	) {
 		self._viewModel = .init(wrappedValue: viewModel)
@@ -60,12 +60,14 @@ public struct CoordinatorView<Route: RouteType>: CoordinatorViewType, View {
 	
 	public var body: some View {
 		RouterView(viewModel: viewModel.router)
-			.onViewDidLoad { [weak viewModel] in viewModel?.start() }
+            .onViewDidLoad { [weak viewModel] in
+                Task { await viewModel?.start() }
+            }
 	}
 	
 	// --------------------------------------------------------------------
 	// MARK: CoordinatorViewType
 	// --------------------------------------------------------------------
 	
-	func clean() { onClean?() }
+    func clean() { Task { await onClean?() } }
 }

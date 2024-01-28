@@ -48,7 +48,7 @@ enum AnyEnumRoute: RouteType {
     var view: Body {
         switch self {
             case .pushStep:
-                return Text("pushStep")
+                return PushStepView()
             case .pushStep2:
                 return Text("pushStep2")
             case .pushStep3:
@@ -60,6 +60,12 @@ enum AnyEnumRoute: RouteType {
             case .detentsStep:
                 return Text("detentsStep")
         }
+    }
+}
+
+struct PushStepView: View {
+    var body: some View {
+        Text("pushStep")
     }
 }
 

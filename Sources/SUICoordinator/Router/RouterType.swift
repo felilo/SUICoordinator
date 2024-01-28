@@ -26,12 +26,6 @@ public protocol RouterType: ObservableObject {
 	/// The associated type representing the possible routes or navigation actions that the router can handle.
 	associatedtype Route: RouteType
 	
-	// --------------------------------------------------------------------
-	// MARK: Typealias
-	// --------------------------------------------------------------------
-	
-	/// A closure type representing an action to be executed upon completion.
-	typealias Completion = () -> Void
 	
 	// --------------------------------------------------------------------
 	// MARK: Properties
@@ -57,9 +51,8 @@ public protocol RouterType: ObservableObject {
 			- route: The route to navigate to.
 			- transitionStyle: The transition style for the navigation. Default is nil.
 			- animated: A flag indicating whether the navigation should be animated.
-			- completion: A closure to be executed upon completion.
 	 */
-	func navigate(to route: Route, presentationStyle: TransitionPresentationStyle?, animated: Bool, completion: Completion?)
+	func navigate(to route: Route, presentationStyle: TransitionPresentationStyle?, animated: Bool) async
 	
 	/**
 	 Presents a view.
@@ -68,27 +61,24 @@ public protocol RouterType: ObservableObject {
 			- view: The view to be presented.
 			- transitionStyle: The transition style for the presentation. Default is nil.
 			- animated: A flag indicating whether the presentation should be animated.
-			- completion: A closure to be executed upon completion.
 	 */
-	func present(_ view: Route, presentationStyle: TransitionPresentationStyle?, animated: Bool, completion: Completion?)
+	func present(_ view: Route, presentationStyle: TransitionPresentationStyle?, animated: Bool) async
 	
 	/**
 	 Pops the current view from the navigation stack.
 	 
 		- Parameters:
 			- animated: A flag indicating whether the pop action should be animated.
-			- completion: A closure to be executed upon completion.
 	 */
-	func pop(animated: Bool, completion: Completion?)
+	func pop(animated: Bool) async
 	
 	/**
 	 Pops to the root view of the navigation stack.
 	 
 		- Parameters:
 			- animated: A flag indicating whether the pop action should be animated.
-			- completion: A closure to be executed upon completion.
 	 */
-	func popToRoot(animated: Bool, completion: Completion?)
+	func popToRoot(animated: Bool) async
 	
 	/**
 	 Pops to a specific view in the navigation stack.
@@ -96,27 +86,24 @@ public protocol RouterType: ObservableObject {
 		- Parameters:
 			- view: The view to which the navigation stack should be popped.
 			- animated: A flag indicating whether the pop action should be animated.
-			- completion: A closure to be executed upon completion.
 	 */
-	func popToView<T>(_ view: T, animated: Bool, completion: ((Bool) -> Void)?) -> Void
+	func popToView<T>(_ view: T, animated: Bool) async -> Bool
 	
 	/**
 	 Dismisses the current view.
 	 
 		- Parameters:
 			- animated: A flag indicating whether the dismissal action should be animated.
-			- completion: A closure to be executed upon completion.
 	 */
-	func dismiss(animated: Bool, completion: Completion?)
+	func dismiss(animated: Bool) async
 	
 	/**
 	 Cleans up the router's state.
 	 
 		- Parameters:
 			- animated: A flag indicating whether the cleanup action should be animated.
-			- completion: A closure to be executed upon completion.
 	 */
-	func clean(animated: Bool, withMainView: Bool, completion: Completion?) -> Void
+	func clean(animated: Bool, withMainView: Bool) async -> Void
 	
 	/**
 	 Closes the current view or flow.
@@ -124,16 +111,14 @@ public protocol RouterType: ObservableObject {
 		- Parameters:
 			- animated: A flag indicating whether the closing action should be animated.
 			- finishFlow: A flag indicating whether to finish the current flow.
-			- completion: A closure to be executed upon completion.
 	 */
-	func close(animated: Bool, finishFlow: Bool, completion: Completion?) -> Void
+	func close(animated: Bool, finishFlow: Bool) async -> Void
 	
 	/**
 	 Restarts the router.
 	 
 		- Parameters:
 			- animated: A flag indicating whether the restart action should be animated.
-			- completion: A closure to be executed upon completion.
 	 */
-	func restart(animated: Bool, completion: Completion?) -> Void
+	func restart(animated: Bool) async -> Void
 }

@@ -31,8 +31,6 @@ import SwiftUI
  Coordinators are responsible for coordinating the flow and navigation within an application. They manage the navigation hierarchy and facilitate communication between different parts of the app.
  
  Conforming types must provide an associated type `Route`, which represents the possible routes or navigation actions that the coordinator can handle.
- 
- Additionally, conforming types must define a type alias `Completion` representing a closure that takes no parameters and returns void.
  */
 
 public protocol CoordinatorType: SCHashable, AnyObject {
@@ -40,9 +38,6 @@ public protocol CoordinatorType: SCHashable, AnyObject {
 	// ---------------------------------------------------------
 	// MARK: typealias
 	// ---------------------------------------------------------
-	
-	/// A closure type representing a completion handler with no parameters and void return.
-	typealias Completion = (() -> Void)
 	
 	/// A type-erased coordinator type.
 	typealias TCoordinatorType = (any CoordinatorType)
@@ -85,5 +80,5 @@ public protocol CoordinatorType: SCHashable, AnyObject {
 	 
 	 Parameter animated: A flag indicating whether the start action should be animated.
 	 */
-    func start(animated: Bool, completion: Completion?) -> Void
+    func start(animated: Bool) async -> Void
 }

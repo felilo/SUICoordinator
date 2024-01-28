@@ -77,7 +77,7 @@ open class Coordinator<Route: RouteType>: ObservableObject, CoordinatorType {
 	parent: An optional parent coordinator. Default is nil.
 	
 	*/
-	public init() {
+    public init() {
 		self.router = .init()
 		self.uuid = "\(NSStringFromClass(type(of: self))) - \(UUID().uuidString)"
 		self.router.coordinator = self
@@ -91,7 +91,7 @@ open class Coordinator<Route: RouteType>: ObservableObject, CoordinatorType {
 	public var view: any View {
 		CoordinatorView(
 			viewModel: self,
-			onClean: { [weak self] in self?.clean() },
+			onClean: { [weak self] in await self?.clean() },
 			onSetTag: { [weak self] tag in self?.tagId = tag }
 		)
 	}
@@ -107,7 +107,7 @@ open class Coordinator<Route: RouteType>: ObservableObject, CoordinatorType {
 		- animated: A flag indicating whether the start should be animated. Default is true.
 	- Important: Subclasses should override this method with their own custom implementation.
 	*/
-    open func start(animated: Bool = true, completion: (() -> Void)? = nil) {
+    open func start(animated: Bool = true) async {
 		fatalError("This method must be overwritten")
 	}
 	
@@ -124,11 +124,10 @@ open class Coordinator<Route: RouteType>: ObservableObject, CoordinatorType {
 	open func forcePresentation(
 		animated: Bool = true,
         presentationStyle: TransitionPresentationStyle = .sheet,
-		mainCoordinator: (any CoordinatorType)? = nil,
-        completion: Completion? = nil
-	) throws {
+		mainCoordinator: (any CoordinatorType)? = nil
+	) async throws {
         let topCoordinator = try mainCoordinator?.topCoordinator()
-		topCoordinator?.navigate(to: self, presentationStyle: presentationStyle, completion: completion)
+		await topCoordinator?.navigate(to: self, presentationStyle: presentationStyle)
 	}
 	
 	/**
@@ -136,7 +135,7 @@ open class Coordinator<Route: RouteType>: ObservableObject, CoordinatorType {
 
 	Important: Subclasses should override this method with their own custom implementation.
 	*/
-	private func clean() {
-		finish(animated: false, withDissmis: false, completion: nil)
+	private func clean() async {
+		await finish(animated: false, withDissmis: false)
 	}
 }
