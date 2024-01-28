@@ -24,61 +24,41 @@
 
 import SwiftUI
 
-/**
- A protocol defining the requirements for a page data source.
-
- The `PageDataSource` protocol includes properties and methods necessary for providing information about a page in a tab bar or similar interface.
-
- - Important: The `title` property represents the title view associated with the page.
-
- - Note: The `icon` property represents the icon view associated with the page.
-
- - Warning: The `position` property specifies the position of the page in the interface.  It must start from 0 and the numbers be consecutive
-
- Example usage:
- ```swift
- // Conform to the PageDataSource protocol and implement the required properties.
- struct MyPageDataSource: PageDataSource {
-	 var title: some View {
-		 // Implementation of the title view
-	 }
-
-	 var icon: some View {
-		 // Implementation of the icon view
-	 }
-
-	 var position: Int {
-		 // Implementation of the position property
-	 }
- }
- */
+/// A protocol representing a data source for a page in a tabbar-based navigation.
+///
+/// Page data sources provide information such as title, icon, and position for a tabbar page.
 public protocol PageDataSource: SCHashable {
-	
-	
-	typealias View = (any SwiftUI.View)
-	
-	// ---------------------------------------------------------
-	// MARK: Properties
-	// ---------------------------------------------------------
-	
-	/// The title view associated with the page.
-	@ViewBuilder
-	var title: View  { get }
-	
-	/// The icon view associated with the page.
-	@ViewBuilder
-	var icon: View { get }
-	
-	/// The position of the page in the interface.
-	var position: Int { get }
+    
+    /// A type alias representing a SwiftUI view.
+    typealias View = (any SwiftUI.View)
+    
+    // ---------------------------------------------------------
+    // MARK: Properties
+    // ---------------------------------------------------------
+    
+    /// The title view for the page.
+    @ViewBuilder
+    var title: View  { get }
+    
+    /// The icon view for the page.
+    @ViewBuilder
+    var icon: View { get }
+    
+    /// The position of the page in the tabbar.
+    var position: Int { get }
 }
 
-
+/// An extension for `PageDataSource` to provide a method for sorting data sources by position.
 public extension PageDataSource where Self: CaseIterable {
-	
-	static func sortedByPosition() -> [Self] {
-		Self.allCases.sorted(by: { $0.position < $1.position })
-	}
+    
+    /// Sorts all cases of `PageDataSource` by their position.
+    ///
+    /// - Returns: An array of sorted `PageDataSource` cases.
+    static func sortedByPosition() -> [Self] {
+        Self.allCases.sorted(by: { $0.position < $1.position })
+    }
 }
 
+/// A type alias representing a page in a tabbar navigation with both `PageDataSource` and `TabbarNavigationRouter` conformances.
 public typealias TabbarPage = PageDataSource & TabbarNavigationRouter
+

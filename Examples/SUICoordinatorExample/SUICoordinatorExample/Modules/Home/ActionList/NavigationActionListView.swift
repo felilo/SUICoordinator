@@ -24,7 +24,7 @@
 
 import SwiftUI
 
-struct ActionListView: View {
+struct NavigationActionListView: View {
     
     typealias ViewModel = ActionListViewModel
     
@@ -67,5 +67,5 @@ struct ActionListView: View {
 }
 
 #Preview {
-    ActionListView(viewModel: .init(coordinator: .init()))
+    NavigationActionListView(viewModel: .init(coordinator: .init()))
 }

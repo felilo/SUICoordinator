@@ -26,233 +26,148 @@ import Foundation
 import SwiftUI
 
 
-/**
- A class representing a sheet coordinator in the Coordinator pattern.
-
- SheetCoordinator manages the presentation and removal of sheet views within an application. It facilitates the coordination of sheet presentations and provides methods for managing the sheet stack.
-
- Example usage:
- ```swift
- let sheetCoordinator = SheetCoordinator<MyViewType>()
- sheetCoordinator.presentSheet(mySheetItem, animated: true)
- */
+/// A class representing a coordinator for managing and presenting sheets.
+///
+/// Sheet coordinators handle the presentation and removal of sheets in a coordinator-based architecture.
 final public class SheetCoordinator<T>: ObservableObject {
-	
-	// ---------------------------------------------------------
-	// MARK: typealias
-	// ---------------------------------------------------------
-	
-	/// A type alias representing the sheet item containing a view conforming to the `View` protocol.
-	public typealias Item = SheetItem<T>
-	
-	// ---------------------------------------------------------
-	// MARK: Properties
-	// ---------------------------------------------------------
-	
-	/// The stack of sheet items managed by the coordinator.
-	@Published var items: [Item?]
-	
-	/// A flag indicating whether the coordinator is in the process of cleaning up.
-	private var isCleaning: Bool = false
-	
-	/// The presentation style of the last presented sheet.
-	public private (set) var lastPresentationStyle: TransitionPresentationStyle?
-	
-	// ---------------------------------------------------------
-	// MARK: Constructor
-	// ---------------------------------------------------------
-	
-	/**
-		 Initializes a new sheet coordinator conforming to this protocol.
-
-		 Example usage:
-		 ```swift
-		 let sheetCoordinator: SheetCoordinator = MySheetCoordinator()
-		 ```
-
-		 - Note: The `init` method initializes the sheet coordinator with an empty stack of sheet items.
-	*/
-	public init() {
-		items = []
-	}
-	
-	// ---------------------------------------------------------
-	// MARK: Computed vars
-	// ---------------------------------------------------------
-	
-	/// The total number of sheet items in the stack.
-	var totalItems: Int {
-		items.count - 1
-	}
-	
-	// ---------------------------------------------------------
-	// MARK: Helper funcs
-	// ---------------------------------------------------------
-	
-	/**
-		 Presents a sheet with the specified item asynchronously.
-
-		 Example usage:
-		 ```swift
-		 sheetCoordinator.presentSheet(mySheetItem, animated: true)
-		 ```
-
-		 - Parameters:
-			- sheet: The sheet item to be presented.
-			- animated: A flag indicating whether the presentation should be animated. Default is true.
-			- action: A closure to be executed after presenting the sheet.
-	*/
-    @MainActor public func presentSheet(
-		_ sheet: Item,
-		animated: Bool = true
-	) async -> Void {
-		lastPresentationStyle = sheet.presentationStyle
-		
-		let runAction = { [weak self] () -> Void in
-			self?.items.append(sheet)
-			self?.removeAllNilItems()
-		}
-		
-		if animated {
-			items.append(nil)
-			await makeDelay(
-				animated: animated,
-				customTime: 60 / 1000
-			)
+    
+    // ---------------------------------------------------------
+    // MARK: typealias
+    // ---------------------------------------------------------
+    
+    /// A type alias representing the sheet item containing a view conforming to the `View` protocol.
+    public typealias Item = SheetItem<T>
+    
+    // ---------------------------------------------------------
+    // MARK: Properties
+    // ---------------------------------------------------------
+    
+    /// The stack of sheet items managed by the coordinator.
+    @Published var items: [Item?]
+    
+    /// A flag indicating whether the coordinator is in the process of cleaning up.
+    private var isCleaning: Bool = false
+    
+    /// The presentation style of the last presented sheet.
+    public private (set) var lastPresentationStyle: TransitionPresentationStyle?
+    
+    // ---------------------------------------------------------
+    // MARK: Constructor
+    // ---------------------------------------------------------
+    
+    /// Initializes a new instance of `SheetCoordinator`.
+    public init() {
+        items = []
+    }
+    
+    // ---------------------------------------------------------
+    // MARK: Computed vars
+    // ---------------------------------------------------------
+    
+    /// The total number of sheet items in the stack.
+    var totalItems: Int {
+        items.count - 1
+    }
+    
+    // ---------------------------------------------------------
+    // MARK: Helper funcs
+    // ---------------------------------------------------------
+    
+    /// Presents a sheet with the specified item.
+    ///
+    /// - Parameters:
+    ///   - sheet: The item representing the sheet to present.
+    ///   - animated: A boolean value indicating whether to animate the sheet presentation.
+    @MainActor public func presentSheet(_ sheet: Item, animated: Bool = true) async -> Void {
+        lastPresentationStyle = sheet.presentationStyle
+        
+        let runAction = { [weak self] () -> Void in
+            self?.items.append(sheet)
+            self?.removeAllNilItems()
+        }
+        
+        if animated {
+            items.append(nil)
+            await makeDelay(
+                animated: animated,
+                customTime: 60 / 1000
+            )
             return runAction()
-		}
-		
-		runAction()
-	}
-	
-	/**
-		Removes the last presented sheet asynchronously.
-
-		Example usage:
-		```swift
-		sheetCoordinator.removeLastSheet(animated: true)
-		```
-
-		- Parameters:
-		   - animated: A flag indicating whether the removal should be animated. Default is true.
-		   - action: A closure to be executed after removing the last sheet.
-	*/
+        }
+        
+        runAction()
+    }
+    
+    /// Removes the last presented sheet.
+    ///
+    /// - Parameters:
+    ///   - animated: A boolean value indicating whether to animate the removal.
     @MainActor func removeLastSheet(animated: Bool = true) async -> Void {
-		guard !items.isEmpty, !isCleaning else { return }
+        guard !items.isEmpty, !isCleaning else { return }
         
-		removeNilItems(at: totalItems)
-		await makeDelay(animated: animated)
+        removeNilItems(at: totalItems)
+        await makeDelay(animated: animated)
         removeAllNilItems()
-	}
-	
-	/**
-		 Removes a sheet item at the specified index.
-
-		 Example usage:
-		 ```swift
-		 sheetCoordinator.remove(at: 0)
-		 ```
-
-		 - Parameters:
-			- index: The index of the sheet item to be removed.
-	*/
+    }
+    
+    /// Removes the item at the specified index.
+    ///
+    /// - Parameters:
+    ///   - index: The index of the item to remove.
     @MainActor func remove(at index: Int) {
-		guard totalItems >= index, !isCleaning else { return }
-		items.remove(at: index)
-	}
-	
-	/**
-		 Removes all sheet items and their corresponding views asynchronously.
-
-		 Example usage:
-		 ```swift
-		 sheetCoordinator.clean(animated: true)
-		 ```
-
-		 - Parameters:
-			- animated: A flag indicating whether the cleanup should be animated. Default is true.
-			- action: A closure to be executed after cleaning up the sheet items.
-	*/
+        guard totalItems >= index, !isCleaning else { return }
+        items.remove(at: index)
+    }
+    
+    /// Cleans up the sheet coordinator, optionally animating the cleanup process.
+    ///
+    /// - Parameters:
+    ///   - animated: A boolean value indicating whether to animate the cleanup process.
     @MainActor func clean(animated: Bool = true) async -> Void {
-		guard !items.isEmpty, !isCleaning else { return }
+        guard !items.isEmpty, !isCleaning else { return }
         
-		isCleaning = true
-		removeNilItems(at: 0)
-		await makeDelay(animated: animated)
+        isCleaning = true
+        removeNilItems(at: 0)
+        await makeDelay(animated: animated)
         resetValues()
-	}
-	
-	// ---------------------------------------------------------
-	// MARK: Private helper funcs
-	// ---------------------------------------------------------
-	
-	/**
-		 Removes all nil items from the sheet stack.
-
-		 Example usage:
-		 ```swift
-		 sheetCoordinator.removeAllNilItems()
-		 ```
-
-		 - Note: The `removeAllNilItems` method removes all nil items from the sheet stack.
-	*/
-	private func removeAllNilItems() {
-		items.removeAll(where: { $0 == nil || $0?.view == nil })
-	}
-	
-	/**
-		 Removes the nil item at the specified index from the sheet stack.
-
-		 Example usage:
-		 ```swift
-		 sheetCoordinator.removeNilItems(at: 0)
-		 ```
-
-		 - Parameters:
-			- index: The index of the nil item to be removed.
-	*/
-	private func removeNilItems(at index: Int) {
-		items[index] = nil
-	}
-	
-	/**
-		 Resets the values of the sheet coordinator.
-
-		 Example usage:
-		 ```swift
-		 sheetCoordinator.resetValues()
-		 ```
-
-		 - Note: The `resetValues` method sets the sheet coordinator's properties to their default values.
-	*/
-	private func resetValues() {
-		items = []
-		lastPresentationStyle = nil
-		isCleaning = false
-	}
-	
-	/**
-		 Introduces a delay before executing an action.
-
-		 Example usage:
-		 ```swift
-		 sheetCoordinator.makeDelay(animated: true) {
-			 // Action to be executed after the delay
-		 }
-		 ```
-
-		 - Parameters:
-			- animated: A flag indicating whether the delay should be based on animation time. Default is true.
-			- customTime: A custom time interval for the delay. If nil, a default time interval is used.
-			- action: A closure to be executed after the delay.
-	*/
+    }
+    
+    // ---------------------------------------------------------
+    // MARK: Private helper funcs
+    // ---------------------------------------------------------
+    
+    /// Removes all `nil` items from the items array.
+    private func removeAllNilItems() {
+        items.removeAll(where: { $0 == nil || $0?.view == nil })
+    }
+    
+    /// Removes `nil` items at the specified index.
+    ///
+    /// - Parameters:
+    ///   - index: The index at which to remove `nil` items.
+    private func removeNilItems(at index: Int) {
+        items[index] = nil
+    }
+    
+    /// Resets values associated with the sheet coordinator.
+    private func resetValues() {
+        items = []
+        lastPresentationStyle = nil
+        isCleaning = false
+    }
+    
+    /// Delays execution optionally with a custom time.
+    ///
+    /// - Parameters:
+    ///   - animated: A boolean value indicating whether to animate the delay.
+    ///   - customTime: An optional custom time for the delay.
     private func makeDelay(animated: Bool, customTime: Double? = nil) async -> Void {
-		var milliSeconds: Double
-		if let customTime {
-			milliSeconds = customTime
-		} else {
-			milliSeconds = (animated ? 600 : 300) / 1000
-		}
+        var milliSeconds: Double
+        if let customTime {
+            milliSeconds = customTime
+        } else {
+            milliSeconds = (animated ? 600 : 300) / 1000
+        }
         try? await Task.sleep(for: .seconds(milliSeconds))
-	}
+    }
 }

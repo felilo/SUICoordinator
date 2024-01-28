@@ -25,60 +25,59 @@
 import Foundation
 import SwiftUI
 
-/**
- Protocol defining the requirements for a coordinator following the Coordinator pattern.
- 
- Coordinators are responsible for coordinating the flow and navigation within an application. They manage the navigation hierarchy and facilitate communication between different parts of the app.
- 
- Conforming types must provide an associated type `Route`, which represents the possible routes or navigation actions that the coordinator can handle.
- */
-
+/// A protocol representing a coordinator in the coordinator pattern.
+///
+/// Coordinators are responsible for the navigation flow and business logic
+/// of a specific module or feature in an application.
+///
+/// - Important: Adopt this protocol in your custom coordinator implementations.
 public protocol CoordinatorType: SCHashable, AnyObject {
-	
-	// ---------------------------------------------------------
-	// MARK: typealias
-	// ---------------------------------------------------------
-	
-	/// A type-erased coordinator type.
-	typealias TCoordinatorType = (any CoordinatorType)
-	
-	// ---------------------------------------------------------
-	// MARK: associatedtype
-	// ---------------------------------------------------------
-	
-	/// The associated type representing the possible routes or navigation actions that the coordinator can handle.
-	associatedtype Route: RouteType
-	
-	// ---------------------------------------------------------
-	// MARK: Properties
-	// ---------------------------------------------------------
-	
-	/// A unique identifier for the coordinator.
-	var uuid: String { get set }
-	
-	/// An optional identifier for tagging purposes.
-	var tagId: String? { get set }
-	
-	/// The parent coordinator, allowing for hierarchical coordination.
-	var parent: TCoordinatorType! { get set }
-	
-	/// The array of child coordinators associated with the current coordinator.
-	var children: [TCoordinatorType] { get set }
-	
-	/// The router responsible for handling the navigation stack.
-	var router: Router<Route> { get set }
-	
-	/// The associated view for the coordinator, conforming to the View protocol.
-	var view: (any View) { get }
-	
-	// ---------------------------------------------------------
-	// MARK: Helpers func
-	// ---------------------------------------------------------
-	
-	/**
-	 Starts the coordinator, initiating its functionality.
-	 
-	 Parameter animated: A flag indicating whether the start action should be animated.
-	 */
+    
+    // ---------------------------------------------------------
+    // MARK: Type Aliases
+    // ---------------------------------------------------------
+    
+    /// A type alias representing any coordinator conforming to CoordinatorType.
+    typealias TCoordinatorType = (any CoordinatorType)
+    
+    // ---------------------------------------------------------
+    // MARK: Associated Type
+    // ---------------------------------------------------------
+    
+    /// The associated type representing the route associated with the coordinator.
+    associatedtype Route: RouteType
+    
+    // ---------------------------------------------------------
+    // MARK: Properties
+    // ---------------------------------------------------------
+    
+    /// The unique identifier for the coordinator.
+    var uuid: String { get set }
+    
+    /// An optional tag identifier for additional context or identification.
+    var tagId: String? { get set }
+    
+    /// The parent coordinator, if any, to which this coordinator is a child.
+    var parent: TCoordinatorType! { get set }
+    
+    /// An array of child coordinators associated with this coordinator.
+    var children: [TCoordinatorType] { get set }
+    
+    /// The router responsible for navigation within the coordinator.
+    var router: Router<Route> { get set }
+    
+    /// The view associated with the coordinator.
+    var view: (any View) { get }
+    
+    // ---------------------------------------------------------
+    // MARK: Helper Functions
+    // ---------------------------------------------------------
+    
+    /// Start the coordinator, triggering the initial navigation or setup.
+    ///
+    /// - Parameters:
+    ///   - animated: A Boolean value indicating whether to animate the start transition.
+    /// - Returns: An asynchronous void task representing the start process.
     func start(animated: Bool) async -> Void
 }
+

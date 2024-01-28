@@ -25,155 +25,128 @@
 import Foundation
 
 extension CoordinatorType {
-	
-	var root: (any RouterType) {
-		return router
-	}
-	
-	/// A Boolean value indicating whether the coordinator is TabbarCoordinatable.
-	var isTabbarCoordinable: Bool {
-		self is (any TabbarCoordinatable)
-	}
-	
-	/**
-	 Clean the views associated with the coordinator.
-	 
-	 - Parameters:
-			- animated: A flag indicating whether the empty action should be animated.
-	 */
-	func cleanView(
-        animated: Bool = false,
-        withMainView: Bool = true
-    ) async {
-		await router.clean(animated: animated, withMainView: withMainView)
-		parent = nil
-	}
-	
-	/**
-	 Retrieves the deep coordinator from a given value.
-	 
-	 - Parameters:
-			- value: An inout parameter representing the value of the coordinator.
-	 
-	 - Returns: The type-erased coordinator obtained from the provided value.
-	 
-	 - Throws: An error if the coordinator cannot be retrieved.
-	 */
-	func getDeepCoordinator(from value: inout TCoordinatorType?) throws -> TCoordinatorType? {
-		if value?.children.last == nil {
-			return value
-		} else if let value = value, let tabCoordinator = getTabbarCoordinable(value) {
-			return try topCoordinator(pCoodinator: try tabCoordinator.getCoordinatorSelected())
-		} else {
-			var last = value?.children.last
-			return try getDeepCoordinator(from: &last)
-		}
-	}
-	
-	/**
-	 Removes a child coordinator from the current coordinator.
-	 
-	 - Parameters:
-			- coordinator: The type-erased coordinator to be removed.
-	 */
-	func removeChild(coordinator : TCoordinatorType) async {
-		guard let index = children.firstIndex(where: {$0.uuid == coordinator.uuid}) else {
-			return
-		}
-		children.remove(at: index)
-		await coordinator.removeChildren()
+    
+    /// The root router associated with the coordinator.
+    var root: (any RouterType) {
+        return router
+    }
+    
+    /// A boolean value indicating whether the coordinator is tabbar-coordinable.
+    var isTabbarCoordinable: Bool {
+        self is (any TabbarCoordinatable)
+    }
+    
+    
+    /// Cleans the view associated with the coordinator.
+    ///
+    /// - Parameters:
+    ///   - animated: A boolean value indicating whether to animate the cleaning process.
+    ///   - withMainView: A boolean value indicating whether to clean the main view.
+    func cleanView(animated: Bool = false, withMainView: Bool = true) async {
+        await router.clean(animated: animated, withMainView: withMainView)
+        parent = nil
+    }
+    
+    /// Retrieves a deep coordinator from the provided value.
+    ///
+    /// - Parameters:
+    ///   - value: An inout parameter containing the coordinator value.
+    /// - Returns: An optional deep coordinator of type TCoordinatorType.
+    /// - Throws: An error if the deep coordinator retrieval fails.
+    func getDeepCoordinator(from value: inout TCoordinatorType?) throws -> TCoordinatorType? {
+        if value?.children.last == nil {
+            return value
+        } else if let value = value, let tabCoordinator = getTabbarCoordinable(value) {
+            return try topCoordinator(pCoodinator: try tabCoordinator.getCoordinatorSelected())
+        } else {
+            var last = value?.children.last
+            return try getDeepCoordinator(from: &last)
+        }
+    }
+    
+    /// Removes a child coordinator from the children array.
+    ///
+    /// - Parameters:
+    ///   - coordinator: The child coordinator to be removed.
+    func removeChild(coordinator : TCoordinatorType) async {
+        guard let index = children.firstIndex(where: {$0.uuid == coordinator.uuid}) else {
+            return
+        }
+        children.remove(at: index)
+        await coordinator.removeChildren()
         await removeChild(coordinator: coordinator)
-	}
-	
-	/**
-	 Removes all child coordinators associated with the current coordinator.
-	 
-	 - Parameters:
-			- animated: A flag indicating whether the removal action should be animated.
-	 */
-	func removeChildren(animated: Bool = false) async {
-		guard let first = children.first else { return }
-		await first.handleFinish(animated: animated, withDissmis: false)
+    }
+    
+    /// Removes all child coordinators associated with this coordinator.
+    ///
+    /// - Parameters:
+    ///   - animated: A boolean value indicating whether to animate the removal process.
+    func removeChildren(animated: Bool = false) async {
+        guard let first = children.first else { return }
+        await first.handleFinish(animated: animated, withDissmis: false)
         await removeChildren()
-	}
-	
-	/**
-	 Retrieves the TabbarCoordinatable from the given coordinator.
-	 
-	 - Parameters:
-	 
-		- coordinator: The type-erased coordinator from which to retrieve the TabbarCoordinatable.
-	 - Returns: The TabbarCoordinatable associated with the provided coordinator.
-	 
-	 Note: Returns nil if the coordinator is not TabbarCoordinatable.
-	 */
-	func getTabbarCoordinable(_ coordinator: TCoordinatorType) ->  (any TabbarCoordinatable)? {
-		coordinator as? (any TabbarCoordinatable)
-	}
-	
-	/**
-	 Starts a child coordinator.
-	 
-	 - Parameters:
-			- coordinator: The type-erased coordinator to be started as a child.
-	 */
-	func startChildCoordinator(_ coordinator: TCoordinatorType) {
-		children.append(coordinator)
-		coordinator.parent = self
-	}
-	
-	/**
-	 Dismisses the last presented sheet.
-	 
-	 - Parameters:
-			- animated: A flag indicating whether the dismissal action should be animated.
-	 */
-	func dismissLastSheet(animated: Bool = true) async {
-		await router.dismiss(animated: animated)
-	}
-	
-	/**
-	 Empties the current coordinator.
-	 
-	 - Parameters:
-        - animated: A flag indicating whether the dismissal action should be animated.
-	 */
-	func emptyCoordinator(animated: Bool) async {
-		guard let parent = parent else {
+    }
+    
+    /// Retrieves the tabbar-coordinable object associated with the provided coordinator.
+    ///
+    /// - Parameters:
+    ///   - coordinator: The coordinator for which to retrieve the tabbar-coordinable object.
+    /// - Returns: An optional tabbar-coordinable object conforming to any TabbarCoordinatable.
+    func getTabbarCoordinable(_ coordinator: TCoordinatorType) ->  (any TabbarCoordinatable)? {
+        coordinator as? (any TabbarCoordinatable)
+    }
+    
+    /// Starts a child coordinator.
+    ///
+    /// - Parameters:
+    ///   - coordinator: The child coordinator to be started.
+    func startChildCoordinator(_ coordinator: TCoordinatorType) {
+        children.append(coordinator)
+        coordinator.parent = self
+    }
+    
+    /// Dismisses the last presented sheet.
+    ///
+    /// - Parameters:
+    ///   - animated: A boolean value indicating whether to animate the dismissal.
+    func dismissLastSheet(animated: Bool = true) async {
+        await router.dismiss(animated: animated)
+    }
+    
+    /// Cleans up the coordinator, preparing it for dismissal.
+    ///
+    /// - Parameters:
+    ///   - animated: A boolean value indicating whether to animate the cleanup process.
+    func emptyCoordinator(animated: Bool) async {
+        guard let parent = parent else {
             await removeChildren()
             return await router.restart(animated: animated)
-		}
-		
-		await parent.removeChild(coordinator: self)
+        }
+        
+        await parent.removeChild(coordinator: self)
         await cleanView(animated: false)
-	}
-	
-	/**
-	 Handles the finish action.
-	 
-	 - Parameters:
-			- animated: A flag indicating whether the finish action should be animated.
-			- withDissmis: A flag indicating whether the dismissal action should be included.
-	 */
-	func handleFinish(animated: Bool = true, withDissmis: Bool = true) async {
-		guard withDissmis else {
-            return await emptyCoordinator(animated: animated)
-		}
-		await router.close(animated: animated, finishFlow: true)
-        await emptyCoordinator(animated: animated)
-	}
+    }
     
-    /**
-     Finishes the coordinator.
-     
-     - Parameters:
-            - animated: A flag indicating whether the finish action should be animated.
-            - withDissmis: A flag indicating whether the dismissal action should be included.
-     */
-    func finish(
-        animated: Bool = true,
-        withDissmis: Bool = true
-    ) async -> Void {
+    /// Handles the finish event, optionally dismissing the coordinator.
+    ///
+    /// - Parameters:
+    ///   - animated: A boolean value indicating whether to animate the finish process.
+    ///   - withDissmis: A boolean value indicating whether to dismiss the coordinator.
+    func handleFinish(animated: Bool = true, withDissmis: Bool = true) async {
+        guard withDissmis else {
+            return await emptyCoordinator(animated: animated)
+        }
+        await router.close(animated: animated, finishFlow: true)
+        await emptyCoordinator(animated: animated)
+    }
+    
+    /// Finishes the coordinator, optionally dismissing it.
+    ///
+    /// - Parameters:
+    ///   - animated: A boolean value indicating whether to animate the finish process.
+    ///   - withDissmis: A boolean value indicating whether to dismiss the coordinator.
+    /// - Returns: An asynchronous void task representing the finish process.
+    func finish(animated: Bool = true, withDissmis: Bool = true) async -> Void {
         let handleFinish = { (coordinator: TCoordinatorType) async -> Void in
             await coordinator.handleFinish(
                 animated: animated,

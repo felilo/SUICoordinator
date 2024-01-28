@@ -25,69 +25,52 @@
 import Foundation
 
 public extension CoordinatorType {
-	
-	/**
-	 Retrieves the top coordinator.
-	 
-	  - Parameters:
-	 
-			- pCoodinator: An optional parent coordinator.
-	 - Returns: The type-erased top coordinator associated with the provided parent coordinator.
-	 - Throws: An error if the top coordinator cannot be retrieved.
-	 */
-	func topCoordinator(pCoodinator: TCoordinatorType? = nil) throws -> TCoordinatorType? {
-		guard children.last != nil else { return self }
-		var auxCoordinator = pCoodinator ?? self.children.last
-		return try getDeepCoordinator(from: &auxCoordinator)
-	}
-	
-	/**
-	 Navigates to a new coordinator.
-	 
-	- Parameters:
-	       - coordinator: The type-erased coordinator to navigate to.
-		   - transitionStyle: The transition style for the navigation.
-		   - animated: A flag indicating whether the navigation should be animated.
-	 */
-	func navigate(
-		to coordinator: TCoordinatorType,
-        presentationStyle: TransitionPresentationStyle,
-		animated: Bool = true
-	) async -> Void {
-		startChildCoordinator(coordinator)
-		
-		let item = SheetItem(
-			view: coordinator.view,
-			animated: animated,
-            presentationStyle: (presentationStyle != .push) ? presentationStyle :  .sheet)
-		
-		await router.presentSheet(item: item)
-	}
     
-    /**
-     Finishes the current flow.
-     
-        - Parameters:
-            - animated: A flag indicating whether the finish action should be animated.
-     */
+    /// Retrieves the top coordinator in the hierarchy, optionally starting from a specified coordinator.
+    ///
+    /// - Parameters:
+    ///   - pCoodinator: The optional starting point for finding the top coordinator.
+    /// - Returns: The top coordinator in the hierarchy or nil if none is found.
+    /// - Throws: An error if the top coordinator retrieval fails.
+    func topCoordinator(pCoodinator: TCoordinatorType? = nil) throws -> TCoordinatorType? {
+        guard children.last != nil else { return self }
+        var auxCoordinator = pCoodinator ?? self.children.last
+        return try getDeepCoordinator(from: &auxCoordinator)
+    }
+    
+    /// Navigates to a new coordinator with a specified presentation style.
+    ///
+    /// - Parameters:
+    ///   - coordinator: The coordinator to navigate to.
+    ///   - presentationStyle: The transition presentation style for the navigation.
+    ///   - animated: A boolean value indicating whether to animate the navigation.
+    func navigate(to coordinator: TCoordinatorType, presentationStyle: TransitionPresentationStyle, animated: Bool = true ) async -> Void {
+        startChildCoordinator(coordinator)
+        
+        let item = SheetItem(
+            view: coordinator.view,
+            animated: animated,
+            presentationStyle: (presentationStyle != .push) ? presentationStyle :  .sheet)
+        
+        await router.presentSheet(item: item)
+    }
+    
+    /// Finishes the flow of the coordinator.
+    ///
+    /// - Parameters:
+    ///   - animated: A boolean value indicating whether to animate the finish flow process.
     @MainActor func finishFlow(animated: Bool) async -> Void {
         await finish(animated: animated, withDissmis: true)
     }
     
     
-    /**
-     Initiates the flow with a given route.
-     
-        - Parameters:
-            - route: The route to start the flow.
-            - transitionStyle: The transition style for the navigation. Default is nil.
-            - animated: A flag indicating whether the navigation should be animated.
-     */
-    @MainActor func startFlow(
-        route: Route,
-        transitionStyle: TransitionPresentationStyle? = nil,
-        animated: Bool = true
-    ) async -> Void {
+    /// Starts a flow in the coordinator with a specified route and transition style.
+    ///
+    /// - Parameters:
+    ///   - route: The route to start the flow.
+    ///   - transitionStyle: The transition presentation style for the flow.
+    ///   - animated: A boolean value indicating whether to animate the start flow process.
+    @MainActor func startFlow(route: Route, transitionStyle: TransitionPresentationStyle? = nil, animated: Bool = true) async -> Void {
         await router.restart(animated: animated)
         router.mainView = route
     }
