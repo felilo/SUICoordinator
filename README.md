@@ -64,9 +64,9 @@ import SUICoordinator
 
 class HomeCoordinator: Coordinator<HomeRoute> {
     
-    override func start(animated: Bool = true, completion: Completion? = nil) {
+    override func start(animated: Bool = true) async {
         let viewModel = ActionListViewModel(coordinator: self)
-        startFlow(route: .actionListView(viewModel: viewModel))
+        await startFlow(route: .actionListView(viewModel: viewModel))
     }
     
     func navigateToPushView() async {
