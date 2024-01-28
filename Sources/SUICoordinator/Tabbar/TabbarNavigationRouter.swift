@@ -24,16 +24,15 @@
 
 import Foundation
 
+/// A protocol representing a type for managing and providing a coordinator for tabbar navigation.
 public protocol TabbarNavigationRouter {
-	
-	// ---------------------------------------------------------
-	// MARK: Funcs
-	// ---------------------------------------------------------
-	
-	/**
-	Retrieves a coordinator associated with the page.
-
-	Returns: The coordinator associated with the page.
-	*/
-	func coordinator() -> (any CoordinatorType)
+    
+    // ---------------------------------------------------------
+    // MARK: Functions
+    // ---------------------------------------------------------
+    
+    /// Retrieves a coordinator associated with tabbar navigation.
+    ///
+    /// - Returns: The coordinator associated with tabbar navigation.
+    func coordinator() -> (any CoordinatorType)
 }

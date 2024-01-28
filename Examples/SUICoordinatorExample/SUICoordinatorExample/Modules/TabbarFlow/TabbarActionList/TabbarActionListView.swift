@@ -36,17 +36,17 @@ struct TabbarActionListView: View {
         List {
             
             Button("Presents Default Tabbar") {
-                viewModel.presentDefaultTabbarCoordinator()
+                Task { await viewModel.presentDefaultTabbarCoordinator() }
             }
             
             Button("Presents Custom Tabbar") {
-                viewModel.presentCustomTabbarCoordinator()
+                Task { await viewModel.presentCustomTabbarCoordinator() }
             }
         }
         .toolbar {
             if isPresented {
                 Button {
-                    viewModel.finsh()
+                    Task { await viewModel.finsh() }
                 } label: {
                     Text("Finish flow")
                 }
@@ -57,5 +57,5 @@ struct TabbarActionListView: View {
 }
 
 #Preview {
-    ActionListView(viewModel: .init(coordinator: .init()))
+    NavigationActionListView(viewModel: .init(coordinator: .init()))
 }

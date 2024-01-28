@@ -32,11 +32,11 @@ class SheetViewModel: ObservableObject {
         self.coordinator = coordinator
     }
     
-    func navigateToNextView() {
-        coordinator.presentFullscreen()
+    func navigateToNextView() async {
+        await coordinator.presentFullscreen()
     }
     
-    func close() {
-        coordinator.close()
+    func close() async {
+        await coordinator.close()
     }
 }

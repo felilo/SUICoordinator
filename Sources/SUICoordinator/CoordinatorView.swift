@@ -26,46 +26,48 @@ import SwiftUI
 
 
 public struct CoordinatorView<Route: RouteType>: CoordinatorViewType, View {
-	
-	// --------------------------------------------------------------------
-	// MARK: Wrapper properties
-	// --------------------------------------------------------------------
-	
-	@StateObject var viewModel: Coordinator<Route>
-	
-	// --------------------------------------------------------------------
-	// MARK: Properties
-	// --------------------------------------------------------------------
-	
-	var onClean: (() -> Void)?
-	var onSetTag: ((String) -> Void)?
-	
-	// --------------------------------------------------------------------
-	// MARK: Constructor
-	// --------------------------------------------------------------------
-	
-	init(
-		viewModel: Coordinator<Route>,
-		onClean: (() -> Void)? = nil,
-		onSetTag: ((String) -> Void)? = nil
-	) {
-		self._viewModel = .init(wrappedValue: viewModel)
-		self.onClean = onClean
-		self.onSetTag = onSetTag
-	}
-	
-	// --------------------------------------------------------------------
-	// MARK: View
-	// --------------------------------------------------------------------
-	
-	public var body: some View {
-		RouterView(viewModel: viewModel.router)
-			.onViewDidLoad { [weak viewModel] in viewModel?.start() }
-	}
-	
-	// --------------------------------------------------------------------
-	// MARK: CoordinatorViewType
-	// --------------------------------------------------------------------
-	
-	func clean() { onClean?() }
+    
+    // --------------------------------------------------------------------
+    // MARK: Wrapper properties
+    // --------------------------------------------------------------------
+    
+    @StateObject var viewModel: Coordinator<Route>
+    
+    // --------------------------------------------------------------------
+    // MARK: Properties
+    // --------------------------------------------------------------------
+    
+    var onClean: (() async -> Void)?
+    var onSetTag: ((String) -> Void)?
+    
+    // --------------------------------------------------------------------
+    // MARK: Constructor
+    // --------------------------------------------------------------------
+    
+    init(
+        viewModel: Coordinator<Route>,
+        onClean: (() async -> Void)? = nil,
+        onSetTag: ((String) -> Void)? = nil
+    ) {
+        self._viewModel = .init(wrappedValue: viewModel)
+        self.onClean = onClean
+        self.onSetTag = onSetTag
+    }
+    
+    // --------------------------------------------------------------------
+    // MARK: View
+    // --------------------------------------------------------------------
+    
+    public var body: some View {
+        RouterView(viewModel: viewModel.router)
+            .onViewDidLoad { [weak viewModel] in
+                Task { await viewModel?.start() }
+            }
+    }
+    
+    // --------------------------------------------------------------------
+    // MARK: CoordinatorViewType
+    // --------------------------------------------------------------------
+    
+    func clean() { Task { await onClean?() } }
 }

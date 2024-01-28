@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D9107CFB2B6703D80039F40D /* NavigationActionListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9107CFA2B6703D80039F40D /* NavigationActionListView.swift */; };
 		D95389212B643BAD000E3357 /* SUICoordinatorExampleApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = D95389202B643BAD000E3357 /* SUICoordinatorExampleApp.swift */; };
 		D95389232B643BAD000E3357 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D95389222B643BAD000E3357 /* ContentView.swift */; };
 		D95389252B643BAE000E3357 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D95389242B643BAE000E3357 /* Assets.xcassets */; };
@@ -20,7 +21,6 @@
 		D9B456022B643FBD004DD03A /* FullscreenViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9B455DA2B643FBD004DD03A /* FullscreenViewModel.swift */; };
 		D9B456032B643FBD004DD03A /* FullscreenView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9B455DB2B643FBD004DD03A /* FullscreenView.swift */; };
 		D9B456042B643FBD004DD03A /* ActionListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9B455DD2B643FBD004DD03A /* ActionListViewModel.swift */; };
-		D9B456052B643FBD004DD03A /* ActionListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9B455DE2B643FBD004DD03A /* ActionListView.swift */; };
 		D9B456062B643FBD004DD03A /* DetentsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9B455E02B643FBD004DD03A /* DetentsView.swift */; };
 		D9B456072B643FBD004DD03A /* DetentsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9B455E12B643FBD004DD03A /* DetentsViewModel.swift */; };
 		D9B4560A2B643FBD004DD03A /* TabbarActionListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9B455E72B643FBD004DD03A /* TabbarActionListViewModel.swift */; };
@@ -39,6 +39,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		D9107CFA2B6703D80039F40D /* NavigationActionListView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NavigationActionListView.swift; sourceTree = "<group>"; };
 		D953891D2B643BAD000E3357 /* SUICoordinatorExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SUICoordinatorExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D95389202B643BAD000E3357 /* SUICoordinatorExampleApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SUICoordinatorExampleApp.swift; sourceTree = "<group>"; };
 		D95389222B643BAD000E3357 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -52,7 +53,6 @@
 		D9B455DA2B643FBD004DD03A /* FullscreenViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FullscreenViewModel.swift; sourceTree = "<group>"; };
 		D9B455DB2B643FBD004DD03A /* FullscreenView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FullscreenView.swift; sourceTree = "<group>"; };
 		D9B455DD2B643FBD004DD03A /* ActionListViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ActionListViewModel.swift; sourceTree = "<group>"; };
-		D9B455DE2B643FBD004DD03A /* ActionListView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ActionListView.swift; sourceTree = "<group>"; };
 		D9B455E02B643FBD004DD03A /* DetentsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DetentsView.swift; sourceTree = "<group>"; };
 		D9B455E12B643FBD004DD03A /* DetentsViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DetentsViewModel.swift; sourceTree = "<group>"; };
 		D9B455E72B643FBD004DD03A /* TabbarActionListViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TabbarActionListViewModel.swift; sourceTree = "<group>"; };
@@ -181,7 +181,7 @@
 			isa = PBXGroup;
 			children = (
 				D9B455DD2B643FBD004DD03A /* ActionListViewModel.swift */,
-				D9B455DE2B643FBD004DD03A /* ActionListView.swift */,
+				D9107CFA2B6703D80039F40D /* NavigationActionListView.swift */,
 			);
 			path = ActionList;
 			sourceTree = "<group>";
@@ -361,11 +361,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D9B456052B643FBD004DD03A /* ActionListView.swift in Sources */,
 				D9B455FC2B643FBD004DD03A /* AppDelegate.swift in Sources */,
 				D9B456002B643FBD004DD03A /* SheetView.swift in Sources */,
 				D9B456162B643FBD004DD03A /* HomeCoordinator.swift in Sources */,
 				D9B456122B643FBD004DD03A /* CustomTabbarCoordinator.swift in Sources */,
+				D9107CFB2B6703D80039F40D /* NavigationActionListView.swift in Sources */,
 				D9B4560F2B643FBD004DD03A /* TabbarFlowCoordinator.swift in Sources */,
 				D9B4560E2B643FBD004DD03A /* DefaultTabbarCoordinator.swift in Sources */,
 				D9B455FE2B643FBD004DD03A /* PushView.swift in Sources */,
