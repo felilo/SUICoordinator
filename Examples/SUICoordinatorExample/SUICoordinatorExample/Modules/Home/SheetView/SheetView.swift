@@ -38,11 +38,11 @@ struct SheetView: View {
                 
                 VStack {
                     Button("Presents FullscreenView") {
-                        viewModel.navigateToNextView()
+                        Task { await  viewModel.navigateToNextView() }
                     }.buttonStyle(.borderedProminent)
                     
                     Button("Close view") {
-                        viewModel.close()
+                        Task { await  viewModel.close() }
                     }.buttonStyle(.borderedProminent)
                 }
             }

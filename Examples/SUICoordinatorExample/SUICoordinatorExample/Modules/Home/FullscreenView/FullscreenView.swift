@@ -38,11 +38,11 @@ struct FullscreenView: View {
                 
                 VStack {
                     Button("Presents DetentsView") {
-                        viewModel.navigateToNextView()
+                        Task { await viewModel.navigateToNextView() }
                     }.buttonStyle(.borderedProminent)
                     
                     Button("Close view") {
-                        viewModel.close()
+                        Task { await viewModel.close() }
                     }.buttonStyle(.borderedProminent)
                 }
             }

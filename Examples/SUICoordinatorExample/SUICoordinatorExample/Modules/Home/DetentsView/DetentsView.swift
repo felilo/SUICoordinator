@@ -38,11 +38,11 @@ struct DetentsView: View {
                 
                 VStack {
                     Button("Presents Tabbar Coordinator") {
-                        viewModel.navigateToNextView()
+                        Task { await viewModel.navigateToNextView() }
                     }.buttonStyle(.borderedProminent)
                     
                     Button("Close view") {
-                        viewModel.close()
+                        Task { await viewModel.close() }
                     }.buttonStyle(.borderedProminent)
                 }
             }

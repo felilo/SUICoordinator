@@ -31,45 +31,45 @@ class HomeCoordinator: Coordinator<HomeRoute> {
     // MARK: Coordinator
     // ---------------------------------------------------------------------
     
-    override func start(animated: Bool = true, completion: (() -> Void)? = nil) {
+    override func start(animated: Bool = true) async {
         let viewModel = ActionListViewModel(coordinator: self)
-        startFlow(route: .actionListView(viewModel: viewModel), completion: completion)
+        await startFlow(route: .actionListView(viewModel: viewModel))
     }
     
     // ---------------------------------------------------------------------
     // MARK: Adiotional flows
     // ---------------------------------------------------------------------
     
-    func navigateToPushView() {
+    func navigateToPushView() async {
         let viewModel = PushViewModel(coordinator: self)
-        router.navigate(to: .push(viewModel: viewModel))
+        await router.navigate(to: .push(viewModel: viewModel), animated: false)
     }
     
-    func presentSheet() {
+    func presentSheet() async {
         let viewModel = SheetViewModel(coordinator: self)
-        router.navigate(to: .sheet(viewModel: viewModel))
+        await router.navigate(to: .sheet(viewModel: viewModel))
     }
     
-    func presentFullscreen() {
+    func presentFullscreen() async {
         let viewModel = FullscreenViewModel(coordinator: self)
-        router.navigate(to: .fullscreen(viewModel: viewModel))
+        await router.navigate(to: .fullscreen(viewModel: viewModel), animated: false)
     }
     
-    func presentDetents() {
+    func presentDetents() async {
         let viewModel = DetentsViewModel(coordinator: self)
-        router.navigate(to: .detents(viewModel: viewModel))
+        await router.navigate(to: .detents(viewModel: viewModel))
     }
     
-    func presentTabbarCoordinator() {
+    func presentTabbarCoordinator() async {
         let coordinator = TabbarFlowCoordinator()
-        navigate(to: coordinator, presentationStyle: .sheet)
+        await navigate(to: coordinator, presentationStyle: .sheet)
     }
     
-    func close() {
-        router.close(completion: nil)
+    func close() async {
+        await router.close()
     }
     
-    func finsh() {
-        finishFlow(animated: true, completion: nil)
+    func finsh() async {
+        await finishFlow(animated: true)
     }
 }

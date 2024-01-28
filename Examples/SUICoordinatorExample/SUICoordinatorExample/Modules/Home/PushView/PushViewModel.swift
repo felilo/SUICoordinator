@@ -32,11 +32,11 @@ class PushViewModel: ObservableObject {
         self.coordinator = coordinator
     }
     
-    func navigateToNextView() {
-        coordinator.presentSheet()
+    func navigateToNextView() async {
+        await coordinator.presentSheet()
     }
     
-    func close() {
-        coordinator.close()
+    func close() async {
+        await coordinator.close()
     }
 }

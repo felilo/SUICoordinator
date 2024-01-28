@@ -29,15 +29,15 @@ class MainCoordinator: Coordinator<MainRoute> {
     
     override init() {
         super.init()
-        startFlow(route: .splash)
     }
     
     // ---------------------------------------------------------------------
     // MARK: Coordinator
     // ---------------------------------------------------------------------
     
-    override func start(animated: Bool = true, completion sucompletion: Completion? = nil) {
+    override func start(animated: Bool = true) async {
         let coordinator = HomeCoordinator()
-        navigate(to: coordinator, presentationStyle: .fullScreenCover)
+        await startFlow(route: .splash, animated: false)
+        await navigate(to: coordinator, presentationStyle: .fullScreenCover, animated: false)
     }
 }

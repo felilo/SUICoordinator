@@ -34,29 +34,29 @@ struct ActionListView: View {
     var body: some View {
         List {
             Button("Push NavigationView") {
-                viewModel.navigateToFirstView()
+                Task { await viewModel.navigateToFirstView() }
             }
             
             Button("Presents SheetView") {
-                viewModel.presentSheet()
+                Task { await viewModel.presentSheet() }
             }
             
             Button("Presents FullscreenView") {
-                viewModel.presentFullscreen()
+                Task { await viewModel.presentFullscreen() }
             }
             
             Button("Presents DetentsView") {
-                viewModel.presentDetents()
+                Task { await viewModel.presentDetents() }
             }
             
             Button("Presents Tabbar Coordinator") {
-                viewModel.presentTabbarCoordinator()
+                Task { await viewModel.presentTabbarCoordinator() }
             }
         }
         .toolbar {
             if isPresented && viewModel.showFinishButton() {
                 Button {
-                    viewModel.finsh()
+                    Task { await viewModel.finsh() }
                 } label: {
                     Text("Finish flow")
                 }
