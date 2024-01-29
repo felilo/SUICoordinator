@@ -86,16 +86,3 @@ struct FullScreenStepView: View {
         Text("FullScreenStepView")
     }
 }
-
-
-
-struct AnyStructRoute: RouteType {
-    
-    var _presentationStyle: TransitionPresentationStyle
-    var presentationStyle: TransitionPresentationStyle { _presentationStyle }
-    var view: Body { Text("AnyStructRoute") }
-    
-    init(presentationStyle: TransitionPresentationStyle) {
-        _presentationStyle = presentationStyle
-    }
-}

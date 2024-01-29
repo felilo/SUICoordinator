@@ -81,21 +81,13 @@ final public class SheetCoordinator<T>: ObservableObject {
     @MainActor public func presentSheet(_ sheet: Item, animated: Bool = true) async -> Void {
         lastPresentationStyle = sheet.presentationStyle
         
-        let runAction = { [weak self] () -> Void in
-            self?.items.append(sheet)
-            self?.removeAllNilItems()
-        }
-        
         if animated {
             items.append(nil)
-            await makeDelay(
-                animated: animated,
-                customTime: 60 / 1000
-            )
-            return runAction()
+            await makeDelay(animated: animated, customTime: 80 / 1000)
         }
         
-        runAction()
+        items.append(sheet)
+        removeAllNilItems()
     }
     
     /// Removes the last presented sheet.
@@ -162,12 +154,11 @@ final public class SheetCoordinator<T>: ObservableObject {
     ///   - animated: A boolean value indicating whether to animate the delay.
     ///   - customTime: An optional custom time for the delay.
     private func makeDelay(animated: Bool, customTime: Double? = nil) async -> Void {
-        var milliSeconds: Double
+        var milliSeconds = (animated ? 600.0 : 300.0) / 1000.0
         if let customTime {
             milliSeconds = customTime
-        } else {
-            milliSeconds = (animated ? 600 : 300) / 1000
         }
+        
         try? await Task.sleep(for: .seconds(milliSeconds))
     }
 }

@@ -92,9 +92,8 @@ extension TabbarCoordinatorView {
         } set: { tappedTab in
             if tappedTab == self.viewModel.currentPage {
                 Task { [weak viewModel] in
-                    try? await viewModel?.getCoordinatorSelected().root.popToRoot(animated: true)
+                    await viewModel?.popToRoot()
                 }
-                
             }
             self.viewModel.currentPage = tappedTab
         }
