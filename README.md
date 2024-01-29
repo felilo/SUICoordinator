@@ -66,7 +66,7 @@ class HomeCoordinator: Coordinator<HomeRoute> {
     
     override func start(animated: Bool = true) async {
         let viewModel = ActionListViewModel(coordinator: self)
-        await startFlow(route: .actionListView(viewModel: viewModel))
+        await startFlow(route: .actionListView(viewModel: viewModel), animated: animated)
     }
     
     func navigateToPushView() async {
@@ -196,10 +196,10 @@ class MainCoordinator: Coordinator<MainRoute> {
         super.init()
     }
     
-    override func start(animated: Bool = true) async {
+    override func start(animated: Bool = false) async {
         let coordinator = HomeCoordinator()
         async let _ = startFlow(route: .splash, animated: false)
-        await navigate(to: coordinator, presentationStyle: .fullScreenCover, animated: false)
+        await navigate(to: coordinator, presentationStyle: .fullScreenCover, animated: animated)
     }
 }
 ```
