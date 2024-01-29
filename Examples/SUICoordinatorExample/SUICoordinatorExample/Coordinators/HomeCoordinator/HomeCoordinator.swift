@@ -33,7 +33,7 @@ class HomeCoordinator: Coordinator<HomeRoute> {
     
     override func start(animated: Bool = true) async {
         let viewModel = ActionListViewModel(coordinator: self)
-        await startFlow(route: .actionListView(viewModel: viewModel))
+        await startFlow(route: .actionListView(viewModel: viewModel), animated: animated)
     }
     
     // ---------------------------------------------------------------------
