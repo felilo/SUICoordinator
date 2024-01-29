@@ -36,7 +36,8 @@ public protocol RouterType: ObservableObject {
     var sheetCoordinator: SheetCoordinator<Route.Body> { get set }
     
     /// The main view associated with the router.
-    var mainView: Route? { get set }
+//    var mainView: Route? { get set }
+    var mainView: PassthroughSubject<Route, Never> { get set }
     
     // --------------------------------------------------------------------
     // MARK: Functions

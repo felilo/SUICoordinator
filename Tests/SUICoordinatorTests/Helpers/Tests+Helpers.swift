@@ -23,6 +23,7 @@
 //
 
 import XCTest
+import Combine
 @testable import SUICoordinator
 
 extension XCTestCase {
@@ -41,9 +42,47 @@ extension XCTestCase {
             to: nextCoordinator,
             presentationStyle: .fullScreenCover,
             animated: false)
+        await nextCoordinator.start(animated: false)
     }
     
     func finishFlow(sut: (any CoordinatorType)) async {
         await sut.finishFlow(animated: false)
+    }
+    
+    /*
+     - Parameters:
+     - publisher: The publisher to execute.
+     - action: The action to perform upon completion.
+     */
+    func execute<T>(
+        _ publisher: AnyPublisher<T, Error>,
+        _ action: (( Result<T, Error> ) -> Void)? = nil
+    ) {
+        
+        let expectation = XCTestExpectation(description: "Waiting for action")
+        var cancellables = Set<AnyCancellable>()
+        
+        publisher
+            .sink(
+                receiveCompletion: { result in
+                    guard case .failure(let error) = result else {
+                        return expectation.fulfill()
+                    }
+                    action?(.failure(error))
+                    expectation.fulfill()
+                },
+                receiveValue: { value in
+                    action?(.success(value))
+                }
+            ).store(in: &cancellables)
+        
+        wait(for: [expectation], timeout: 2)
+    }
+    
+    /**
+        
+     */
+    func getNameOf<T>(object: T) -> String {
+        String(describing: object.self).replacingOccurrences(of: "()", with: "")
     }
 }

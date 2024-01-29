@@ -31,15 +31,9 @@ class AnyCoordinator: Coordinator<AnyEnumRoute> {
     }
 }
 
-class OtherCoordinator: Coordinator<AnyStructRoute> {
+class OtherCoordinator: Coordinator<RouteBase> { 
     override func start(animated: Bool = true) async {
-        await startFlow(route: .init(presentationStyle: .detents([.medium])))
-    }
-}
-
-class BaseCoordinator: Coordinator<RouteBase> {
-    override func start(animated: Bool = true) async {
-        let route = RouteBase(presentationStyle: .detents([.medium]), content: Text("Hello, RouteBase"))
-        await startFlow(route: route)
+        let page = AnyEnumRoute.pushStep
+        await startFlow(route: .init(presentationStyle: page.presentationStyle, content: page.view))
     }
 }

@@ -52,6 +52,7 @@ final class TabbarCoordinatorTests: XCTestCase {
     func test_get_coordinator_selected_fail() async {
         let sut = makeSUT(currentPage: .tab1)
         
+        await sut.start(animated: false)
         XCTAssertEqual(sut.currentPage, .tab1)
         sut.currentPage = .tab2
         XCTAssertEqual(sut.currentPage, .tab2)
@@ -75,6 +76,27 @@ final class TabbarCoordinatorTests: XCTestCase {
         await finishFlow(sut: sut)
     }
     
+    func test_popToRoot_in_tab() async throws {
+        let sut = makeSUT(currentPage: .tab1)
+        await sut.start(animated: false)
+        
+        let coordinatorSelected = try sut.getCoordinatorSelected() as? AnyCoordinator
+        
+        await coordinatorSelected?.router.navigate(to: .pushStep2)
+        await coordinatorSelected?.router.navigate(to: .pushStep3)
+        XCTAssertEqual(coordinatorSelected?.router.items.count, 2)
+        
+        await sut.popToRoot()
+        XCTAssertEqual(coordinatorSelected?.router.items.count, 0)
+        await finishFlow(sut: sut)
+    }
+    
+    func test_siTabbarCoordinator() async throws {
+        let sut = makeSUT(currentPage: .tab1)
+        XCTAssertTrue(sut.isTabbarCoordinable)
+        await finishFlow(sut: sut)
+    }
+    
     func test_finshCoordinator() async throws {
         let sut = makeSUT()
         let coordinator1 = OtherCoordinator()
@@ -87,7 +109,6 @@ final class TabbarCoordinatorTests: XCTestCase {
         XCTAssertTrue(sut.children.isEmpty)
         XCTAssertTrue(sut.router.items.isEmpty)
         XCTAssertTrue(sut.router.sheetCoordinator.items.isEmpty)
-        XCTAssertNil(sut.router.mainView)
     }
     
     func test_force_to_present_coordinator() async throws {

@@ -23,6 +23,7 @@
 //
 
 import XCTest
+import Combine
 @testable import SUICoordinator
 
 final class CoordinatorTests: XCTestCase {
@@ -76,10 +77,25 @@ final class CoordinatorTests: XCTestCase {
         let sut = makeSUT()
         let route = AnyEnumRoute.fullScreenStep
         
-        await sut.start(animated: false)
-        await sut.startFlow(route: route)
         
-        XCTAssertEqual(sut.router.mainView, route)
+        let publisher = sut.router.mainView
+            .setFailureType(to: Error.self)
+            .eraseToAnyPublisher()
+        
+        Task {
+            self.execute(publisher) { result in
+                switch result {
+                    case .success(let mainRoute):
+                        XCTAssertEqual(mainRoute, route)
+                        XCTAssertEqual(self.getNameOf(object: mainRoute.view), self.getNameOf(object: FullScreenStepView.self))
+                        
+                    case .failure(let error):
+                        XCTFail("Expected success, got failure: \(error.localizedDescription)")
+                }
+            }
+        }
+
+        async let _ = sut.startFlow(route: route)
         await finishFlow(sut: sut)
     }
     
