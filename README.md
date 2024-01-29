@@ -274,7 +274,7 @@ struct SUICoordinatorDemoApp: App {
 
 ### Example project
 
-For better understanding, I recommend that you take a look at the example project located in the [Example folder](https://github.com/felilo/SUICoordinator/tree/main/SUICoordinatorDemo).
+For better understanding, I recommend that you take a look at the example project located in the [Example folder](https://github.com/felilo/SUICoordinator/tree/main/Examples/SUICoordinatorExample).
 
 https://github.com/felilo/SUICoordinator/assets/10853689/90e8564e-6fa5-458b-b2a3-23d10f5aebb4
 
