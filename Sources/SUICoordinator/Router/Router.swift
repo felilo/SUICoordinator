@@ -135,7 +135,9 @@ public class Router<Route: RouteType>: ObservableObject, RouterType {
     /// - Returns: A boolean value indicating whether the pop action was successful.
     @MainActor public func popToView<T>(_ view: T, animated: Bool = true) async -> Bool {
         let name: (Any) -> String = { String(describing: $0.self) }
-        guard let index = items.firstIndex(where: { name($0) == name(view) }) else { return false }
+        guard let index = items.firstIndex(where: {
+            return name($0.view).replacingOccurrences(of: "()", with: "") == name(view)
+        }) else { return false }
         
         let position = index + 1
         let range = position..<items.count

@@ -118,17 +118,21 @@ final class RouterTests: XCTestCase {
     
     func test_navigationStack_popToView() async throws {
         let sut = makeSUT()
-        let route = AnyEnumRoute.pushStep
+        let view = PushStepView.self
         
-        await sut.navigate(to: route, animated: false)
+        await sut.navigate(to: .pushStep, animated: false)
         await sut.navigate(to: .pushStep2, animated: false)
         await sut.navigate(to: .pushStep3, animated: false)
         
-        let result = await sut.popToView(route, animated: false)
+        let result = await sut.popToView(view, animated: false)
         XCTAssertTrue(result)
         
         XCTAssertEqual(sut.items.count, 1)
-        XCTAssertEqual(sut.items.last?.id, route.id)
+        if let lastItem = sut.items.last {
+            XCTAssertEqual(getNameOf(object: lastItem.view), getNameOf(object: view))
+        } else {
+            XCTFail("lastItem can not be nil")
+        }
     }
     
     func test_navigationStack_popToViewFail() async throws {
@@ -158,5 +162,9 @@ final class RouterTests: XCTestCase {
     
     private func makeSheetItem(_ item: any RouteType, animated: Bool = true) -> SheetItem<RouteType.Body> {
         .init(view: item.view, animated: animated, presentationStyle: item.presentationStyle)
+    }
+    
+    private func getNameOf<T>(object: T) -> String {
+        String(describing: object.self).replacingOccurrences(of: "()", with: "")
     }
 }
