@@ -32,7 +32,7 @@ struct RouterView<Router: RouterType>: View {
     // --------------------------------------------------------------------
     
     @StateObject var viewModel: Router
-    @State private var firstView: AnyView = AnyView(Text("Loading"))
+    @State private var mainView: AnyView?
     
     // --------------------------------------------------------------------
     // MARK: Constructor
@@ -47,17 +47,20 @@ struct RouterView<Router: RouterType>: View {
     // --------------------------------------------------------------------
     
     var body: some View {
-        
-        if viewModel.coordinator?.isTabbarCoordinable == true {
-            addSheetTo(view: firstView)
-        } else {
-            let view = NavigationStack(path: $viewModel.items) {
-                firstView.navigationDestination(for: Router.Route.self) {
-                    AnyView($0.view)
+        ZStack {
+            
+            if viewModel.coordinator?.isTabbarCoordinable == true {
+                addSheetTo(view: mainView)
+            } else {
+                let view = NavigationStack(path: $viewModel.items) {
+                    mainView.navigationDestination(for: Router.Route.self) {
+                        AnyView($0.view)
+                    }
                 }
+                addSheetTo(view: view)
             }
-            addSheetTo(view: view)
-        }
+            
+        }.onReceive(viewModel.mainView, perform: onChangeFirstView)
     }
     
     // --------------------------------------------------------------------
@@ -67,7 +70,6 @@ struct RouterView<Router: RouterType>: View {
     @ViewBuilder
     private func addSheetTo(view: some View ) -> some View {
         view
-            .onChange(of: viewModel.mainView, perform: onChangeFirstView)
             .sheetCoordinating(
                 coordinator: viewModel.sheetCoordinator,
                 onDissmis: { [weak viewModel] index in
@@ -79,6 +81,6 @@ struct RouterView<Router: RouterType>: View {
     
     private func onChangeFirstView(_ value: Router.Route?)  {
         guard let view = value?.view else { return }
-        firstView = AnyView(view)
+        mainView = AnyView(view)
     }
 }

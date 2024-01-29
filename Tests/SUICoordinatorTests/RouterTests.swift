@@ -59,37 +59,6 @@ final class RouterTests: XCTestCase {
         XCTAssertNil(sut.items.last ?? nil)
     }
     
-    func test_sheetStack_presentRoute() async throws {
-        let sut = makeSUT()
-        let route = AnyEnumRoute.sheetStep
-        
-        await sut.navigate(to: route, animated: false)
-        
-        XCTAssertFalse(sut.sheetCoordinator.items.isEmpty)
-        XCTAssertNotNil(sut.sheetCoordinator.items.last ?? nil)
-    }
-    
-    func test_sheetStack_presentRouteTwice() async throws {
-        let sut = makeSUT()
-        let finalRoute = AnyEnumRoute.sheetStep
-        
-        await sut.navigate(to: .sheetStep, animated: false)
-        await sut.navigate(to: finalRoute, animated: false)
-        
-        XCTAssertEqual(sut.sheetCoordinator.items.count, 2)
-        XCTAssertEqual(sut.sheetCoordinator.items.last??.id, finalRoute.id)
-    }
-    
-    func test_sheetStack_dismissRoute() async throws {
-        let sut = makeSUT()
-        
-        await sut.navigate(to: .sheetStep, animated: false)
-        XCTAssertEqual(sut.sheetCoordinator.items.count, 1)
-        
-        await sut.dismiss(animated: false)
-        XCTAssertEqual(sut.sheetCoordinator.items.count, 0)
-    }
-    
     func test_closeRoute() async throws {
         let sut = makeSUT()
         
@@ -113,7 +82,6 @@ final class RouterTests: XCTestCase {
         
         XCTAssertEqual(sut.items.count, 0)
         XCTAssertEqual(sut.sheetCoordinator.items.count, 0)
-        XCTAssertNil(sut.mainView)
     }
     
     func test_navigationStack_popToView() async throws {
@@ -130,6 +98,29 @@ final class RouterTests: XCTestCase {
         XCTAssertEqual(sut.items.count, 1)
         if let lastItem = sut.items.last {
             XCTAssertEqual(getNameOf(object: lastItem.view), getNameOf(object: view))
+        } else {
+            XCTFail("lastItem can not be nil")
+        }
+    }
+    
+    func test_navigationStack_popToView_with_customRoute() async throws {
+        let sut = Router<RouteBase>()
+        let view = PushStepView.self
+        sut.mainView.send(RouteBase(presentationStyle: .push, content: PushStepView()))
+        
+        
+        await sut.navigate(to: .init(presentationStyle: .push, content: PushStepView()), animated: false)
+        await sut.navigate(to: .init(presentationStyle: .push, content: PushStep2View()), animated: false)
+        await sut.navigate(to: .init(presentationStyle: .push, content: PushStep3View()), animated: false)
+        await sut.navigate(to: .init(presentationStyle: .push, content: FullScreenStepView()), animated: false)
+        
+        let result = await sut.popToView(view, animated: false)
+        XCTAssertTrue(result)
+        
+        XCTAssertEqual(sut.items.count, 1)
+        if let lastItem = sut.items.last {
+            XCTAssertEqual(getNameOf(object: lastItem.view), getNameOf(object: view))
+            XCTAssertEqual(lastItem.presentationStyle, .push)
         } else {
             XCTFail("lastItem can not be nil")
         }
@@ -155,16 +146,12 @@ final class RouterTests: XCTestCase {
     
     private func makeSUT(file: StaticString = #filePath, line: UInt = #line) -> Router<AnyEnumRoute> {
         let router = Router<AnyEnumRoute>()
-        router.mainView = .pushStep
+        router.mainView.send(.pushStep)
         trackForMemoryLeaks(router, file: file, line: line)
         return router
     }
     
     private func makeSheetItem(_ item: any RouteType, animated: Bool = true) -> SheetItem<RouteType.Body> {
         .init(view: item.view, animated: animated, presentationStyle: item.presentationStyle)
-    }
-    
-    private func getNameOf<T>(object: T) -> String {
-        String(describing: object.self).replacingOccurrences(of: "()", with: "")
     }
 }

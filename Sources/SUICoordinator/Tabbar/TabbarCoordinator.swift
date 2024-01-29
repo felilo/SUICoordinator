@@ -144,6 +144,10 @@ open class TabbarCoordinator<Page>: Coordinator<RouteBase>, TabbarCoordinatorTyp
         })
     }
     
+    public func popToRoot() async {
+        try? await getCoordinatorSelected().root.popToRoot(animated: true)
+    }
+    
     // ---------------------------------------------------------------------
     // MARK: Private helper funcs
     // ---------------------------------------------------------------------

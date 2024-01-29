@@ -36,7 +36,7 @@ class MainCoordinator: Coordinator<MainRoute> {
     
     override func start(animated: Bool = true) async {
         let coordinator = HomeCoordinator()
-        async let _ = startFlow(route: .splash, animated: false)
+        async let _ = await startFlow(route: .splash, animated: false)
         await navigate(to: coordinator, presentationStyle: .fullScreenCover, animated: false)
     }
 }
