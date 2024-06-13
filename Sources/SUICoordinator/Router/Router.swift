@@ -186,8 +186,8 @@ public class Router<Route: RouteType>: ObservableObject, RouterType {
     ///   - withMainView: A boolean value indicating whether to clean the main view.
     @MainActor public func clean(animated: Bool, withMainView: Bool = true) async -> Void {
         await runActionWithAnimation(animated) { [weak self] in
-            await self?.sheetCoordinator.clean(animated: animated)
             return {
+                self?.sheetCoordinator.clean(animated: animated)
                 self?.items = []
                 self?.coordinator = nil
                 if withMainView { self?.mainView = nil }
@@ -201,7 +201,7 @@ public class Router<Route: RouteType>: ObservableObject, RouterType {
     ///   - animated: A boolean value indicating whether to animate the restart action.
     @MainActor public func restart(animated: Bool) async -> Void {
         await popToRoot(animated: animated)
-        await sheetCoordinator.clean(animated: animated)
+        sheetCoordinator.clean(animated: animated)
     }
     
     /// Presents a sheet with a specified item.
