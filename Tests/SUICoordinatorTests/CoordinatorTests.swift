@@ -37,13 +37,13 @@ final class CoordinatorTests: XCTestCase {
         await sut.router.navigate(to: .pushStep, animated: false )
         await navigateToCoordinator(coordinator1, in: sut)
         await navigateToCoordinator(coordinator2, in: coordinator1)
-        await sut.router.restart(animated: false )
+        
+        await sut.restart(animated: false )
         
         XCTAssertEqual(sut.router.items.count, 0)
         XCTAssertTrue(sut.children.isEmpty)
         XCTAssertNotNil(sut.router.mainView)
         XCTAssertEqual(sut.router.sheetCoordinator.items.count, 0)
-        await finishFlow(sut: sut)
     }
     
     func test_finshFlow() async throws {
