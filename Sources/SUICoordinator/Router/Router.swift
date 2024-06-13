@@ -190,7 +190,7 @@ public class Router<Route: RouteType>: ObservableObject, RouterType {
             return {
                 self?.items = []
                 self?.coordinator = nil
-//                if withMainView { self?.mainView = nil }
+                if withMainView { self?.mainView = nil }
             }
         }
     }
