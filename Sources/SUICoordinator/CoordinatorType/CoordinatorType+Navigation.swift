@@ -84,14 +84,4 @@ public extension CoordinatorType {
         await finishFlow(animated: animated)
         await startFlow(route: mainView)
     }
-    
-    
-    @MainActor func restart(animated: Bool = true) async -> Void {
-        guard let mainView = router.mainView else {
-            return
-        }
-        
-        await finishFlow(animated: animated)
-        await startFlow(route: mainView)
-    }
 }
