@@ -68,6 +68,7 @@ final class RouterTests: XCTestCase {
         
         await sut.navigate(to: .sheetStep, animated: false)
         await sut.close(animated: false)
+        sut.sheetCoordinator.removeAllNilItems()
         XCTAssertEqual(sut.sheetCoordinator.items.count, 0)
     }
     
