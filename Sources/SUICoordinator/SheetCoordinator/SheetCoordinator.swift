@@ -112,7 +112,7 @@ final public class SheetCoordinator<T>: ObservableObject {
     ///
     /// - Parameters:
     ///   - animated: A boolean value indicating whether to animate the cleanup process.
-    @MainActor func clean(animated: Bool = true) async -> Void {
+    func clean(animated: Bool = true) -> Void {
         guard !items.isEmpty, !isCleaning else { return }
         
         isCleaning = true
