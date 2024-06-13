@@ -82,7 +82,7 @@ final class SheetCoordinatorTests: XCTestCase {
         await sut.presentSheet(makeSheetItem("Third Item"))
         XCTAssertEqual(sut.items.count, 3)
         
-        await sut.clean(animated: false)
+        sut.clean(animated: false)
         XCTAssertEqual(sut.items.count, 0)
     }
     
