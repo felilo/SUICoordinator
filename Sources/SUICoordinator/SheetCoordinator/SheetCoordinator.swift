@@ -83,7 +83,7 @@ final public class SheetCoordinator<T>: ObservableObject {
         
         if animated {
             items.append(nil)
-            await makeDelay(animated: animated, customTime: 80 / 1000)
+            await makeDelay(animated: animated, duration: .seconds(0.08))
         }
         
         items.append(sheet)
@@ -149,12 +149,13 @@ final public class SheetCoordinator<T>: ObservableObject {
     /// - Parameters:
     ///   - animated: A boolean value indicating whether to animate the delay.
     ///   - customTime: An optional custom time for the delay.
-    private func makeDelay(animated: Bool, customTime: Double? = nil) async -> Void {
-        var milliSeconds = (animated ? 600.0 : 300.0) / 1000.0
-        if let customTime {
-            milliSeconds = customTime
+    private func makeDelay(animated: Bool, duration: ContinuousClock.Instant.Duration? = nil) async -> Void {
+        var finalDuration = ContinuousClock.Instant.Duration.seconds(animated ? 0.3 : 0)
+        
+        if let duration {
+            finalDuration = duration
         }
         
-        try? await Task.sleep(for: .seconds(milliSeconds))
+        try? await Task.sleep(for: finalDuration )
     }
 }
