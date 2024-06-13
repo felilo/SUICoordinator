@@ -76,26 +76,13 @@ final class CoordinatorTests: XCTestCase {
     func test_starFlow() async throws {
         let sut = makeSUT()
         let route = AnyEnumRoute.fullScreenStep
-        
-        
-        let publisher = sut.router.mainView
-            .setFailureType(to: Error.self)
-            .eraseToAnyPublisher()
-        
-        Task {
-            self.execute(publisher) { result in
-                switch result {
-                    case .success(let mainRoute):
-                        XCTAssertEqual(mainRoute, route)
-                        XCTAssertEqual(self.getNameOf(object: mainRoute.view), self.getNameOf(object: FullScreenStepView.self))
-                        
-                    case .failure(let error):
-                        XCTFail("Expected success, got failure: \(error.localizedDescription)")
-                }
-            }
-        }
 
-        async let _ = sut.startFlow(route: route)
+        await sut.startFlow(route: route)
+        let mainView = try XCTUnwrap(sut.router.mainView)
+        
+        XCTAssertEqual(mainView, route)
+        XCTAssertEqual(self.getNameOf(object: mainView.view), self.getNameOf(object: FullScreenStepView.self))
+        
         await finishFlow(sut: sut)
     }
     

@@ -52,5 +52,3 @@ class CustomTabbarViewModel: ObservableObject {
         currentPage = value
     }
 }
-
-

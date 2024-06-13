@@ -60,7 +60,7 @@ struct RouterView<Router: RouterType>: View {
                 addSheetTo(view: view)
             }
             
-        }.onReceive(viewModel.mainView, perform: onChangeFirstView)
+        }.onViewDidLoad { onChangeFirstView(viewModel.mainView) }
     }
     
     // --------------------------------------------------------------------
@@ -70,6 +70,7 @@ struct RouterView<Router: RouterType>: View {
     @ViewBuilder
     private func addSheetTo(view: some View ) -> some View {
         view
+            .onChange(of: viewModel.mainView, perform: onChangeFirstView)
             .sheetCoordinating(
                 coordinator: viewModel.sheetCoordinator,
                 onDissmis: { [weak viewModel] index in
