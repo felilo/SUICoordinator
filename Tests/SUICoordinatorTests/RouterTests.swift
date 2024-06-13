@@ -147,7 +147,7 @@ final class RouterTests: XCTestCase {
     
     private func makeSUT(file: StaticString = #filePath, line: UInt = #line) -> Router<AnyEnumRoute> {
         let router = Router<AnyEnumRoute>()
-        router.mainView = .pushStep
+        router.mainView.send(.pushStep)
         trackForMemoryLeaks(router, file: file, line: line)
         return router
     }
