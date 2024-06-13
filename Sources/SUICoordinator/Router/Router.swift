@@ -38,7 +38,7 @@ public class Router<Route: RouteType>: ObservableObject, RouterType {
     
     /// The first view in the navigation flow.
 //    @Published public var mainView: Route?
-    public var mainView: PassthroughSubject<Route, Never> = .init()
+    public var mainView: Route?
     /// The array of routes managed by the navigation router.
     @Published public var items: [Route] = []
     // The sheet coordinator for presenting sheets.

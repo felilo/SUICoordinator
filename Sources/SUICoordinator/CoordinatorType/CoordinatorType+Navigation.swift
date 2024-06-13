@@ -72,7 +72,17 @@ public extension CoordinatorType {
     ///   - animated: A boolean value indicating whether to animate the start flow process.
     @MainActor func startFlow(route: Route, transitionStyle: TransitionPresentationStyle? = nil, animated: Bool = true) async -> Void {
         await router.restart(animated: animated)
-        router.mainView.send(route)
+        router.mainView = route
+    }
+    
+    
+    @MainActor func restart(animated: Bool = true) async -> Void {
+        guard let mainView = router.mainView else {
+            return
+        }
+        
+        await finishFlow(animated: animated)
+        await startFlow(route: mainView)
     }
     
     
