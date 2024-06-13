@@ -79,7 +79,10 @@ struct SheetCoordinating: ViewModifier {
                             )
                         },
                         transitionStyle: coordinator.lastPresentationStyle,
-                        onDismiss: onDissmis,
+                        onDismiss: {
+                            coordinator.removeAllNilItems()
+                            onDissmis?($0)
+                        },
                         onDidLoad: onDidLoad
                     )
                 }

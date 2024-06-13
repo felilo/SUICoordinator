@@ -68,6 +68,7 @@ final class RouterTests: XCTestCase {
         
         await sut.navigate(to: .sheetStep, animated: false)
         await sut.close(animated: false)
+        sut.sheetCoordinator.removeAllNilItems()
         XCTAssertEqual(sut.sheetCoordinator.items.count, 0)
     }
     
@@ -106,7 +107,7 @@ final class RouterTests: XCTestCase {
     func test_navigationStack_popToView_with_customRoute() async throws {
         let sut = Router<RouteBase>()
         let view = PushStepView.self
-        sut.mainView.send(RouteBase(presentationStyle: .push, content: PushStepView()))
+        sut.mainView = RouteBase(presentationStyle: .push, content: PushStepView())
         
         
         await sut.navigate(to: .init(presentationStyle: .push, content: PushStepView()), animated: false)

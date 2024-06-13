@@ -48,7 +48,6 @@ struct RouterView<Router: RouterType>: View {
     
     var body: some View {
         ZStack {
-            
             if viewModel.coordinator?.isTabbarCoordinable == true {
                 addSheetTo(view: mainView)
             } else {
@@ -60,7 +59,7 @@ struct RouterView<Router: RouterType>: View {
                 addSheetTo(view: view)
             }
             
-        }.onReceive(viewModel.mainView, perform: onChangeFirstView)
+        }.onViewDidLoad { onChangeFirstView(viewModel.mainView) }
     }
     
     // --------------------------------------------------------------------
