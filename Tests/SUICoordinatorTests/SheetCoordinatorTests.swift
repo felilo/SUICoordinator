@@ -55,7 +55,9 @@ final class SheetCoordinatorTests: XCTestCase {
         await sut.presentSheet(item)
         XCTAssertEqual(sut.items.count, 1)
         
-        await sut.removeLastSheet()
+        sut.removeLastSheet()
+        sut.removeAllNilItems()
+        
         XCTAssertEqual(sut.items.count, 0)
     }
     

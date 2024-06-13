@@ -37,8 +37,7 @@ public class Router<Route: RouteType>: ObservableObject, RouterType {
     // --------------------------------------------------------------------
     
     /// The first view in the navigation flow.
-//    @Published public var mainView: Route?
-    public var mainView: PassthroughSubject<Route, Never> = .init()
+    @Published public var mainView: Route?
     /// The array of routes managed by the navigation router.
     @Published public var items: [Route] = []
     // The sheet coordinator for presenting sheets.
@@ -157,8 +156,7 @@ public class Router<Route: RouteType>: ObservableObject, RouterType {
     ///   - animated: A boolean value indicating whether to animate the dismissal.
     @MainActor public func dismiss(animated: Bool = true) async -> Void {
         await runActionWithAnimation(animated) { [weak self] in
-            await self?.sheetCoordinator.removeLastSheet(animated: animated)
-            return { }
+            return { self?.sheetCoordinator.removeLastSheet(animated: animated) }
         }
     }
     
@@ -191,7 +189,7 @@ public class Router<Route: RouteType>: ObservableObject, RouterType {
             return {
                 self?.items = []
                 self?.coordinator = nil
-//                if withMainView { self?.mainView = nil }
+                if withMainView { self?.mainView = nil }
             }
         }
     }
@@ -230,10 +228,16 @@ fileprivate extension Router {
         _ animated: Bool,
         action: @escaping () async -> (() -> Void)
     ) async {
+        let customAction = await action()
         var transaction = Transaction()
         transaction.disablesAnimations = !animated
-        let customAction = await action()
-        withTransaction(transaction, customAction)
+        
+        await withCheckedContinuation { continuation in
+            withTransaction(transaction) {
+                customAction()
+                continuation.resume()
+            }
+        }
     }
     
     /// Handles the pop action by updating the navigation stack.
