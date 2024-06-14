@@ -25,7 +25,7 @@
 import SwiftUI
 import Combine
 
-struct SheetCoordinating: ViewModifier {
+struct SheetCoordinatorView: ViewModifier {
     
     // ---------------------------------------------------------
     // MARK: typealias
