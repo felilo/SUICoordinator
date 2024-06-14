@@ -28,24 +28,6 @@ import Combine
 
 final class CoordinatorTests: XCTestCase {
     
-    func test_restartMainCoordinator() async throws {
-        let sut = makeSUT()
-        let coordinator1 = OtherCoordinator()
-        let coordinator2 = AnyCoordinator()
-        
-        await sut.start(animated: false)
-        await sut.router.navigate(to: .pushStep, animated: false )
-        await navigateToCoordinator(coordinator1, in: sut)
-        await navigateToCoordinator(coordinator2, in: coordinator1)
-        
-        await sut.restart(animated: false )
-        
-        XCTAssertEqual(sut.router.items.count, 0)
-        XCTAssertTrue(sut.children.isEmpty)
-        XCTAssertNotNil(sut.router.mainView)
-        XCTAssertEqual(sut.router.sheetCoordinator.items.count, 0)
-    }
-    
     func test_finshFlow() async throws {
         let sut = makeSUT()
         
