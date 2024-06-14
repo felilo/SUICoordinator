@@ -190,11 +190,13 @@ class MainCoordinator: Coordinator<MainRoute> {
     
     override init() {
         super.init()
+        Task {
+            await startFlow(route: .splash, animated: false)
+        }
     }
     
-    override func start(animated: Bool = false) async {
+    override func start(animated: Bool = true) async {
         let coordinator = HomeCoordinator()
-        async let _ = await startFlow(route: .splash, animated: false)
         await navigate(to: coordinator, presentationStyle: .fullScreenCover, animated: animated)
     }
 }
@@ -516,7 +518,3 @@ _____
 ## Contributing
 
 Contributions to the SUICoordinator library are welcome! To contribute, simply fork this repository and make your changes in a new branch. When your changes are ready, submit a pull request to this repository for review.
-
-License
-
-The SUICoordinator library is released under the MIT license. See the LICENSE file for more information.

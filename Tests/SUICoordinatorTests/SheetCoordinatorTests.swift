@@ -41,7 +41,7 @@ final class SheetCoordinatorTests: XCTestCase {
         let sut = makeSUT()
         let finalRoute = makeSheetItem("Final Item")
         
-        await sut.presentSheet(makeSheetItem("First Item"))
+        await presentSheet(makeSheetItem("First Item"), with: sut)
         await sut.presentSheet(finalRoute)
         
         XCTAssertEqual(sut.items.count, 2)
@@ -52,7 +52,7 @@ final class SheetCoordinatorTests: XCTestCase {
         let sut = makeSUT()
         let item = makeSheetItem("Custom Item")
         
-        await sut.presentSheet(item)
+        await presentSheet(item, with: sut)
         XCTAssertEqual(sut.items.count, 1)
         
         sut.removeLastSheet()
@@ -64,9 +64,9 @@ final class SheetCoordinatorTests: XCTestCase {
     func test_dismiss_route_atPositon() async throws {
         let sut = makeSUT()
         
-        await sut.presentSheet(makeSheetItem("First Item"))
-        await sut.presentSheet(makeSheetItem("Second Item"))
-        await sut.presentSheet(makeSheetItem("Third Item"))
+        await presentSheet(makeSheetItem("First Item"), with: sut)
+        await presentSheet(makeSheetItem("Second Item"), with: sut)
+        await presentSheet(makeSheetItem("Third Item"), with: sut)
         
         await sut.remove(at: 1)
         
@@ -77,9 +77,9 @@ final class SheetCoordinatorTests: XCTestCase {
     func test_cleanCoordinator() async throws {
         let sut = makeSUT()
         
-        await sut.presentSheet(makeSheetItem("First Item"))
-        await sut.presentSheet(makeSheetItem("Second Item"))
-        await sut.presentSheet(makeSheetItem("Third Item"))
+        await presentSheet(makeSheetItem("First Item"), with: sut)
+        await presentSheet(makeSheetItem("Second Item"), with: sut)
+        await presentSheet(makeSheetItem("Third Item"), with: sut)
         XCTAssertEqual(sut.items.count, 3)
         
         sut.clean(animated: false)
@@ -102,5 +102,10 @@ final class SheetCoordinatorTests: XCTestCase {
         animated: Bool = false
     ) -> SheetItem<String> {
         .init(view: item, animated: animated, presentationStyle: presentationStyle)
+    }
+    
+    private func presentSheet( _ item: SheetItem<String>, with sut: SheetCoordinator<String>) async {
+        await sut.presentSheet(item)
+        sut.removeAllNilItems()
     }
 }

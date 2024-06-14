@@ -34,7 +34,7 @@ public extension View {
         onDidLoad: ((Int) -> Void)? = nil
     ) -> some View {
         modifier(
-            SheetCoordinating(
+            SheetCoordinatorView(
                 coordinator: coordinator,
                 index: index,
                 isLast: isLast,
