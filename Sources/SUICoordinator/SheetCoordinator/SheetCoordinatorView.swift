@@ -83,7 +83,10 @@ struct SheetCoordinatorView: ViewModifier {
                             coordinator.removeAllNilItems()
                             onDissmis?($0)
                         },
-                        onDidLoad: onDidLoad
+                        onDidLoad: {
+                            coordinator.removeAllNilItems()
+                            onDidLoad?($0)
+                        }
                     )
                 }
             }

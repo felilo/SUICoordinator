@@ -109,7 +109,6 @@ final class RouterTests: XCTestCase {
         let view = PushStepView.self
         sut.mainView = RouteBase(presentationStyle: .push, content: PushStepView())
         
-        
         await sut.navigate(to: .init(presentationStyle: .push, content: PushStepView()), animated: false)
         await sut.navigate(to: .init(presentationStyle: .push, content: PushStep2View()), animated: false)
         await sut.navigate(to: .init(presentationStyle: .push, content: PushStep3View()), animated: false)
