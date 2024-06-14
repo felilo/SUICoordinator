@@ -83,11 +83,10 @@ final public class SheetCoordinator<T>: ObservableObject {
         
         if animated {
             items.append(nil)
-            await makeDelay(animated: animated, duration: .seconds(0.08))
+            await makeDelay(animated: animated, duration: .seconds(0))
         }
         
         items.append(sheet)
-        removeAllNilItems()
     }
     
     /// Removes the last presented sheet.

@@ -25,7 +25,7 @@
 import SwiftUI
 import Combine
 
-struct SheetCoordinating: ViewModifier {
+struct SheetCoordinatorView: ViewModifier {
     
     // ---------------------------------------------------------
     // MARK: typealias
@@ -83,7 +83,10 @@ struct SheetCoordinating: ViewModifier {
                             coordinator.removeAllNilItems()
                             onDissmis?($0)
                         },
-                        onDidLoad: onDidLoad
+                        onDidLoad: {
+                            coordinator.removeAllNilItems()
+                            onDidLoad?($0)
+                        }
                     )
                 }
             }
