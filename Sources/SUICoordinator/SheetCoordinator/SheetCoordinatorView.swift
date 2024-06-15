@@ -65,7 +65,7 @@ struct SheetCoordinatorView: ViewModifier {
                         items: $coordinator.items,
                         content: { (index, item) in
                             let view = AnyView(item.view)
-                                .sheetCoordinating(
+                                .sheetCoordinator(
                                     coordinator: coordinator,
                                     index: (index + 1),
                                     isLast: index == coordinator.totalItems,
