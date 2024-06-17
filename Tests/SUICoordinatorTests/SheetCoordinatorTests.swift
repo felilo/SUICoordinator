@@ -42,7 +42,7 @@ final class SheetCoordinatorTests: XCTestCase {
         let finalRoute = makeSheetItem("Final Item")
         
         await presentSheet(makeSheetItem("First Item"), with: sut)
-        await sut.presentSheet(finalRoute)
+        await presentSheet(finalRoute, with: sut)
         
         XCTAssertEqual(sut.items.count, 2)
         XCTAssertEqual(sut.items.last??.id, finalRoute.id)

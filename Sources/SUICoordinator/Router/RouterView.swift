@@ -70,11 +70,9 @@ struct RouterView<Router: RouterType>: View {
     private func addSheetTo(view: some View ) -> some View {
         view
             .onChange(of: viewModel.mainView, perform: onChangeFirstView)
-            .sheetCoordinating(
+            .sheetCoordinator(
                 coordinator: viewModel.sheetCoordinator,
-                onDissmis: { [weak viewModel] index in
-                    viewModel?.sheetCoordinator.remove(at: index)
-                },
+                onDissmis: { viewModel.sheetCoordinator.remove(at: $0) },
                 onDidLoad: nil
             )
     }

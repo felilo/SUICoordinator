@@ -138,12 +138,7 @@ final class TabbarCoordinatorTests: XCTestCase {
         file: StaticString = #filePath,
         line: UInt = #line
     ) -> AnyTabbarCoordinator {
-        let parent = OtherCoordinator()
         let coordinator = AnyTabbarCoordinator(currentPage: currentPage)
-        
-        coordinator.parent = parent
-        parent.children.append(coordinator)
-        
         trackForMemoryLeaks(coordinator, file: file, line: line)
         return coordinator
     }

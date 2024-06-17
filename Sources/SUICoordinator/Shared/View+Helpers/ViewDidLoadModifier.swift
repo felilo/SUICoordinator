@@ -26,7 +26,7 @@ import SwiftUI
 
 public extension View {
     
-    func sheetCoordinating(
+    func sheetCoordinator(
         coordinator: SheetCoordinator<(any View)>,
         index: Int = 0,
         isLast: Bool = false,

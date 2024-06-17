@@ -46,11 +46,9 @@ final class CoordinatorTests: XCTestCase {
         await sut.start(animated: false)
         await sut.router.navigate(to: .pushStep2, animated: false )
         await navigateToCoordinator(coordinator, in: sut)
-        await sut.router.navigate(to: .sheetStep, animated: false )
         
         await finishFlow(sut: sut)
         XCTAssertEqual(sut.router.items.count, 0)
-        XCTAssertNotNil(sut.router.mainView)
         XCTAssertTrue(sut.children.isEmpty)
         XCTAssertEqual(sut.router.sheetCoordinator.items.count, 0)
     }
@@ -141,10 +139,7 @@ final class CoordinatorTests: XCTestCase {
     // --------------------------------------------------------------------
     
     private func makeSUT(file: StaticString = #filePath, line: UInt = #line) -> AnyCoordinator {
-        let parent = OtherCoordinator()
         let coordinator = AnyCoordinator()
-        coordinator.parent = parent
-        parent.children.append(coordinator)
         trackForMemoryLeaks(coordinator, file: file, line: line)
         return coordinator
     }

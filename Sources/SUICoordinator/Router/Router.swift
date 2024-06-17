@@ -37,7 +37,6 @@ public class Router<Route: RouteType>: ObservableObject, RouterType {
     // --------------------------------------------------------------------
     
     /// The first view in the navigation flow.
-//    @Published public var mainView: Route?
     public var mainView: Route?
     /// The array of routes managed by the navigation router.
     @Published public var items: [Route] = []
@@ -187,8 +186,6 @@ public class Router<Route: RouteType>: ObservableObject, RouterType {
     @MainActor public func clean(animated: Bool, withMainView: Bool = true) async -> Void {
         await runActionWithAnimation(animated) { [weak self] in
             return {
-                self?.sheetCoordinator.clean(animated: animated)
-                self?.items = []
                 self?.coordinator = nil
                 if withMainView { self?.mainView = nil }
             }

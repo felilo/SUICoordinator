@@ -95,7 +95,7 @@ final public class SheetCoordinator<T>: ObservableObject {
     ///   - animated: A boolean value indicating whether to animate the removal.
     func removeLastSheet(animated: Bool = true) -> Void {
         guard !items.isEmpty, !isCleaning else { return }
-        removeNilItems(at: totalItems)
+        makeNilItem(at: totalItems)
     }
     
     /// Removes the item at the specified index.
@@ -115,7 +115,7 @@ final public class SheetCoordinator<T>: ObservableObject {
         guard !items.isEmpty, !isCleaning else { return }
         
         isCleaning = true
-        removeNilItems(at: 0)
+        makeNilItem(at: 0)
         resetValues()
     }
     
@@ -128,11 +128,11 @@ final public class SheetCoordinator<T>: ObservableObject {
         items.removeAll(where: { $0 == nil || $0?.view == nil })
     }
     
-    /// Removes `nil` items at the specified index.
+    /// Makes item `nil` at the specified index.
     ///
     /// - Parameters:
     ///   - index: The index at which to remove `nil` items.
-    private func removeNilItems(at index: Int) {
+    private func makeNilItem(at index: Int) {
         items[index] = nil
     }
     
