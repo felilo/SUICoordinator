@@ -119,7 +119,8 @@ extension CoordinatorType {
     ///   - animated: A boolean value indicating whether to animate the cleanup process.
     func emptyCoordinator(animated: Bool) async {
         guard let parent = parent else {
-            async let _ = await router.restart(animated: animated)
+            await router.restart(animated: animated)
+            await cleanView(animated: false)
             return await removeChildren()
         }
         
@@ -154,7 +155,7 @@ extension CoordinatorType {
             )
         }
         
-        if (parent is (any TabbarCoordinatable)) {
+        if let parent, (parent is (any TabbarCoordinatable)) {
             await router.close(animated: animated, finishFlow: true)
             await handleFinish(parent)
         } else {
