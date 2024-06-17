@@ -46,7 +46,7 @@ extension XCTestCase {
     }
     
     func finishFlow(sut: (any CoordinatorType)) async {
-        await sut.finishFlow(animated: false)
+        async let _ = await sut.finishFlow(animated: false)
     }
     
     func getNameOf<T>(object: T) -> String {

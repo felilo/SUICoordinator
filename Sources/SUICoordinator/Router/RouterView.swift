@@ -72,12 +72,7 @@ struct RouterView<Router: RouterType>: View {
             .onChange(of: viewModel.mainView, perform: onChangeFirstView)
             .sheetCoordinator(
                 coordinator: viewModel.sheetCoordinator,
-                onDissmis: { index in
-                    viewModel.sheetCoordinator.remove(at: index)
-                    Task {
-                        async let _ = await viewModel.restart(animated: false)
-                    }
-                },
+                onDissmis: { viewModel.sheetCoordinator.remove(at: $0) },
                 onDidLoad: nil
             )
     }

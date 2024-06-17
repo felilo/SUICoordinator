@@ -59,7 +59,7 @@ public extension CoordinatorType {
     ///
     /// - Parameters:
     ///   - animated: A boolean value indicating whether to animate the finish flow process.
-    @MainActor func finishFlow(animated: Bool) async -> Void {
+    @MainActor func finishFlow(animated: Bool = true) async -> Void {
         await finish(animated: animated, withDissmis: true)
     }
     
