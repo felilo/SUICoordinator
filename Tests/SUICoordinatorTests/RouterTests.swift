@@ -80,6 +80,7 @@ final class RouterTests: XCTestCase {
         await sut.navigate(to: .sheetStep, animated: false)
         await sut.navigate(to: .fullScreenStep, animated: false)
         await sut.clean(animated: false)
+        await sut.restart(animated: false)
         
         XCTAssertEqual(sut.items.count, 0)
         XCTAssertEqual(sut.sheetCoordinator.items.count, 0)
