@@ -106,9 +106,9 @@ final class RouterTests: XCTestCase {
     }
     
     func test_navigationStack_popToView_with_customRoute() async throws {
-        let sut = Router<RouteBase>()
+        let sut = Router<DefaultRoute>()
         let view = PushStepView.self
-        sut.mainView = RouteBase(presentationStyle: .push, content: PushStepView())
+        sut.mainView = DefaultRoute(presentationStyle: .push, content: PushStepView())
         
         await sut.navigate(to: .init(presentationStyle: .push, content: PushStepView()), animated: false)
         await sut.navigate(to: .init(presentationStyle: .push, content: PushStep2View()), animated: false)
