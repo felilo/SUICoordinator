@@ -25,7 +25,7 @@
 import Foundation
 import SUICoordinator
 
-class TabbarFlowCoordinator: Coordinator<RouteBase> {
+class TabbarFlowCoordinator: Coordinator<DefaultRoute> {
     
     // ---------------------------------------------------------------------
     // MARK: Coordinator
@@ -34,7 +34,7 @@ class TabbarFlowCoordinator: Coordinator<RouteBase> {
     override func start(animated: Bool = true) async {
         let viewModel = TabbarActionListViewModel(coordinator: self)
         
-        let route = RouteBase(
+        let route = DefaultRoute(
             presentationStyle: .push,
             content: TabbarActionListView(viewModel: viewModel)
         )
@@ -54,10 +54,6 @@ class TabbarFlowCoordinator: Coordinator<RouteBase> {
     func presentCustomTabbarCoordinator() async {
         let coordinator = CustomTabbarCoordinator()
         await navigate(to: coordinator, presentationStyle: .sheet)
-    }
-    
-    func close() async {
-        await router.close()
     }
     
     func finish() async {

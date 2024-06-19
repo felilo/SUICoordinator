@@ -35,13 +35,6 @@ public enum MyTabbarPage: TabbarPage, CaseIterable {
     // MARK: TabbarPage
     // ---------------------------------------------------------
     
-    public var badge: String? {
-        switch self {
-            case .first: "new"
-            case .second: "10"
-        }
-    }
-    
     @ViewBuilder
     public var icon: (any View) {
         switch self {
