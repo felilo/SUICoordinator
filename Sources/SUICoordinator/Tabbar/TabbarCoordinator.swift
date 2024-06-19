@@ -28,7 +28,7 @@ import Combine
 /// An open class representing a coordinator for managing a tabbar-based navigation.
 ///
 /// Tabbar coordinators handle the navigation and coordination of pages within a tabbar.
-open class TabbarCoordinator<Page>: Coordinator<RouteBase>, TabbarCoordinatorType where Page: TabbarPage {
+open class TabbarCoordinator<Page>: Coordinator<DefaultRoute>, TabbarCoordinatorType where Page: TabbarPage {
     
     // --------------------------------------------------------------------
     // MARK: Wrapper properties
@@ -85,7 +85,7 @@ open class TabbarCoordinator<Page>: Coordinator<RouteBase>, TabbarCoordinatorTyp
     /// - Parameters:
     ///   - animated: A boolean value indicating whether to animate the start process.
     open override func start(animated: Bool = true) async {
-        let route = RouteBase(
+        let route = DefaultRoute(
             presentationStyle: presentationStyle,
             content: customView ?? TabbarCoordinatorView(viewModel: self)
         )
