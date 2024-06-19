@@ -287,6 +287,15 @@ _____
 These are the most important features and actions that you can perform:
 <br>
 
+
+#### RouteType
+
+To create any route in `SUICoordinator` you need to extend your object to the `RouteType` protocol; Additionally, you can add your custom functions if you need. As you can see, in our example we are using custom types (`enums`) to implement it.
+
+Last but not least, you can also use `DefaultRoute` to create custom routes as demonstrated in the `TabBarFlowCoordinator` [example](https://github.com/felilo/SUICoordinator/blob/main/Examples/SUICoordinatorExample/SUICoordinatorExample/Coordinators/TabbarFlow/TabbarFlowCoordinator.swift)
+<br>
+
+
 #### Router
 
 The router is encharge to manage the navigation stack and coordinate the transitions between different views. It abstracts away the navigation details from the views, allowing them to focus on their specific features such as:
