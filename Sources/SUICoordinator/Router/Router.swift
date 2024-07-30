@@ -206,7 +206,7 @@ public class Router<Route: RouteType>: ObservableObject, RouterType {
     /// - Parameters:
     ///   - item: The sheet item containing the view to present.
     @MainActor func presentSheet(item: SheetItem<(any View)>) async -> Void {
-        await sheetCoordinator.presentSheet(item, animated: item.animated)
+        await sheetCoordinator.presentSheet(item)
     }
 }
 
