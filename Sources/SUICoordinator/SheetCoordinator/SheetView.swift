@@ -43,6 +43,7 @@ struct SheetView<Content: View, T: SCIdentifiable>: View {
     let onDismiss: ((Int) -> Void)?
     let onDidLoad: ((Int) -> Void)?
     let transitionStyle: TransitionPresentationStyle?
+    let animated: Bool
     
     // ---------------------------------------------------------
     // MARK: Constructor
@@ -53,6 +54,7 @@ struct SheetView<Content: View, T: SCIdentifiable>: View {
         items: Binding<[Item?]>,
         @ViewBuilder content: @escaping (Int, (Item)) -> Content,
         transitionStyle: TransitionPresentationStyle?,
+        animated: Bool,
         onDismiss: ((Int) -> Void)? = nil,
         onDidLoad: ((Int) -> Void)?
     ) {
@@ -62,6 +64,7 @@ struct SheetView<Content: View, T: SCIdentifiable>: View {
         self.onDismiss = onDismiss
         self.onDidLoad = onDidLoad
         self.transitionStyle = transitionStyle
+        self.animated = animated
     }
     
     // ---------------------------------------------------------
@@ -72,10 +75,14 @@ struct SheetView<Content: View, T: SCIdentifiable>: View {
         ForEach($items.indices, id: \.self) { (index) in
             if index == self.index {
                 let item = $items[index]
-                switch transitionStyle {
+                Group {
+                    switch transitionStyle {
                     case .fullScreenCover:
                         fullScreenView(item: item)
                     default: sheetView(item: item)
+                    }
+                }.transaction {
+                    $0.disablesAnimations = !(animated)
                 }
             }
         }

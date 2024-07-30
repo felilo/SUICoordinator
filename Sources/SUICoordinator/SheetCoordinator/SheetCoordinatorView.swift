@@ -72,13 +72,13 @@ struct SheetCoordinatorView: ViewModifier {
                                     onDissmis: onDissmis,
                                     onDidLoad: onDidLoad
                                 )
-                            
                             buildContent(
                                 transitionStyle: item.presentationStyle,
                                 content: view
                             )
                         },
-                        transitionStyle: coordinator.lastPresentationStyle,
+                        transitionStyle: coordinator.lastPresentationStyle, 
+                        animated: coordinator.animated ?? true,
                         onDismiss: {
                             coordinator.removeAllNilItems()
                             onDissmis?($0)
