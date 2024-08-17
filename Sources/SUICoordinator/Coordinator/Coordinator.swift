@@ -111,6 +111,6 @@ open class Coordinator<Route: RouteType>: ObservableObject, CoordinatorType {
     
     /// Cleans up the coordinator.
     private func clean() async {
-        await finish(animated: false, withDissmis: false)
+        await finish(animated: false, withDismiss: false)
     }
 }

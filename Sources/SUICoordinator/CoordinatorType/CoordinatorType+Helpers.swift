@@ -83,7 +83,7 @@ extension CoordinatorType {
     ///   - animated: A boolean value indicating whether to animate the removal process.
     func removeChildren(animated: Bool = false) async {
         guard let first = children.first else { return }
-        await first.handleFinish(animated: animated, withDissmis: false)
+        await first.handleFinish(animated: animated, withDismiss: false)
         await removeChildren()
     }
     
@@ -133,8 +133,8 @@ extension CoordinatorType {
     /// - Parameters:
     ///   - animated: A boolean value indicating whether to animate the finish process.
     ///   - withDissmis: A boolean value indicating whether to dismiss the coordinator.
-    func handleFinish(animated: Bool = true, withDissmis: Bool = true) async {
-        guard withDissmis else {
+    func handleFinish(animated: Bool = true, withDismiss: Bool = true) async {
+        guard withDismiss else {
             return await emptyCoordinator(animated: animated)
         }
         await router.close(animated: animated, finishFlow: true)
@@ -147,11 +147,11 @@ extension CoordinatorType {
     ///   - animated: A boolean value indicating whether to animate the finish process.
     ///   - withDissmis: A boolean value indicating whether to dismiss the coordinator.
     /// - Returns: An asynchronous void task representing the finish process.
-    func finish(animated: Bool = true, withDissmis: Bool = true) async -> Void {
+    func finish(animated: Bool = true, withDismiss: Bool = true) async -> Void {
         let handleFinish = { (coordinator: TCoordinatorType) async -> Void in
             await coordinator.handleFinish(
                 animated: animated,
-                withDissmis: withDissmis
+                withDismiss: withDismiss
             )
         }
         
