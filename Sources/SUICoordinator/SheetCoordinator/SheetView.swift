@@ -24,7 +24,7 @@
 
 import SwiftUI
 
-struct SheetView<Content: View, T: SCIdentifiable>: View {
+struct SheetView<Content: View, T: SheetItemType>: View {
     
     typealias Item = T
     
@@ -72,20 +72,21 @@ struct SheetView<Content: View, T: SCIdentifiable>: View {
     // ---------------------------------------------------------
     
     var body: some View {
-        ForEach($items.indices, id: \.self) { (index) in
-            if index == self.index {
+        Group {
+            if let index = $items.indices.firstIndex(of: index) {
                 let item = $items[index]
-                Group {
-                    switch transitionStyle {
-                    case .fullScreenCover:
-                        fullScreenView(item: item)
-                    default: sheetView(item: item)
-                    }
-                }.transaction {
-                    $0.disablesAnimations = !(animated)
+                
+                switch getTransitionStyle(from: index) {
+                case .fullScreenCover:
+                    fullScreenView(item: item)
+                case .sheet, .detents:
+                    sheetView(item: item)
+                default:
+                    EmptyView()
                 }
             }
         }
+        .transaction { $0.disablesAnimations = !(animated) }
     }
     
     // ---------------------------------------------------------
@@ -94,17 +95,18 @@ struct SheetView<Content: View, T: SCIdentifiable>: View {
     
     @ViewBuilder
     private func sheetView(item: Binding<Item?>) -> some View {
-        Color.clear.frame(width: 0.3, height: 0.3)
+        defaultView
             .sheet(
                 item: item,
                 onDismiss: { onDismiss?(index) },
                 content: { content(index, $0) }
-            ).onAppear { onDidLoad?(index) }
+            )
+            .onAppear { onDidLoad?(index) }
     }
     
     @ViewBuilder
     private func fullScreenView(item: Binding<Item?>) -> some View {
-        Color.clear.frame(width: 0.3, height: 0.3)
+        defaultView
             .fullScreenCover(
                 item: item,
                 onDismiss: { onDismiss?(index) },
