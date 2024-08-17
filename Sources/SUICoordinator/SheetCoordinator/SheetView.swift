@@ -111,4 +111,20 @@ struct SheetView<Content: View, T: SCIdentifiable>: View {
                 content: { content(index, $0) }
             ).onAppear{ onDidLoad?(index)}
     }
+    
+    private var defaultView: some View {
+        Color.blue.frame(width: 0.3, height: 0.3)
+    }
+    
+    // ---------------------------------------------------------
+    // MARK: Helper Functions
+    // ---------------------------------------------------------
+    
+    private func getTransitionStyle(from index: Int) -> TransitionPresentationStyle? {
+        guard items.indices.contains(index) else {
+            return transitionStyle
+        }
+        
+        return items[index]?.presentationStyle ?? transitionStyle
+    }
 }
