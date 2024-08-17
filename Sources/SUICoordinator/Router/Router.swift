@@ -154,10 +154,8 @@ public class Router<Route: RouteType>: ObservableObject, RouterType {
     ///
     /// - Parameters:
     ///   - animated: A boolean value indicating whether to animate the dismissal.
-    @MainActor public func dismiss(animated: Bool = true) async -> Void {
-        await runActionWithAnimation(animated) { [weak self] in
-            return { self?.sheetCoordinator.removeLastSheet(animated: animated) }
-        }
+    @MainActor public func dismiss(animated: Bool = true) -> Void {
+        sheetCoordinator.removeLastSheet(animated: animated)
     }
     
     /// Closes the current view or sheet, optionally finishing the associated flow.
@@ -170,11 +168,10 @@ public class Router<Route: RouteType>: ObservableObject, RouterType {
             if let parent = coordinator?.parent {
                 await parent.dismissLastSheet(animated: animated)
             }
-            
         } else if sheetCoordinator.items.isEmpty {
             await pop(animated: animated)
         } else {
-            await dismiss(animated: animated)
+            dismiss(animated: animated)
         }
     }
     
@@ -183,14 +180,10 @@ public class Router<Route: RouteType>: ObservableObject, RouterType {
     /// - Parameters:
     ///   - animated: A boolean value indicating whether to animate the cleanup process.
     ///   - withMainView: A boolean value indicating whether to clean the main view.
-    @MainActor public func clean(animated: Bool, withMainView: Bool = true) async -> Void {
-        await runActionWithAnimation(animated) { [weak self] in
-            return {
-                self?.sheetCoordinator.clean(animated: animated)
-                self?.coordinator = nil
-                if withMainView { self?.mainView = nil }
-            }
-        }
+    @MainActor public func clean(animated: Bool, withMainView: Bool = true) -> Void {
+        sheetCoordinator.clean(animated: animated)
+        coordinator = nil
+        if withMainView { mainView = nil }
     }
     
     /// Restarts the current view or coordinator, optionally animating the restart.

@@ -82,14 +82,14 @@ public protocol RouterType: ObservableObject {
     ///
     /// - Parameters:
     ///   - animated: A boolean value indicating whether to animate the dismissal.
-    func dismiss(animated: Bool) async
+    func dismiss(animated: Bool)
     
     /// Cleans up the current view or coordinator, optionally preserving the main view.
     ///
     /// - Parameters:
     ///   - animated: A boolean value indicating whether to animate the cleanup process.
     ///   - withMainView: A boolean value indicating whether to clean the main view.
-    func clean(animated: Bool, withMainView: Bool) async -> Void
+    func clean(animated: Bool, withMainView: Bool) -> Void
     
     /// Closes the current view or coordinator, optionally finishing the associated flow.
     ///
