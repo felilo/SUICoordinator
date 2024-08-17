@@ -132,7 +132,7 @@ extension CoordinatorType {
     ///
     /// - Parameters:
     ///   - animated: A boolean value indicating whether to animate the finish process.
-    ///   - withDissmis: A boolean value indicating whether to dismiss the coordinator.
+    ///   - withDismiss: A boolean value indicating whether to dismiss the coordinator.
     func handleFinish(animated: Bool = true, withDismiss: Bool = true) async {
         guard withDismiss else {
             return await emptyCoordinator(animated: animated)
@@ -145,7 +145,7 @@ extension CoordinatorType {
     ///
     /// - Parameters:
     ///   - animated: A boolean value indicating whether to animate the finish process.
-    ///   - withDissmis: A boolean value indicating whether to dismiss the coordinator.
+    ///   - withDismiss: A boolean value indicating whether to dismiss the coordinator.
     /// - Returns: An asynchronous void task representing the finish process.
     func finish(animated: Bool = true, withDismiss: Bool = true) async -> Void {
         let handleFinish = { (coordinator: TCoordinatorType) async -> Void in
