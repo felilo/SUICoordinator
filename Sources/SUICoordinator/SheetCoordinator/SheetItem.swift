@@ -27,7 +27,7 @@ import Foundation
 /// A class representing a sheet item for presenting views or coordinators in a coordinator-based architecture.
 ///
 /// Sheet items encapsulate information about the view, animation, and presentation style.
-final public class SheetItem<T>: SCHashable {
+final public class SheetItem<T>: SCHashable, SheetItemType {
     
     // ---------------------------------------------------------
     // MARK: Properties
@@ -40,10 +40,10 @@ final public class SheetItem<T>: SCHashable {
     let view: T
     
     /// A boolean value indicating whether to animate the presentation.
-    let animated: Bool
+    var animated: Bool
     
     /// The transition presentation style for presenting the sheet item.
-    let presentationStyle: TransitionPresentationStyle
+    var presentationStyle: TransitionPresentationStyle
     
     // ---------------------------------------------------------
     // MARK: Constructor
@@ -56,7 +56,7 @@ final public class SheetItem<T>: SCHashable {
     ///   - view: The view or coordinator to present.
     ///   - animated: A boolean value indicating whether to animate the presentation.
     ///   - presentationStyle: The transition presentation style for presenting the sheet item.
-    init(id: String = UUID().uuidString, view: T, animated: Bool, presentationStyle: TransitionPresentationStyle) {
+    init(id: String, view: T, animated: Bool, presentationStyle: TransitionPresentationStyle) {
         self.view = view
         self.animated = animated
         self.presentationStyle = presentationStyle
