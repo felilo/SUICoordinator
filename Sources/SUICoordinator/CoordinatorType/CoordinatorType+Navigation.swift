@@ -48,6 +48,7 @@ public extension CoordinatorType {
         startChildCoordinator(coordinator)
         
         let item = SheetItem(
+            id: "\(coordinator.uuid) - \(presentationStyle.id)",
             view: coordinator.view,
             animated: animated,
             presentationStyle: (presentationStyle != .push) ? presentationStyle :  .sheet)
