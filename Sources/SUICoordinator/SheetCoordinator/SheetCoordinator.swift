@@ -82,8 +82,11 @@ final public class SheetCoordinator<T>: ObservableObject {
     ///   - sheet: The item representing the sheet to present.
     ///   - animated: A boolean value indicating whether to animate the sheet presentation.
     @MainActor public func presentSheet(_ sheet: Item) -> Void {
-        lastPresentationStyle = sheet.presentationStyle
+        if sheet.animated {
+            items.append(nil)
+        }
         animated = sheet.animated
+        lastPresentationStyle = sheet.presentationStyle
         items.append(sheet)
     }
     
@@ -94,6 +97,7 @@ final public class SheetCoordinator<T>: ObservableObject {
     func removeLastSheet(animated: Bool) -> Void {
         guard !items.isEmpty, !isCleaning else { return }
         self.animated = animated
+        lastPresentationStyle = items.last(where: { $0?.presentationStyle != nil })??.presentationStyle
         makeNilItem(at: totalItems)
     }
     
@@ -123,7 +127,7 @@ final public class SheetCoordinator<T>: ObservableObject {
     // ---------------------------------------------------------
     
     /// Removes all `nil` items from the items array.
-    func removeAllNilItems() {
+    @MainActor func removeAllNilItems() {
         items.removeAll(where: { $0 == nil || $0?.view == nil })
     }
     
