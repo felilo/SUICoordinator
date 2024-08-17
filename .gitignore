@@ -1,1 +1,4 @@
 .build/
+Examples/SUICoordinatorExample/build/
+.swiftpm/
+Examples/SUICoordinatorExample/SUICoordinatorExample.xcodeproj/project.xcworkspace/xcuserdata/
