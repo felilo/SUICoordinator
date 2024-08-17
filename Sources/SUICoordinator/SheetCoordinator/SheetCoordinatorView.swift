@@ -63,30 +63,11 @@ struct SheetCoordinatorView: ViewModifier {
                     SheetView(
                         index: index,
                         items: $coordinator.items,
-                        content: { (index, item) in
-                            let view = AnyView(item.view)
-                                .sheetCoordinator(
-                                    coordinator: coordinator,
-                                    index: (index + 1),
-                                    isLast: index == coordinator.totalItems,
-                                    onDissmis: onDissmis,
-                                    onDidLoad: onDidLoad
-                                )
-                            buildContent(
-                                transitionStyle: item.presentationStyle,
-                                content: view
-                            )
-                        },
-                        transitionStyle: coordinator.lastPresentationStyle, 
+                        content: buildContent,
+                        transitionStyle: coordinator.lastPresentationStyle,
                         animated: coordinator.animated ?? true,
-                        onDismiss: {
-                            coordinator.removeAllNilItems()
-                            onDissmis?($0)
-                        },
-                        onDidLoad: {
-                            coordinator.removeAllNilItems()
-                            onDidLoad?($0)
-                        }
+                        onDismiss: onDissmis,
+                        onDidLoad: onDidLoad
                     )
                 }
             }
@@ -97,11 +78,24 @@ struct SheetCoordinatorView: ViewModifier {
     // ---------------------------------------------------------
     
     @ViewBuilder
-    private func buildContent(
-        transitionStyle: TransitionPresentationStyle?,
-        content: some View
+    private func buildContent(with index: Int, item: SheetItem<Value>) -> some View {
+        let view = AnyView(item.view)
+            .sheetCoordinator(
+            coordinator: coordinator,
+            index: (index + 1),
+            isLast: index == coordinator.totalItems,
+            onDissmis: onDissmis,
+            onDidLoad: onDidLoad
+        )
+        addSheet(to: view, with: item.presentationStyle)
+    }
+    
+    @ViewBuilder
+    private func addSheet(
+        to content: some View,
+        with presentationStyle: TransitionPresentationStyle
     ) -> some View {
-        switch transitionStyle {
+        switch presentationStyle {
             case .detents(let data): content.presentationDetents(data)
             default: content
         }

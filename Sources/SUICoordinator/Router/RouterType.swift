@@ -104,3 +104,18 @@ public protocol RouterType: ObservableObject {
     ///   - animated: A boolean value indicating whether to animate the restart action.
     func restart(animated: Bool) async -> Void
 }
+
+extension RouterType {
+    
+    @MainActor func removeNilItemsFromSheetCoordinator() -> Void {
+        sheetCoordinator.removeAllNilItems()
+    }
+    
+    @MainActor func removeItemFromSheetCoordinator(at index: Int) -> Void {
+        sheetCoordinator.remove(at: index)
+    }
+    
+    var isTabbarCoordinable: Bool {
+        coordinator?.isTabbarCoordinable == true
+    }
+}

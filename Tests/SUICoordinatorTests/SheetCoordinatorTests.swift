@@ -55,8 +55,8 @@ final class SheetCoordinatorTests: XCTestCase {
         await presentSheet(item, with: sut)
         XCTAssertEqual(sut.items.count, 1)
         
-        sut.removeLastSheet()
-        sut.removeAllNilItems()
+        sut.removeLastSheet(animated: false)
+        await sut.removeAllNilItems()
         
         XCTAssertEqual(sut.items.count, 0)
     }
@@ -101,11 +101,11 @@ final class SheetCoordinatorTests: XCTestCase {
         presentationStyle: TransitionPresentationStyle = .fullScreenCover,
         animated: Bool = false
     ) -> SheetItem<String> {
-        .init(view: item, animated: animated, presentationStyle: presentationStyle)
+        .init(id: UUID().uuidString, view: item, animated: animated, presentationStyle: presentationStyle)
     }
     
     private func presentSheet( _ item: SheetItem<String>, with sut: SheetCoordinator<String>) async {
         await sut.presentSheet(item)
-        sut.removeAllNilItems()
+        await sut.removeAllNilItems()
     }
 }
