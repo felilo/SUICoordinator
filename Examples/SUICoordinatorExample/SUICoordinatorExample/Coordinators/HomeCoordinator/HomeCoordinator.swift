@@ -27,6 +27,8 @@ import Foundation
 
 class HomeCoordinator: Coordinator<HomeRoute> {
     
+    private let animated: Bool  = true
+    
     // ---------------------------------------------------------------------
     // MARK: Coordinator
     // ---------------------------------------------------------------------
@@ -42,34 +44,34 @@ class HomeCoordinator: Coordinator<HomeRoute> {
     
     func navigateToPushView() async {
         let viewModel = PushViewModel(coordinator: self)
-        await router.navigate(to: .push(viewModel: viewModel))
+        await router.navigate(to: .push(viewModel: viewModel), animated: animated)
     }
     
     func presentSheet() async {
         let viewModel = SheetViewModel(coordinator: self)
-        await router.navigate(to: .sheet(viewModel: viewModel))
+        await router.navigate(to: .sheet(viewModel: viewModel), animated: animated)
     }
     
     func presentFullscreen() async {
         let viewModel = FullscreenViewModel(coordinator: self)
-        await router.navigate(to: .fullscreen(viewModel: viewModel))
+        await router.navigate(to: .fullscreen(viewModel: viewModel), animated: animated)
     }
     
     func presentDetents() async {
         let viewModel = DetentsViewModel(coordinator: self)
-        await router.navigate(to: .detents(viewModel: viewModel))
+        await router.navigate(to: .detents(viewModel: viewModel), animated: animated)
     }
     
     func presentTabbarCoordinator() async {
         let coordinator = TabbarFlowCoordinator()
-        await navigate(to: coordinator, presentationStyle: .sheet)
+        await navigate(to: coordinator, presentationStyle: .sheet, animated: animated)
     }
     
     func close() async {
-        await router.close()
+        await router.close(animated: animated)
     }
     
     func finsh() async {
-        await finishFlow()
+        await finishFlow(animated: animated)
     }
 }

@@ -51,6 +51,9 @@ final public class SheetCoordinator<T>: ObservableObject {
     /// The presentation style of the last presented sheet.
     public private (set) var lastPresentationStyle: TransitionPresentationStyle?
     
+    /// The presentation style of the last presented sheet.
+    public private (set) var animated: Bool?
+    
     // ---------------------------------------------------------
     // MARK: Constructor
     // ---------------------------------------------------------
@@ -78,14 +81,12 @@ final public class SheetCoordinator<T>: ObservableObject {
     /// - Parameters:
     ///   - sheet: The item representing the sheet to present.
     ///   - animated: A boolean value indicating whether to animate the sheet presentation.
-    @MainActor public func presentSheet(_ sheet: Item, animated: Bool = true) async -> Void {
-        lastPresentationStyle = sheet.presentationStyle
-        
-        if animated {
+    @MainActor public func presentSheet(_ sheet: Item) -> Void {
+        if sheet.animated {
             items.append(nil)
-            await makeDelay(animated: animated, duration: .seconds(0))
         }
-        
+        animated = sheet.animated
+        lastPresentationStyle = sheet.presentationStyle
         items.append(sheet)
     }
     
@@ -93,8 +94,10 @@ final public class SheetCoordinator<T>: ObservableObject {
     ///
     /// - Parameters:
     ///   - animated: A boolean value indicating whether to animate the removal.
-    func removeLastSheet(animated: Bool = true) -> Void {
+    func removeLastSheet(animated: Bool) -> Void {
         guard !items.isEmpty, !isCleaning else { return }
+        self.animated = animated
+        lastPresentationStyle = items.last(where: { $0?.presentationStyle != nil })??.presentationStyle
         makeNilItem(at: totalItems)
     }
     
@@ -124,7 +127,7 @@ final public class SheetCoordinator<T>: ObservableObject {
     // ---------------------------------------------------------
     
     /// Removes all `nil` items from the items array.
-    func removeAllNilItems() {
+    @MainActor func removeAllNilItems() {
         items.removeAll(where: { $0 == nil || $0?.view == nil })
     }
     
@@ -141,20 +144,5 @@ final public class SheetCoordinator<T>: ObservableObject {
         items = []
         lastPresentationStyle = nil
         isCleaning = false
-    }
-    
-    /// Delays execution optionally with a custom time.
-    ///
-    /// - Parameters:
-    ///   - animated: A boolean value indicating whether to animate the delay.
-    ///   - customTime: An optional custom time for the delay.
-    private func makeDelay(animated: Bool, duration: ContinuousClock.Instant.Duration? = nil) async -> Void {
-        var finalDuration = ContinuousClock.Instant.Duration.seconds(animated ? 0.3 : 0)
-        
-        if let duration {
-            finalDuration = duration
-        }
-        
-        try? await Task.sleep(for: finalDuration )
     }
 }

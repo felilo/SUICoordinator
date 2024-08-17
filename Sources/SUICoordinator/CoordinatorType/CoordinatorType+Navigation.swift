@@ -48,6 +48,7 @@ public extension CoordinatorType {
         startChildCoordinator(coordinator)
         
         let item = SheetItem(
+            id: "\(coordinator.uuid) - \(presentationStyle.id)",
             view: coordinator.view,
             animated: animated,
             presentationStyle: (presentationStyle != .push) ? presentationStyle :  .sheet)
@@ -60,7 +61,7 @@ public extension CoordinatorType {
     /// - Parameters:
     ///   - animated: A boolean value indicating whether to animate the finish flow process.
     @MainActor func finishFlow(animated: Bool = true) async -> Void {
-        await finish(animated: animated, withDissmis: true)
+        await finish(animated: animated, withDismiss: true)
     }
     
     

@@ -82,14 +82,14 @@ public protocol RouterType: ObservableObject {
     ///
     /// - Parameters:
     ///   - animated: A boolean value indicating whether to animate the dismissal.
-    func dismiss(animated: Bool) async
+    func dismiss(animated: Bool)
     
     /// Cleans up the current view or coordinator, optionally preserving the main view.
     ///
     /// - Parameters:
     ///   - animated: A boolean value indicating whether to animate the cleanup process.
     ///   - withMainView: A boolean value indicating whether to clean the main view.
-    func clean(animated: Bool, withMainView: Bool) async -> Void
+    func clean(animated: Bool, withMainView: Bool) -> Void
     
     /// Closes the current view or coordinator, optionally finishing the associated flow.
     ///
@@ -103,4 +103,19 @@ public protocol RouterType: ObservableObject {
     /// - Parameters:
     ///   - animated: A boolean value indicating whether to animate the restart action.
     func restart(animated: Bool) async -> Void
+}
+
+extension RouterType {
+    
+    @MainActor func removeNilItemsFromSheetCoordinator() -> Void {
+        sheetCoordinator.removeAllNilItems()
+    }
+    
+    @MainActor func removeItemFromSheetCoordinator(at index: Int) -> Void {
+        sheetCoordinator.remove(at: index)
+    }
+    
+    var isTabbarCoordinable: Bool {
+        coordinator?.isTabbarCoordinable == true
+    }
 }

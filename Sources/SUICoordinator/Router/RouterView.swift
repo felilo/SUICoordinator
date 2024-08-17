@@ -48,7 +48,7 @@ struct RouterView<Router: RouterType>: View {
     
     var body: some View {
         ZStack {
-            if viewModel.coordinator?.isTabbarCoordinable == true {
+            if viewModel.isTabbarCoordinable {
                 addSheetTo(view: mainView)
             } else {
                 let view = NavigationStack(path: $viewModel.items) {
@@ -58,8 +58,8 @@ struct RouterView<Router: RouterType>: View {
                 }
                 addSheetTo(view: view)
             }
-            
-        }.onViewDidLoad { onChangeFirstView(viewModel.mainView) }
+        }
+        .onViewDidLoad { onChangeFirstView(viewModel.mainView) }
     }
     
     // --------------------------------------------------------------------
@@ -72,8 +72,11 @@ struct RouterView<Router: RouterType>: View {
             .onChange(of: viewModel.mainView, perform: onChangeFirstView)
             .sheetCoordinator(
                 coordinator: viewModel.sheetCoordinator,
-                onDissmis: { viewModel.sheetCoordinator.remove(at: $0) },
-                onDidLoad: nil
+                onDissmis: { index in Task {
+                    viewModel.removeNilItemsFromSheetCoordinator()
+                    viewModel.removeItemFromSheetCoordinator(at: index)
+                }},
+                onDidLoad: { _ in Task(operation: viewModel.removeNilItemsFromSheetCoordinator) }
             )
     }
     

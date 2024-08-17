@@ -68,7 +68,7 @@ final class RouterTests: XCTestCase {
         
         await sut.navigate(to: .sheetStep, animated: false)
         await sut.close(animated: false)
-        sut.sheetCoordinator.removeAllNilItems()
+        await sut.sheetCoordinator.removeAllNilItems()
         XCTAssertEqual(sut.sheetCoordinator.items.count, 0)
     }
     
@@ -153,6 +153,6 @@ final class RouterTests: XCTestCase {
     }
     
     private func makeSheetItem(_ item: any RouteType, animated: Bool = true) -> SheetItem<RouteType.Body> {
-        .init(view: item.view, animated: animated, presentationStyle: item.presentationStyle)
+        .init(id: UUID().uuidString, view: item.view, animated: animated, presentationStyle: item.presentationStyle)
     }
 }

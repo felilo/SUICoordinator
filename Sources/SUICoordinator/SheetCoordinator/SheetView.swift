@@ -24,7 +24,7 @@
 
 import SwiftUI
 
-struct SheetView<Content: View, T: SCIdentifiable>: View {
+struct SheetView<Content: View, T: SheetItemType>: View {
     
     typealias Item = T
     
@@ -43,6 +43,7 @@ struct SheetView<Content: View, T: SCIdentifiable>: View {
     let onDismiss: ((Int) -> Void)?
     let onDidLoad: ((Int) -> Void)?
     let transitionStyle: TransitionPresentationStyle?
+    let animated: Bool
     
     // ---------------------------------------------------------
     // MARK: Constructor
@@ -53,6 +54,7 @@ struct SheetView<Content: View, T: SCIdentifiable>: View {
         items: Binding<[Item?]>,
         @ViewBuilder content: @escaping (Int, (Item)) -> Content,
         transitionStyle: TransitionPresentationStyle?,
+        animated: Bool,
         onDismiss: ((Int) -> Void)? = nil,
         onDidLoad: ((Int) -> Void)?
     ) {
@@ -62,6 +64,7 @@ struct SheetView<Content: View, T: SCIdentifiable>: View {
         self.onDismiss = onDismiss
         self.onDidLoad = onDidLoad
         self.transitionStyle = transitionStyle
+        self.animated = animated
     }
     
     // ---------------------------------------------------------
@@ -69,16 +72,21 @@ struct SheetView<Content: View, T: SCIdentifiable>: View {
     // ---------------------------------------------------------
     
     var body: some View {
-        ForEach($items.indices, id: \.self) { (index) in
-            if index == self.index {
+        Group {
+            if let index = $items.indices.firstIndex(of: index) {
                 let item = $items[index]
-                switch transitionStyle {
-                    case .fullScreenCover:
-                        fullScreenView(item: item)
-                    default: sheetView(item: item)
+                
+                switch getTransitionStyle(from: index) {
+                case .fullScreenCover:
+                    fullScreenView(item: item)
+                case .sheet, .detents:
+                    sheetView(item: item)
+                default:
+                    EmptyView()
                 }
             }
         }
+        .transaction { $0.disablesAnimations = !(animated) }
     }
     
     // ---------------------------------------------------------
@@ -87,21 +95,38 @@ struct SheetView<Content: View, T: SCIdentifiable>: View {
     
     @ViewBuilder
     private func sheetView(item: Binding<Item?>) -> some View {
-        Color.clear.frame(width: 0.3, height: 0.3)
+        defaultView
             .sheet(
                 item: item,
                 onDismiss: { onDismiss?(index) },
                 content: { content(index, $0) }
-            ).onAppear { onDidLoad?(index) }
+            )
+            .onAppear { onDidLoad?(index) }
     }
     
     @ViewBuilder
     private func fullScreenView(item: Binding<Item?>) -> some View {
-        Color.clear.frame(width: 0.3, height: 0.3)
+        defaultView
             .fullScreenCover(
                 item: item,
                 onDismiss: { onDismiss?(index) },
                 content: { content(index, $0) }
             ).onAppear{ onDidLoad?(index)}
+    }
+    
+    private var defaultView: some View {
+        Color.blue.frame(width: 0.3, height: 0.3)
+    }
+    
+    // ---------------------------------------------------------
+    // MARK: Helper Functions
+    // ---------------------------------------------------------
+    
+    private func getTransitionStyle(from index: Int) -> TransitionPresentationStyle? {
+        guard items.indices.contains(index) else {
+            return transitionStyle
+        }
+        
+        return items[index]?.presentationStyle ?? transitionStyle
     }
 }
