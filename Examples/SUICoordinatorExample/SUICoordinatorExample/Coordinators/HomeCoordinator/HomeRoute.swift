@@ -25,6 +25,7 @@
 import Foundation
 import SUICoordinator
 
+@available(iOS 16.0, *)
 enum HomeRoute: RouteType {
     
     case push(viewModel: PushViewModel)

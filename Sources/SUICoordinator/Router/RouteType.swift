@@ -31,6 +31,7 @@ import SwiftUI
  
  Conforming types must provide a type alias `Body`, which represents the body of the route and conforms to the `View` protocol.
  */
+@available(iOS 16.0, *)
 public protocol RouteType: SCHashable {
     
     // ---------------------------------------------------------

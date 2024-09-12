@@ -8,6 +8,7 @@
 import SwiftUI
 import SUICoordinator
 
+@available(iOS 16.0, *)
 class AppDelegate: NSObject, UIApplicationDelegate {
     
     var mainCoodinator: (any CoordinatorType)?

@@ -28,6 +28,7 @@ import Combine
 /// A protocol representing a type for managing and coordinating a tabbar-based navigation.
 ///
 /// Tabbar coordinator types define the interface for handling the selected page and badge updates.
+@available(iOS 16.0, *)
 public protocol TabbarCoordinatorType {
     
     // ---------------------------------------------------------
@@ -58,4 +59,5 @@ public protocol TabbarCoordinatorType {
 }
 
 /// A type alias representing a coordinator that conforms to both `CoordinatorType` and `TabbarCoordinatorType`.
+@available(iOS 16.0, *)
 public typealias TabbarCoordinatable = CoordinatorType & TabbarCoordinatorType

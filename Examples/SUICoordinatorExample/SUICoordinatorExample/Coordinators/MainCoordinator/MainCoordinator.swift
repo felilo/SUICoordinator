@@ -24,6 +24,7 @@
 
 import SUICoordinator
 
+@available(iOS 16.0, *)
 class MainCoordinator: Coordinator<MainRoute> {
     
     override init() {

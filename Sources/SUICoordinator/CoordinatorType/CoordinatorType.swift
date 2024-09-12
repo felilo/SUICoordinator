@@ -31,6 +31,7 @@ import SwiftUI
 /// of a specific module or feature in an application.
 ///
 /// - Important: Adopt this protocol in your custom coordinator implementations.
+@available(iOS 16.0, *)
 public protocol CoordinatorType: SCHashable, AnyObject {
     
     // ---------------------------------------------------------

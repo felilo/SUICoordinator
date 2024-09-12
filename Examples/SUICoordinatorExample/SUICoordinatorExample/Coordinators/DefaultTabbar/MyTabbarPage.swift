@@ -26,6 +26,7 @@ import SUICoordinator
 import SwiftUI
 
 
+@available(iOS 16.0, *)
 public enum MyTabbarPage: TabbarPage, CaseIterable {
     
     case first

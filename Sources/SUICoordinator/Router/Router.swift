@@ -30,6 +30,7 @@ import SwiftUI
 /// Routers are responsible for the actual navigation and presentation of
 /// views or coordinators within a coordinator-based architecture.
 
+@available(iOS 16.0, *)
 public class Router<Route: RouteType>: ObservableObject, RouterType {
     
     // --------------------------------------------------------------------
@@ -205,6 +206,7 @@ public class Router<Route: RouteType>: ObservableObject, RouterType {
 }
 
 
+@available(iOS 16.0, *)
 fileprivate extension Router {
     
     // --------------------------------------------------------------------

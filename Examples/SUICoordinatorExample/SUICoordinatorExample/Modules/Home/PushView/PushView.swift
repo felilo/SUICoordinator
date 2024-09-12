@@ -24,6 +24,7 @@
 
 import SwiftUI
 
+@available(iOS 16.0, *)
 struct PushView: View {
     
     typealias ViewModel = PushViewModel
@@ -50,6 +51,7 @@ struct PushView: View {
     }
 }
 
+@available(iOS 16.0, *)
 #Preview {
     PushView(viewModel: .init(coordinator: .init()))
 }

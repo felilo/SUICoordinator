@@ -25,6 +25,7 @@
 import Foundation
 
 /// A protocol representing a type for managing and providing a coordinator for tabbar navigation.
+@available(iOS 16.0, *)
 public protocol TabbarNavigationRouter {
     
     // ---------------------------------------------------------

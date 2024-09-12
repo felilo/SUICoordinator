@@ -28,6 +28,7 @@ import SwiftUI
 ///
 /// Sheet coordinator types define the interface for handling the presentation and removal of sheets
 /// in a coordinator-based architecture.
+@available(iOS 16.0, *)
 public protocol SheetCoordinatorType: ObservableObject {
     
     // ---------------------------------------------------------

@@ -24,6 +24,7 @@
 
 import Foundation
 
+@available(iOS 16.0, *)
 class DetentsViewModel: ObservableObject {
     
     let coordinator: HomeCoordinator

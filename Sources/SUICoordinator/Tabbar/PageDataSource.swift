@@ -60,5 +60,6 @@ public extension PageDataSource where Self: CaseIterable {
 }
 
 /// A type alias representing a page in a tabbar navigation with both `PageDataSource` and `TabbarNavigationRouter` conformances.
+@available(iOS 16.0, *)
 public typealias TabbarPage = PageDataSource & TabbarNavigationRouter
 
