@@ -108,7 +108,7 @@ final class RouterTests: XCTestCase {
     func test_navigationStack_popToView_with_customRoute() async throws {
         let sut = Router<DefaultRoute>()
         let view = PushStepView.self
-        sut.mainView = DefaultRoute(presentationStyle: .push, content: PushStepView())
+        sut.mainView = await DefaultRoute(presentationStyle: .push, content: PushStepView())
         
         await sut.navigate(to: .init(presentationStyle: .push, content: PushStepView()), animated: false)
         await sut.navigate(to: .init(presentationStyle: .push, content: PushStep2View()), animated: false)
@@ -116,9 +116,10 @@ final class RouterTests: XCTestCase {
         await sut.navigate(to: .init(presentationStyle: .push, content: FullScreenStepView()), animated: false)
         
         let result = await sut.popToView(view, animated: false)
-        XCTAssertTrue(result)
         
+        XCTAssertTrue(result)
         XCTAssertEqual(sut.items.count, 1)
+        
         if let lastItem = sut.items.last {
             XCTAssertEqual(getNameOf(object: lastItem.view), getNameOf(object: view))
             XCTAssertEqual(lastItem.presentationStyle, .push)

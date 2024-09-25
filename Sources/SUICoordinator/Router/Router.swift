@@ -133,11 +133,17 @@ public class Router<Route: RouteType>: ObservableObject, RouterType {
     ///   - view: The target view or coordinator to pop to.
     ///   - animated: A boolean value indicating whether to animate the pop action.
     /// - Returns: A boolean value indicating whether the pop action was successful.
+    @discardableResult
     @MainActor public func popToView<T>(_ view: T, animated: Bool = true) async -> Bool {
         let name: (Any) -> String = { String(describing: $0.self) }
-        guard let index = items.firstIndex(where: {
-            name($0.view).replacingOccurrences(of: "()", with: "") == name(view)
-        }) else { return false }
+        
+        let isValidName = { (route: Route) in
+            Self.removingParenthesesContent(name(route.view)) == name(view)
+        }
+        
+        guard let index = items.firstIndex(where: isValidName) else {
+            return false
+        }
         
         let position = index + 1
         let range = position..<items.count
@@ -199,8 +205,26 @@ public class Router<Route: RouteType>: ObservableObject, RouterType {
     ///
     /// - Parameters:
     ///   - item: The sheet item containing the view to present.
-    @MainActor func presentSheet(item: SheetItem<(any View)>) async -> Void {
-        await sheetCoordinator.presentSheet(item)
+    @MainActor func presentSheet(item: SheetItem<(any View)>) -> Void {
+        sheetCoordinator.presentSheet(item)
+    }
+    
+    /// Removes all content inside parentheses, including nested parentheses, from the string.
+    ///
+    /// The method works recursively by finding the innermost parentheses and removing them,
+    /// repeating the process until no parentheses are left in the string.
+    /// It handles cases with multiple and nested parentheses.
+    ///
+    /// - Returns: A new string with all parentheses and their contents removed.
+    static func removingParenthesesContent(_ content: String) -> String {
+        var modifiedString = content
+        let regex = "\\([^()]*\\)"
+
+        while let range = modifiedString.range(of: regex, options: .regularExpression) {
+            modifiedString.removeSubrange(range)
+        }
+        
+        return modifiedString
     }
 }
 
