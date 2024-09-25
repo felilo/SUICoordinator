@@ -36,6 +36,12 @@ extension CoordinatorType {
         self is (any TabbarCoordinatable)
     }
     
+    /// A boolean value indicating whether the coordinator is empty.
+    var isEmptyCoordinator: Bool {
+        router.items.isEmpty &&
+        router.sheetCoordinator.items.isEmpty &&
+        (router.mainView == nil)
+    }
     
     /// Cleans the view associated with the coordinator.
     ///

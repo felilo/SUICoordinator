@@ -32,7 +32,6 @@ public struct CoordinatorView<Route: RouteType>: CoordinatorViewType, View {
     // --------------------------------------------------------------------
     
     @StateObject var viewModel: Coordinator<Route>
-    @State private var isLoaded = false
     
     // --------------------------------------------------------------------
     // MARK: Properties
@@ -62,7 +61,6 @@ public struct CoordinatorView<Route: RouteType>: CoordinatorViewType, View {
     public var body: some View {
         RouterView(viewModel: viewModel.router)
             .onViewDidLoad { [weak viewModel] in
-                isLoaded = true
                 Task { await viewModel?.start() }
             }
     }
@@ -72,7 +70,6 @@ public struct CoordinatorView<Route: RouteType>: CoordinatorViewType, View {
     // --------------------------------------------------------------------
     
     func clean() {
-        guard isLoaded else { return }
         Task { await onClean?() }
     }
 }
