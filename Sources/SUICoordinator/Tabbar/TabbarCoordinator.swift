@@ -28,6 +28,7 @@ import Combine
 /// An open class representing a coordinator for managing a tabbar-based navigation.
 ///
 /// Tabbar coordinators handle the navigation and coordination of pages within a tabbar.
+@available(iOS 16.0, *)
 open class TabbarCoordinator<Page>: Coordinator<DefaultRoute>, TabbarCoordinatorType where Page: TabbarPage {
     
     // --------------------------------------------------------------------

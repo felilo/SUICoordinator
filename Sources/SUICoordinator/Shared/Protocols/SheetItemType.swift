@@ -24,6 +24,7 @@
 
 import Foundation
 
+@available(iOS 16.0, *)
 protocol SheetItemType: SCIdentifiable {
     /// A boolean value indicating whether to animate the presentation.
     var animated: Bool { get set }

@@ -24,6 +24,7 @@
 
 import SwiftUI
 
+@available(iOS 16.0, *)
 struct SheetView: View {
     
     typealias ViewModel = SheetViewModel
@@ -50,6 +51,7 @@ struct SheetView: View {
     }
 }
 
+@available(iOS 16.0, *)
 #Preview {
     SheetView(viewModel: .init(coordinator: .init()))
 }

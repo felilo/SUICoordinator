@@ -24,6 +24,7 @@
 
 import SwiftUI
 
+@available(iOS 16.0, *)
 struct NavigationActionListView: View {
     
     typealias ViewModel = ActionListViewModel
@@ -66,6 +67,7 @@ struct NavigationActionListView: View {
     }
 }
 
+@available(iOS 16.0, *)
 #Preview {
     NavigationActionListView(viewModel: .init(coordinator: .init()))
 }

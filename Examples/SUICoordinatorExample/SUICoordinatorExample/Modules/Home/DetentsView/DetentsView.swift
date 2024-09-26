@@ -24,6 +24,7 @@
 
 import SwiftUI
 
+@available(iOS 16.0, *)
 struct DetentsView: View {
     
     typealias ViewModel = DetentsViewModel
@@ -50,6 +51,7 @@ struct DetentsView: View {
     }
 }
 
+@available(iOS 16.0, *)
 #Preview {
     DetentsView(viewModel: .init(coordinator: .init()))
 }

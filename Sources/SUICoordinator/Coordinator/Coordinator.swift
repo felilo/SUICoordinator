@@ -29,6 +29,7 @@ import SwiftUI
 /// An open class representing a coordinator in a coordinator-based architecture.
 ///
 /// Coordinators are responsible for coordinating the navigation and flow within an application.
+@available(iOS 16.0, *)
 open class Coordinator<Route: RouteType>: ObservableObject, CoordinatorType {
     
     // --------------------------------------------------------------------

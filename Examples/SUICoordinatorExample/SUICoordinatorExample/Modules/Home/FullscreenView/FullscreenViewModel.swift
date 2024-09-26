@@ -24,6 +24,7 @@
 
 import Foundation
 
+@available(iOS 16.0, *)
 class FullscreenViewModel: ObservableObject {
     
     let coordinator: HomeCoordinator

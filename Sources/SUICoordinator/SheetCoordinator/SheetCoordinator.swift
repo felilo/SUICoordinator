@@ -29,6 +29,7 @@ import SwiftUI
 /// A class representing a coordinator for managing and presenting sheets.
 ///
 /// Sheet coordinators handle the presentation and removal of sheets in a coordinator-based architecture.
+@available(iOS 16.0, *)
 final public class SheetCoordinator<T>: ObservableObject {
     
     // ---------------------------------------------------------

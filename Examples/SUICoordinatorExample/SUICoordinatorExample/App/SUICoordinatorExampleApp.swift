@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+@available(iOS 16.0, *)
 @main
 struct SUICoordinatorExampleApp: App {
     @UIApplicationDelegateAdaptor private var appDelegate: AppDelegate

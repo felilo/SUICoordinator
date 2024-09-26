@@ -33,6 +33,7 @@ enum MainRoute: RouteType {
     // MARK: RouteType
     // ---------------------------------------------------------
     
+    @available(iOS 16.0, *)
     public var presentationStyle: TransitionPresentationStyle {
         switch self {
             case .splash:

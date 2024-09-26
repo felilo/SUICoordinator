@@ -26,6 +26,7 @@ import Foundation
 import SwiftUI
 
 /// A struct representing a default route with a specified presentation style and content view.
+@available(iOS 16.0, *)
 public struct DefaultRoute: RouteType {
     
     // ---------------------------------------------------------

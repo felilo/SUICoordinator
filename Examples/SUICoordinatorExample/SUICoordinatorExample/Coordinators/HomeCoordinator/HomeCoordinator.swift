@@ -25,6 +25,7 @@
 import SUICoordinator
 import Foundation
 
+@available(iOS 16.0, *)
 class HomeCoordinator: Coordinator<HomeRoute> {
     
     private let animated: Bool  = true

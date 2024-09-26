@@ -27,6 +27,7 @@ import Foundation
 /// A class representing a sheet item for presenting views or coordinators in a coordinator-based architecture.
 ///
 /// Sheet items encapsulate information about the view, animation, and presentation style.
+@available(iOS 16.0, *)
 final public class SheetItem<T>: SCHashable, SheetItemType {
     
     // ---------------------------------------------------------

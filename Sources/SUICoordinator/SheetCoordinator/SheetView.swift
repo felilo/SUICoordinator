@@ -24,6 +24,7 @@
 
 import SwiftUI
 
+@available(iOS 16.0, *)
 struct SheetView<Content: View, T: SheetItemType>: View {
     
     typealias Item = T

@@ -24,6 +24,7 @@
 
 import Foundation
 
+@available(iOS 16.0, *)
 public extension CoordinatorType {
     
     /// Retrieves the top coordinator in the hierarchy, optionally starting from a specified coordinator.

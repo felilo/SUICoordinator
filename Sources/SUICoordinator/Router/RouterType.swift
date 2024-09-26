@@ -13,6 +13,7 @@ import Combine
 ///
 /// Routers are responsible for the actual navigation and presentation of
 /// views or coordinators within a coordinator-based architecture.
+@available(iOS 16.0, *)
 public protocol RouterType: ObservableObject {
     
     // --------------------------------------------------------------------
@@ -105,6 +106,7 @@ public protocol RouterType: ObservableObject {
     func restart(animated: Bool) async -> Void
 }
 
+@available(iOS 16.0, *)
 extension RouterType {
     
     @MainActor func removeNilItemsFromSheetCoordinator() -> Void {

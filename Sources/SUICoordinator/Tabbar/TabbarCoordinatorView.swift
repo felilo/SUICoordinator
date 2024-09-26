@@ -25,6 +25,7 @@
 import SwiftUI
 import Foundation
 
+@available(iOS 16.0, *)
 struct TabbarCoordinatorView<PAGE: TabbarPage>: View {
     
     typealias BadgeItem = (value: String?, page: PAGE)
@@ -84,6 +85,7 @@ struct TabbarCoordinatorView<PAGE: TabbarPage>: View {
 }
 
 
+@available(iOS 16.0, *)
 extension TabbarCoordinatorView {
     
     private func tabSelection() -> Binding<PAGE> {

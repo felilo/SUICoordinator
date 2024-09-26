@@ -24,6 +24,7 @@
 
 import SwiftUI
 
+@available(iOS 16.0, *)
 struct FullscreenView: View {
     
     typealias ViewModel = FullscreenViewModel
@@ -50,6 +51,7 @@ struct FullscreenView: View {
     }
 }
 
+@available(iOS 16.0, *)
 #Preview {
     FullscreenView(viewModel: .init(coordinator: .init()))
 }

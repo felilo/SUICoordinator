@@ -25,6 +25,7 @@
 import Foundation
 import SUICoordinator
 
+@available(iOS 16.0, *)
 class DefaultTabbarCoordinator: TabbarCoordinator<MyTabbarPage> {
     
     // ---------------------------------------------------------------------
