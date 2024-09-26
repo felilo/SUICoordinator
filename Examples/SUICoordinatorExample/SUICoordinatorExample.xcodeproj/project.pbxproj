@@ -32,8 +32,6 @@
 		D9B456102B643FBD004DD03A /* CustomTabbarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9B455F32B643FBD004DD03A /* CustomTabbarView.swift */; };
 		D9B456112B643FBD004DD03A /* CustomTabbarViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9B455F42B643FBD004DD03A /* CustomTabbarViewModel.swift */; };
 		D9B456122B643FBD004DD03A /* CustomTabbarCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9B455F52B643FBD004DD03A /* CustomTabbarCoordinator.swift */; };
-		D9B456132B643FBD004DD03A /* MainRoute.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9B455F72B643FBD004DD03A /* MainRoute.swift */; };
-		D9B456142B643FBD004DD03A /* MainCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9B455F82B643FBD004DD03A /* MainCoordinator.swift */; };
 		D9B456152B643FBD004DD03A /* HomeRoute.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9B455FA2B643FBD004DD03A /* HomeRoute.swift */; };
 		D9B456162B643FBD004DD03A /* HomeCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9B455FB2B643FBD004DD03A /* HomeCoordinator.swift */; };
 /* End PBXBuildFile section */
@@ -64,8 +62,6 @@
 		D9B455F32B643FBD004DD03A /* CustomTabbarView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomTabbarView.swift; sourceTree = "<group>"; };
 		D9B455F42B643FBD004DD03A /* CustomTabbarViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomTabbarViewModel.swift; sourceTree = "<group>"; };
 		D9B455F52B643FBD004DD03A /* CustomTabbarCoordinator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomTabbarCoordinator.swift; sourceTree = "<group>"; };
-		D9B455F72B643FBD004DD03A /* MainRoute.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainRoute.swift; sourceTree = "<group>"; };
-		D9B455F82B643FBD004DD03A /* MainCoordinator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainCoordinator.swift; sourceTree = "<group>"; };
 		D9B455FA2B643FBD004DD03A /* HomeRoute.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HomeRoute.swift; sourceTree = "<group>"; };
 		D9B455FB2B643FBD004DD03A /* HomeCoordinator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HomeCoordinator.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -234,7 +230,6 @@
 				D9B455ED2B643FBD004DD03A /* DefaultTabbar */,
 				D9B455F02B643FBD004DD03A /* TabbarFlow */,
 				D9B455F22B643FBD004DD03A /* CustomTabbar */,
-				D9B455F62B643FBD004DD03A /* MainCoordinator */,
 				D9B455F92B643FBD004DD03A /* HomeCoordinator */,
 			);
 			path = Coordinators;
@@ -265,15 +260,6 @@
 				D9B455F52B643FBD004DD03A /* CustomTabbarCoordinator.swift */,
 			);
 			path = CustomTabbar;
-			sourceTree = "<group>";
-		};
-		D9B455F62B643FBD004DD03A /* MainCoordinator */ = {
-			isa = PBXGroup;
-			children = (
-				D9B455F72B643FBD004DD03A /* MainRoute.swift */,
-				D9B455F82B643FBD004DD03A /* MainCoordinator.swift */,
-			);
-			path = MainCoordinator;
 			sourceTree = "<group>";
 		};
 		D9B455F92B643FBD004DD03A /* HomeCoordinator */ = {
@@ -380,11 +366,9 @@
 				D9B4560C2B643FBD004DD03A /* SplashView.swift in Sources */,
 				D9B456102B643FBD004DD03A /* CustomTabbarView.swift in Sources */,
 				D95389232B643BAD000E3357 /* ContentView.swift in Sources */,
-				D9B456132B643FBD004DD03A /* MainRoute.swift in Sources */,
 				D9B455FF2B643FBD004DD03A /* PushViewModel.swift in Sources */,
 				D9B4560D2B643FBD004DD03A /* MyTabbarPage.swift in Sources */,
 				D95389212B643BAD000E3357 /* SUICoordinatorExampleApp.swift in Sources */,
-				D9B456142B643FBD004DD03A /* MainCoordinator.swift in Sources */,
 				D9B456152B643FBD004DD03A /* HomeRoute.swift in Sources */,
 				D9B456032B643FBD004DD03A /* FullscreenView.swift in Sources */,
 			);
