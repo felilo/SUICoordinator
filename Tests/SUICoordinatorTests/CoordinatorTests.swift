@@ -131,6 +131,7 @@ final class CoordinatorTests: XCTestCase {
         XCTAssertTrue(sut.children.isEmpty)
         XCTAssertTrue(sut.router.items.isEmpty)
         XCTAssertTrue(sut.router.sheetCoordinator.items.isEmpty)
+        await finishFlow(sut: sut)
     }
     
     

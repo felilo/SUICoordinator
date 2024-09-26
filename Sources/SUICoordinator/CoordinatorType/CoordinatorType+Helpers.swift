@@ -80,7 +80,6 @@ extension CoordinatorType {
         }
         children.remove(at: index)
         await coordinator.removeChildren()
-        await removeChild(coordinator: coordinator)
     }
     
     /// Removes all child coordinators associated with this coordinator.
@@ -142,17 +141,19 @@ extension CoordinatorType {
     /// - Returns: An asynchronous void task representing the finish process.
     func finish(animated: Bool = true, withDismiss: Bool = true) async -> Void {
         let handleFinish = { (coordinator: TCoordinatorType) async -> Void in
-            await coordinator.handleFinish(
-                animated: animated,
-                withDismiss: withDismiss
-            )
+            await coordinator.emptyCoordinator(animated: animated)
         }
         
-        if let parent, (parent is (any TabbarCoordinatable)) {
-            await router.close(animated: animated, finishFlow: true)
-            await handleFinish(parent)
-        } else {
-            await handleFinish(self)
+        guard let parent, withDismiss else {
+            return await handleFinish(self)
         }
+        
+        if parent is (any TabbarCoordinatable) {
+            await parent.parent?.closeLastSheet(animated: animated)
+            return await handleFinish(parent)
+        }
+        
+        await parent.closeLastSheet(animated: animated)
+        await handleFinish(self)
     }
 }

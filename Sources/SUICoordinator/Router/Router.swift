@@ -104,7 +104,7 @@ public class Router<Route: RouteType>: ObservableObject, RouterType {
             animated: animated,
             presentationStyle: presentationStyle ?? view.presentationStyle)
         
-        await presentSheet(item: item)
+        presentSheet(item: item)
     }
     
     /// Pops the top view or coordinator from the navigation stack.
@@ -183,7 +183,7 @@ public class Router<Route: RouteType>: ObservableObject, RouterType {
     ///   - animated: A boolean value indicating whether to animate the cleanup process.
     ///   - withMainView: A boolean value indicating whether to clean the main view.
     @MainActor public func clean(animated: Bool, withMainView: Bool = true) -> Void {
-        sheetCoordinator.clean(animated: animated)
+        sheetCoordinator = .init()
         coordinator = nil
         if withMainView { mainView = nil }
     }
@@ -194,7 +194,6 @@ public class Router<Route: RouteType>: ObservableObject, RouterType {
     ///   - animated: A boolean value indicating whether to animate the restart action.
     @MainActor public func restart(animated: Bool) async -> Void {
         await popToRoot(animated: animated)
-        sheetCoordinator.clean(animated: animated)
     }
     
     /// Presents a sheet with a specified item.

@@ -68,8 +68,12 @@ final public class SheetCoordinator<T>: ObservableObject {
     // ---------------------------------------------------------
     
     /// The total number of sheet items in the stack.
-    var totalItems: Int {
-        items.count - 1
+    private var totalItems: Int {
+        guard !items.isEmpty else {
+            return 0
+        }
+        
+        return items.count - 1
     }
     
     // ---------------------------------------------------------
@@ -94,7 +98,7 @@ final public class SheetCoordinator<T>: ObservableObject {
     ///
     /// - Parameters:
     ///   - animated: A boolean value indicating whether to animate the removal.
-    func removeLastSheet(animated: Bool) -> Void {
+    @MainActor func removeLastSheet(animated: Bool) -> Void {
         guard !items.isEmpty, !isCleaning else { return }
         self.animated = animated
         lastPresentationStyle = items.last(where: { $0?.presentationStyle != nil })??.presentationStyle
@@ -106,20 +110,8 @@ final public class SheetCoordinator<T>: ObservableObject {
     /// - Parameters:
     ///   - index: The index of the item to remove.
     @MainActor func remove(at index: Int) {
-        guard totalItems >= index, !isCleaning else { return }
+        guard isValidIndex(index), !isCleaning else { return }
         items.remove(at: index)
-    }
-    
-    /// Cleans up the sheet coordinator, optionally animating the cleanup process.
-    ///
-    /// - Parameters:
-    ///   - animated: A boolean value indicating whether to animate the cleanup process.
-    func clean(animated: Bool = true) -> Void {
-        guard !items.isEmpty, !isCleaning else { return }
-        
-        isCleaning = true
-        makeNilItem(at: 0)
-        resetValues()
     }
     
     // ---------------------------------------------------------
@@ -135,14 +127,24 @@ final public class SheetCoordinator<T>: ObservableObject {
     ///
     /// - Parameters:
     ///   - index: The index at which to remove `nil` items.
-    private func makeNilItem(at index: Int) {
+    @MainActor private func makeNilItem(at index: Int) {
+        guard isValidIndex(index) else { return }
         items[index] = nil
     }
     
-    /// Resets values associated with the sheet coordinator.
-    private func resetValues() {
+    func getNextIndex(_ index: Int) -> Int {
+        index + 1
+    }
+    
+    func isLastIndex(_ index: Int) -> Bool {
+        items.isEmpty || index == totalItems
+    }
+    
+    func isValidIndex(_ index: Int) -> Bool {
+        !items.isEmpty && items.indices.contains(index)
+    }
+    
+    deinit {
         items = []
-        lastPresentationStyle = nil
-        isCleaning = false
     }
 }

@@ -81,12 +81,12 @@ struct SheetCoordinatorView: ViewModifier {
     private func buildContent(with index: Int, item: SheetItem<Value>) -> some View {
         let view = AnyView(item.view)
             .sheetCoordinator(
-            coordinator: coordinator,
-            index: (index + 1),
-            isLast: index == coordinator.totalItems,
-            onDissmis: onDissmis,
-            onDidLoad: onDidLoad
-        )
+                coordinator: coordinator,
+                index: coordinator.getNextIndex(index),
+                isLast: coordinator.isLastIndex(index),
+                onDissmis: onDissmis,
+                onDidLoad: onDidLoad
+            )
         addSheet(to: view, with: item.presentationStyle)
     }
     

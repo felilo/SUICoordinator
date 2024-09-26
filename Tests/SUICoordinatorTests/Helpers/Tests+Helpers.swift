@@ -50,6 +50,6 @@ extension XCTestCase {
     }
     
     func getNameOf<T>(object: T) -> String {
-        String(describing: object.self).replacingOccurrences(of: "()", with: "")
+        Router<AnyEnumRoute>.removingParenthesesContent(String(describing: object.self))
     }
 }

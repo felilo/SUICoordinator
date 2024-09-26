@@ -77,8 +77,8 @@ struct RouterView<Router: RouterType>: View {
             .sheetCoordinator(
                 coordinator: viewModel.sheetCoordinator,
                 onDissmis: { index in Task {
-                    viewModel.removeNilItemsFromSheetCoordinator()
                     viewModel.removeItemFromSheetCoordinator(at: index)
+                    viewModel.removeNilItemsFromSheetCoordinator()
                 }},
                 onDidLoad: { _ in Task(operation: viewModel.removeNilItemsFromSheetCoordinator) }
             )

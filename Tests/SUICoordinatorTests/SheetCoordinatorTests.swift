@@ -55,7 +55,7 @@ final class SheetCoordinatorTests: XCTestCase {
         await presentSheet(item, with: sut)
         XCTAssertEqual(sut.items.count, 1)
         
-        sut.removeLastSheet(animated: false)
+        await sut.removeLastSheet(animated: false)
         await sut.removeAllNilItems()
         
         XCTAssertEqual(sut.items.count, 0)
@@ -72,18 +72,6 @@ final class SheetCoordinatorTests: XCTestCase {
         
         XCTAssertEqual(sut.items.count, 2)
         XCTAssertEqual(sut.items.last??.view, "Third Item")
-    }
-    
-    func test_cleanCoordinator() async throws {
-        let sut = makeSUT()
-        
-        await presentSheet(makeSheetItem("First Item"), with: sut)
-        await presentSheet(makeSheetItem("Second Item"), with: sut)
-        await presentSheet(makeSheetItem("Third Item"), with: sut)
-        XCTAssertEqual(sut.items.count, 3)
-        
-        sut.clean(animated: false)
-        XCTAssertEqual(sut.items.count, 0)
     }
     
     // --------------------------------------------------------------------
