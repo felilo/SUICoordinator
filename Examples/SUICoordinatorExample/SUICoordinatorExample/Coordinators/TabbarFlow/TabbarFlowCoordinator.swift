@@ -55,8 +55,4 @@ class TabbarFlowCoordinator: Coordinator<DefaultRoute> {
         let coordinator = CustomTabbarCoordinator()
         await navigate(to: coordinator, presentationStyle: .sheet)
     }
-    
-    func finish() async {
-        await finishFlow(animated: true)
-    }
 }
