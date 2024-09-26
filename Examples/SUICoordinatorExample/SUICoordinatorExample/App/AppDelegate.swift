@@ -16,7 +16,7 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         _ application: UIApplication,
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil
     ) -> Bool {
-        mainCoodinator = MainCoordinator()
+        mainCoodinator = HomeCoordinator()
         return true
     }
 }

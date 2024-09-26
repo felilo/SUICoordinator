@@ -32,6 +32,9 @@ struct PushView: View {
     
     var body: some View {
         ZStack {
+            
+            Color.white.ignoresSafeArea()
+            
             VStack {
                 Text("Hello, PushView!")
                     .font(.largeTitle)

@@ -32,6 +32,9 @@ struct SheetView: View {
     
     var body: some View {
         ZStack {
+            
+            Color.green.ignoresSafeArea()
+            
             VStack {
                 Text("Hello, SheetView!")
                     .font(.largeTitle)

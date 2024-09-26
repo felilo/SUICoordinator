@@ -32,6 +32,9 @@ struct DetentsView: View {
     
     var body: some View {
         ZStack {
+            
+            Color.yellow.ignoresSafeArea()
+            
             VStack {
                 Text("Hello, DetentsView!")
                     .font(.largeTitle)
@@ -43,6 +46,10 @@ struct DetentsView: View {
                     
                     Button("Close view") {
                         Task { await viewModel.close() }
+                    }.buttonStyle(.borderedProminent)
+                    
+                    Button("Finish flow") {
+                        Task { await viewModel.finishFlow() }
                     }.buttonStyle(.borderedProminent)
                 }
             }

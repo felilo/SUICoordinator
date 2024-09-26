@@ -32,6 +32,9 @@ struct FullscreenView: View {
     
     var body: some View {
         ZStack {
+            
+            Color.blue.ignoresSafeArea()
+            
             VStack {
                 Text("Hello, FullscreenView!")
                     .font(.largeTitle)

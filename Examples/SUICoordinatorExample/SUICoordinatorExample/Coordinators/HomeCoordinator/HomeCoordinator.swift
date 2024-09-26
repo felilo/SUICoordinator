@@ -71,7 +71,7 @@ class HomeCoordinator: Coordinator<HomeRoute> {
         await router.close(animated: animated)
     }
     
-    func finsh() async {
+    func finish() async {
         await finishFlow(animated: animated)
     }
 }

@@ -56,7 +56,7 @@ struct NavigationActionListView: View {
         .toolbar {
             if isPresented && viewModel.showFinishButton() {
                 Button {
-                    Task { await viewModel.finsh() }
+                    Task { await viewModel.finish() }
                 } label: {
                     Text("Finish flow")
                 }

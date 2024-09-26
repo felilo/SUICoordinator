@@ -52,11 +52,11 @@ class ActionListViewModel: ObservableObject {
         await coordinator.presentTabbarCoordinator()
     }
     
-    func finsh() async {
-        await coordinator.finsh()
+    func finish() async {
+        await coordinator.finish()
     }
     
     func showFinishButton() -> Bool {
-        !(coordinator.parent is MainCoordinator)
+        !(coordinator.parent is HomeCoordinator)
     }
 }
