@@ -49,10 +49,10 @@ final public class SheetCoordinator<T>: ObservableObject {
     private var isCleaning: Bool = false
     
     /// The presentation style of the last presented sheet.
-    public private (set) var lastPresentationStyle: TransitionPresentationStyle?
+    public private(set) var lastPresentationStyle: TransitionPresentationStyle?
     
     /// The presentation style of the last presented sheet.
-    public private (set) var animated: Bool?
+    public private(set) var animated: Bool?
     
     // ---------------------------------------------------------
     // MARK: Constructor

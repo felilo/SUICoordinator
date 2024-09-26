@@ -89,7 +89,7 @@ extension CoordinatorType {
     ///   - animated: A boolean value indicating whether to animate the removal process.
     func removeChildren(animated: Bool = false) async {
         guard let first = children.first else { return }
-        await first.handleFinish(animated: animated, withDismiss: false)
+        await first.emptyCoordinator(animated: animated)
         await removeChildren()
     }
     
@@ -111,12 +111,12 @@ extension CoordinatorType {
         coordinator.parent = self
     }
     
-    /// Dismisses the last presented sheet.
+    /// Dismisses or pops the last presented sheet.
     ///
     /// - Parameters:
     ///   - animated: A boolean value indicating whether to animate the dismissal.
-    func dismissLastSheet(animated: Bool = true) async {
-        await router.dismiss(animated: animated)
+    func closeLastSheet(animated: Bool = true) async {
+        await router.close(animated: animated)
     }
     
     /// Cleans up the coordinator, preparing it for dismissal.
@@ -132,19 +132,6 @@ extension CoordinatorType {
         
         await parent.removeChild(coordinator: self)
         await cleanView(animated: false)
-    }
-    
-    /// Handles the finish event, optionally dismissing the coordinator.
-    ///
-    /// - Parameters:
-    ///   - animated: A boolean value indicating whether to animate the finish process.
-    ///   - withDismiss: A boolean value indicating whether to dismiss the coordinator.
-    func handleFinish(animated: Bool = true, withDismiss: Bool = true) async {
-        guard withDismiss else {
-            return await emptyCoordinator(animated: animated)
-        }
-        await router.close(animated: animated, finishFlow: true)
-        await emptyCoordinator(animated: animated)
     }
     
     /// Finishes the coordinator, optionally dismissing it.

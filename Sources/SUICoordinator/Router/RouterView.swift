@@ -59,7 +59,12 @@ struct RouterView<Router: RouterType>: View {
                 addSheetTo(view: view)
             }
         }
-        .onViewDidLoad { onChangeFirstView(viewModel.mainView) }
+        .onChange(of: viewModel.mainView) { value in
+            Task { await onChangeFirstView(value) }
+        }
+        .onViewDidLoad {
+            Task { await onChangeFirstView(viewModel.mainView) }
+        }
     }
     
     // --------------------------------------------------------------------
@@ -69,7 +74,6 @@ struct RouterView<Router: RouterType>: View {
     @ViewBuilder
     private func addSheetTo(view: some View ) -> some View {
         view
-            .onChange(of: viewModel.mainView, perform: onChangeFirstView)
             .sheetCoordinator(
                 coordinator: viewModel.sheetCoordinator,
                 onDissmis: { index in Task {
@@ -80,8 +84,10 @@ struct RouterView<Router: RouterType>: View {
             )
     }
     
-    private func onChangeFirstView(_ value: Router.Route?)  {
+    private func onChangeFirstView(_ value: Router.Route?) async {
         guard let view = value?.view else { return }
-        mainView = AnyView(view)
+        Task { @MainActor in
+            mainView = AnyView(view)
+        }
     }
 }

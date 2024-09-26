@@ -170,14 +170,10 @@ public class Router<Route: RouteType>: ObservableObject, RouterType {
     ///   - animated: A boolean value indicating whether to animate the closing action.
     ///   - finishFlow: A boolean value indicating whether to finish the associated flow.
     @MainActor public func close(animated: Bool = true, finishFlow: Bool = false) async -> Void {
-        if finishFlow {
-            if let parent = coordinator?.parent {
-                await parent.dismissLastSheet(animated: animated)
-            }
-        } else if sheetCoordinator.items.isEmpty {
-            await pop(animated: animated)
-        } else {
+        if !sheetCoordinator.items.isEmpty {
             dismiss(animated: animated)
+        } else if !items.isEmpty {
+            await pop(animated: animated)
         }
     }
     

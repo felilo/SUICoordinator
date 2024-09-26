@@ -78,9 +78,9 @@ struct SheetView<Content: View, T: SheetItemType>: View {
                 
                 switch getTransitionStyle(from: index) {
                 case .fullScreenCover:
-                    fullScreenView(item: item)
+                    fullScreenView(item: item, index: index)
                 case .sheet, .detents:
-                    sheetView(item: item)
+                    sheetView(item: item, index: index)
                 default:
                     EmptyView()
                 }
@@ -94,7 +94,7 @@ struct SheetView<Content: View, T: SheetItemType>: View {
     // ---------------------------------------------------------
     
     @ViewBuilder
-    private func sheetView(item: Binding<Item?>) -> some View {
+    private func sheetView(item: Binding<Item?>, index: Int) -> some View {
         defaultView
             .sheet(
                 item: item,
@@ -105,7 +105,7 @@ struct SheetView<Content: View, T: SheetItemType>: View {
     }
     
     @ViewBuilder
-    private func fullScreenView(item: Binding<Item?>) -> some View {
+    private func fullScreenView(item: Binding<Item?>, index: Int) -> some View {
         defaultView
             .fullScreenCover(
                 item: item,

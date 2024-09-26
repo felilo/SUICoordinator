@@ -53,8 +53,7 @@ public protocol SCIdentifiable: Identifiable {}
 extension SCIdentifiable {
     /// The default identifier based on the type's name.
     public var id: String {
-        let string = String(describing: self.self)
-        return string
+        String(describing: self.self)
     }
 }
 
