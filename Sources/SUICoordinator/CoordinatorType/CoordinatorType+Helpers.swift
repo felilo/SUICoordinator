@@ -124,9 +124,9 @@ extension CoordinatorType {
     ///   - animated: A boolean value indicating whether to animate the cleanup process.
     func emptyCoordinator(animated: Bool) async {
         guard let parent = parent else {
-            await router.restart(animated: animated)
-            await cleanView(animated: false)
-            return await removeChildren()
+            await router.clean(animated: animated)
+            await removeChildren()
+            return router.sheetCoordinator.items.removeAll()
         }
         
         await parent.removeChild(coordinator: self)

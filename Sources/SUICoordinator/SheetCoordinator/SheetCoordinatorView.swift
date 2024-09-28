@@ -38,7 +38,7 @@ struct SheetCoordinatorView: ViewModifier {
     // MARK: Wrapper Properties
     // ---------------------------------------------------------
     
-    @StateObject var coordinator: SheetCoordinator<Value>
+    @ObservedObject var coordinator: SheetCoordinator<Value>
     @State var index = 0
     
     // ---------------------------------------------------------

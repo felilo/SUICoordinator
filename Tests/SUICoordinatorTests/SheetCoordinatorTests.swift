@@ -74,6 +74,18 @@ final class SheetCoordinatorTests: XCTestCase {
         XCTAssertEqual(sut.items.last??.view, "Third Item")
     }
     
+    func test_cleanCoordinator() async throws {
+        let sut = makeSUT()
+        
+        await presentSheet(makeSheetItem("First Item"), with: sut)
+        await presentSheet(makeSheetItem("Second Item"), with: sut)
+        await presentSheet(makeSheetItem("Third Item"), with: sut)
+        XCTAssertEqual(sut.items.count, 3)
+        
+        await sut.clean(animated: false)
+        XCTAssertNil(sut.items.first??.view)
+    }
+    
     // --------------------------------------------------------------------
     // MARK: Helpers
     // --------------------------------------------------------------------
