@@ -101,7 +101,7 @@ struct SheetView<Content: View, T: SheetItemType>: View {
                 onDismiss: { onDismiss?(index) },
                 content: { content(index, $0) }
             )
-            .onAppear { onDidLoad?(index) }
+            .onViewDidLoad { onDidLoad?(index) }
     }
     
     @ViewBuilder
@@ -111,7 +111,8 @@ struct SheetView<Content: View, T: SheetItemType>: View {
                 item: item,
                 onDismiss: { onDismiss?(index) },
                 content: { content(index, $0) }
-            ).onAppear{ onDidLoad?(index)}
+            )
+            .onViewDidLoad { onDidLoad?(index) }
     }
     
     private var defaultView: some View {

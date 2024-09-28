@@ -183,9 +183,10 @@ public class Router<Route: RouteType>: ObservableObject, RouterType {
     ///   - animated: A boolean value indicating whether to animate the cleanup process.
     ///   - withMainView: A boolean value indicating whether to clean the main view.
     @MainActor public func clean(animated: Bool, withMainView: Bool = true) -> Void {
-        sheetCoordinator = .init()
+        items = []
         coordinator = nil
         if withMainView { mainView = nil }
+        sheetCoordinator = .init()
     }
     
     /// Restarts the current view or coordinator, optionally animating the restart.
@@ -193,7 +194,12 @@ public class Router<Route: RouteType>: ObservableObject, RouterType {
     /// - Parameters:
     ///   - animated: A boolean value indicating whether to animate the restart action.
     @MainActor public func restart(animated: Bool) async -> Void {
-        await popToRoot(animated: animated)
+        if !sheetCoordinator.items.isEmpty {
+            await pop(animated: false)
+            sheetCoordinator.clean()
+        } else {
+            await popToRoot(animated: animated)
+        }
     }
     
     /// Presents a sheet with a specified item.
