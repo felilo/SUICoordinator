@@ -52,7 +52,7 @@ public extension CoordinatorType {
             animated: animated,
             presentationStyle: (presentationStyle != .push) ? presentationStyle :  .sheet,
             view: { [weak coordinator] in coordinator?.getView() },
-            onFinish: { Task {
+            onFinish: { Task(priority: .low) {
                 @MainActor [weak coordinator] in await coordinator?.swipedAway()
             }}
         )

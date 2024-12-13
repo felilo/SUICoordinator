@@ -29,11 +29,13 @@ import SwiftUI
 
 final class TabbarCoordinatorTests: XCTestCase {
     
+    private let animated: Bool = false
+    
     func test_setPages() async throws {
         let sut = makeSUT()
         let pages = [AnyEnumTabbarRoute.tab2]
         
-        await sut.start(animated: false)
+        await sut.start(animated: animated)
         await sut.setPages(pages)
         
         XCTAssertEqual(pages, sut.pages)
@@ -52,7 +54,7 @@ final class TabbarCoordinatorTests: XCTestCase {
     func test_get_coordinator_selected_fail() async {
         let sut = makeSUT(currentPage: .tab1)
         
-        await sut.start(animated: false)
+        await sut.start(animated: animated)
         XCTAssertEqual(sut.currentPage, .tab1)
         sut.currentPage = .tab2
         XCTAssertEqual(sut.currentPage, .tab2)
@@ -68,7 +70,7 @@ final class TabbarCoordinatorTests: XCTestCase {
         let sut = makeSUT(currentPage: .tab1)
         let coordinator = AnyCoordinator()
         
-        await sut.start(animated: false)
+        await sut.start(animated: animated)
         XCTAssertEqual(sut.currentPage, .tab1)
         sut.currentPage = .tab2
         await navigateToCoordinator(coordinator, in: try sut.getCoordinatorSelected())
@@ -78,7 +80,7 @@ final class TabbarCoordinatorTests: XCTestCase {
     
     func test_popToRoot_in_tab() async throws {
         let sut = makeSUT(currentPage: .tab1)
-        await sut.start(animated: false)
+        await sut.start(animated: animated)
         
         let coordinatorSelected = try sut.getCoordinatorSelected() as? AnyCoordinator
         
@@ -106,23 +108,21 @@ final class TabbarCoordinatorTests: XCTestCase {
         await navigateToCoordinator(coordinator2, in: coordinator1)
         await finishFlow(sut: sut)
         
-        XCTAssertTrue(sut.children.isEmpty)
-        XCTAssertTrue(sut.router.items.isEmpty)
-        XCTAssertTrue(sut.router.sheetCoordinator.items.isEmpty)
+        XCTAssertTrue(sut.isEmptyCoordinator)
     }
     
     func test_force_to_present_coordinator() async throws {
         let sut = makeSUT(currentPage: .tab1)
         let coordinator = AnyCoordinator()
         
-        await sut.start(animated: false)
+        await sut.start(animated: animated)
         XCTAssertEqual(sut.currentPage, .tab1)
         sut.currentPage = .tab2
         try await coordinator.forcePresentation(
-            animated: false,
+            animated: animated,
             presentationStyle: .fullScreenCover,
             mainCoordinator: sut)
-        await coordinator.start(animated: false)
+        await coordinator.start(animated: animated)
         
         XCTAssertEqual(coordinator.parent.uuid, try sut.getCoordinatorSelected().uuid)
         await finishFlow(sut: sut)

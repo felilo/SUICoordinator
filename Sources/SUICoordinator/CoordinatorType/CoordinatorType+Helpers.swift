@@ -38,6 +38,7 @@ extension CoordinatorType {
     
     /// A boolean value indicating whether the coordinator is empty.
     var isEmptyCoordinator: Bool {
+        parent == nil &&
         router.items.isEmpty &&
         router.sheetCoordinator.items.isEmpty &&
         (router.mainView == nil)
@@ -134,9 +135,8 @@ extension CoordinatorType {
     ///   - animated: A boolean value indicating whether to animate the cleanup process.
     func emptyCoordinator(animated: Bool) async {
         guard let parent = parent else {
-            await router.clean(animated: animated)
             await removeChildren()
-            return router.sheetCoordinator.items.removeAll()
+            return await router.clean(animated: animated)
         }
         
         await parent.removeChild(coordinator: self)

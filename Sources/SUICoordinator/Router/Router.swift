@@ -222,6 +222,19 @@ public class Router<Route: RouteType>: ObservableObject, RouterType {
     ///
     /// - Returns: A new string with all parentheses and their contents removed.
     static func removingParenthesesContent(_ content: String) -> String {
+        var content = content
+        let regexPattern = #"id: \"([^\"]+)\""#
+
+        if let regex = try? NSRegularExpression(pattern: regexPattern) {
+            let range = NSRange(content.startIndex..<content.endIndex, in: content)
+            if let match = regex.firstMatch(in: content, range: range) {
+                if let idRange = Range(match.range(at: 1), in: content) {
+                    let extractedID = String(content[idRange])
+                    content = extractedID
+                }
+            }
+        }
+        
         var modifiedString = content
         let regex = "\\([^()]*\\)"
 

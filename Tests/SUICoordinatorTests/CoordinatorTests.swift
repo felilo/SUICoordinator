@@ -28,11 +28,13 @@ import Combine
 
 final class CoordinatorTests: XCTestCase {
     
+    private let animated: Bool = false
+    
     func test_finshFlow() async throws {
         let sut = makeSUT()
         
-        await sut.router.navigate(to: .pushStep2, animated: false )
-        await sut.router.navigate(to: .sheetStep, animated: false )
+        await sut.router.navigate(to: .pushStep2, animated: animated )
+        await sut.router.navigate(to: .sheetStep, animated: animated )
         
         await finishFlow(sut: sut)
         XCTAssertEqual(sut.router.items.count, 0)
@@ -43,8 +45,8 @@ final class CoordinatorTests: XCTestCase {
         let sut = AnyCoordinator()
         let coordinator = OtherCoordinator()
         
-        await sut.start(animated: false)
-        await sut.router.navigate(to: .pushStep2, animated: false )
+        await sut.start(animated: animated)
+        await sut.router.navigate(to: .pushStep2, animated: animated )
         await navigateToCoordinator(coordinator, in: sut)
         
         await finishFlow(sut: sut)
@@ -107,7 +109,7 @@ final class CoordinatorTests: XCTestCase {
         await navigateToCoordinator(coordinator1, in: sut)
         
         try await coordinator2.forcePresentation(
-            animated: false,
+            animated: animated,
             presentationStyle: .fullScreenCover,
             mainCoordinator: sut)
         

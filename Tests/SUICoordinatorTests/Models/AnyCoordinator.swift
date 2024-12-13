@@ -34,6 +34,6 @@ class AnyCoordinator: Coordinator<AnyEnumRoute> {
 class OtherCoordinator: Coordinator<DefaultRoute> { 
     override func start(animated: Bool = true) async {
         let page = AnyEnumRoute.pushStep
-        await startFlow(route: .init(presentationStyle: page.presentationStyle, content: page.view))
+        await startFlow(route: .init(presentationStyle: page.presentationStyle, content: { page.view }))
     }
 }

@@ -66,10 +66,10 @@ public struct DefaultRoute: RouteType {
     
     /// The view to be presented for the route.
     public var view: any View {
-        var view = AnyView(EmptyView())
+        var view = AnyView(EmptyView()).id(UUID().uuidString)
         
         if let v = content() {
-            view = AnyView(v)
+            view = AnyView(v).id(String(describing: v.self))
         }
         
         return view

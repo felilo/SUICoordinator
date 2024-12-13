@@ -23,7 +23,6 @@
 //
 
 import Foundation
-import Combine
 import SUICoordinator
 
 public class CustomTabbarCoordinator: TabbarCoordinator<MyTabbarPage> {

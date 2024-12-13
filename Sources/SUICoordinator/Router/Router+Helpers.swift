@@ -37,7 +37,7 @@ extension RouterType {
             }
         }
         
-        await try? Task.sleep(for: .seconds(animated ? 0.2 : 0))
+        try? await Task.sleep(for: .seconds(animated ? 0.2 : 0))
     }
     
     /// Removes all `nil` items from the sheet coordinator.

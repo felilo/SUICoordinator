@@ -34,7 +34,7 @@ final class SheetCoordinatorTests: XCTestCase {
         await sut.presentSheet(item)
         
         XCTAssertFalse(sut.items.isEmpty)
-        XCTAssertEqual(sut.items.last??.view, item.view)
+        XCTAssertEqual(sut.items.last??.view(), item.view())
     }
     
     func test_presentRouteTwice() async throws {
@@ -71,7 +71,7 @@ final class SheetCoordinatorTests: XCTestCase {
         await sut.remove(at: 1)
         
         XCTAssertEqual(sut.items.count, 2)
-        XCTAssertEqual(sut.items.last??.view, "Third Item")
+        XCTAssertEqual(sut.items.last??.view(), "Third Item")
     }
     
     func test_cleanCoordinator() async throws {
@@ -101,7 +101,7 @@ final class SheetCoordinatorTests: XCTestCase {
         presentationStyle: TransitionPresentationStyle = .fullScreenCover,
         animated: Bool = false
     ) -> SheetItem<String> {
-        .init(id: UUID().uuidString, view: item, animated: animated, presentationStyle: presentationStyle)
+        .init(id: UUID().uuidString, animated: animated, presentationStyle: presentationStyle, view: { item })
     }
     
     private func presentSheet( _ item: SheetItem<String>, with sut: SheetCoordinator<String>) async {

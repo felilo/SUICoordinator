@@ -25,7 +25,7 @@
 import SwiftUI
 
 
-public struct CoordinatorView<Route: RouteType>: CoordinatorViewType, View {
+public struct CoordinatorView<Route: RouteType>: View {
     
     // --------------------------------------------------------------------
     // MARK: Wrapper properties
@@ -61,15 +61,7 @@ public struct CoordinatorView<Route: RouteType>: CoordinatorViewType, View {
     public var body: some View {
         RouterView(viewModel: viewModel.router)
             .onViewDidLoad {
-                Task { await viewModel.start() }
+                Task(priority: .high) { await viewModel.start() }
             }
-    }
-    
-    // --------------------------------------------------------------------
-    // MARK: CoordinatorViewType
-    // --------------------------------------------------------------------
-    
-    func clean() {
-        Task { await onClean?() }
     }
 }
