@@ -36,7 +36,7 @@ class TabbarFlowCoordinator: Coordinator<DefaultRoute> {
         
         let route = DefaultRoute(
             presentationStyle: .push,
-            content: TabbarActionListView(viewModel: viewModel)
+            content: { TabbarActionListView(viewModel: viewModel) }
         )
         
         await startFlow(route: route )

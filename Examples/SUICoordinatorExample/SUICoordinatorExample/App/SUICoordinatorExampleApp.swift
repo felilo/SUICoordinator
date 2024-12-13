@@ -13,9 +13,7 @@ struct SUICoordinatorExampleApp: App {
     
     var body: some Scene {
         WindowGroup {
-            if let view = appDelegate.mainCoodinator?.view {
-                AnyView(view)
-            }
+            appDelegate.mainCoodinator?.getView()
         }
     }
 }

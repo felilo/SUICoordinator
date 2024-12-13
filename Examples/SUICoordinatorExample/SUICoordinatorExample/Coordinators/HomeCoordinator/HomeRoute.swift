@@ -56,15 +56,15 @@ enum HomeRoute: RouteType {
     var view: Body {
         switch self {
             case .push(let viewModel):
-                return PushView(viewModel: viewModel)
+                PushView(viewModel: viewModel)
             case .sheet(let viewModel):
-                return SheetView(viewModel: viewModel)
+                SheetView(viewModel: viewModel)
             case .fullscreen(let viewModel):
-                return FullscreenView(viewModel: viewModel)
+                FullscreenView(viewModel: viewModel)
             case .detents(let viewModel):
-                return DetentsView(viewModel: viewModel)
+                DetentsView(viewModel: viewModel)
             case .actionListView(let viewModel):
-                return NavigationActionListView(viewModel: viewModel)
+                NavigationActionListView(viewModel: viewModel)
         }
     }
 }

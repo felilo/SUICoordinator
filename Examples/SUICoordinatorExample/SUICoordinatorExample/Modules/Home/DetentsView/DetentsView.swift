@@ -47,10 +47,6 @@ struct DetentsView: View {
                     Button("Close view") {
                         Task { await viewModel.close() }
                     }.buttonStyle(.borderedProminent)
-                    
-                    Button("Finish flow") {
-                        Task { await viewModel.finishFlow() }
-                    }.buttonStyle(.borderedProminent)
                 }
             }
         }

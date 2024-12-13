@@ -10,7 +10,7 @@ import SUICoordinator
 
 class AppDelegate: NSObject, UIApplicationDelegate {
     
-    var mainCoodinator: (any CoordinatorType)?
+    var mainCoodinator: HomeCoordinator?
     
     func application(
         _ application: UIApplication,

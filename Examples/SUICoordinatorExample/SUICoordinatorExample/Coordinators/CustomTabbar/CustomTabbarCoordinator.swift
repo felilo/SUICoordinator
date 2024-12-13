@@ -29,13 +29,6 @@ import SUICoordinator
 public class CustomTabbarCoordinator: TabbarCoordinator<MyTabbarPage> {
     
     // ---------------------------------------------------------------------
-    // MARK: Properties
-    // ---------------------------------------------------------------------
-    
-    private var cancelables = Set<AnyCancellable>()
-    let viewModel: CustomTabbarViewModel
-    
-    // ---------------------------------------------------------------------
     // MARK: Init
     // ---------------------------------------------------------------------
     
@@ -43,31 +36,15 @@ public class CustomTabbarCoordinator: TabbarCoordinator<MyTabbarPage> {
         currentPage: MyTabbarPage = .first,
         presentationStyle: TransitionPresentationStyle = .sheet
     ) {
-        
-        viewModel = CustomTabbarViewModel()
-        viewModel.currentPage = currentPage
-        
         super.init(
             pages: PAGE.allCases,
-            currentPage: currentPage,
-            customView: CustomTabbarView(viewModel: viewModel)
+            currentPage: currentPage
         )
         
-        setupObservers()
-    }
-    
-    // ---------------------------------------------------------------------
-    // MARK: Helper funcs
-    // ---------------------------------------------------------------------
-    
-    private func setupObservers() {
-        viewModel.$currentPage
-              .sink { [weak self] page in
-                self?.currentPage = page
-              }.store(in: &cancelables)
+        customView = { CustomTabbarView(viewModel: self) }
         
-        viewModel.getCoordinator = { [weak self] positon in
-            self?.getCoordinator(with: positon)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
+            self?.setBadge.send(( "2", .first ))
         }
     }
 }
