@@ -49,7 +49,12 @@ extension CoordinatorType {
     ///   - animated: A boolean value indicating whether to animate the cleaning process.
     ///   - withMainView: A boolean value indicating whether to clean the main view.
     func cleanView(animated: Bool = false, withMainView: Bool = true) async {
-        await router.clean(animated: animated, withMainView: withMainView)
+        if let coordinator = self as? (any TabbarCoordinatable) {
+            await coordinator.clean()
+        } else {
+            await router.clean(animated: animated, withMainView: withMainView)
+        }
+        
         parent = nil
     }
     
@@ -88,6 +93,11 @@ extension CoordinatorType {
     ///   - animated: A boolean value indicating whether to animate the removal process.
     func removeChildren(animated: Bool = false) async {
         guard let first = children.first else { return }
+        
+        if let parent = first.parent as? (any TabbarCoordinatable) {
+            await parent.setCurrentPage(with: first)
+        }
+        
         await first.emptyCoordinator(animated: animated)
         await removeChildren()
     }
@@ -155,5 +165,11 @@ extension CoordinatorType {
         
         await parent.closeLastSheet(animated: animated)
         await handleFinish(self)
+    }
+    
+    /// Cleans up the coordinator.
+    func swipedAway() async {
+        guard !isEmptyCoordinator else { return }
+        await finish(animated: false, withDismiss: false)
     }
 }

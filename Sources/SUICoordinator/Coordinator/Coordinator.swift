@@ -24,7 +24,6 @@
 
 import Foundation
 import Combine
-import SwiftUI
 
 /// An open class representing a coordinator in a coordinator-based architecture.
 ///
@@ -62,20 +61,8 @@ open class Coordinator<Route: RouteType>: ObservableObject, CoordinatorType {
     public init() {
         self.router = .init()
         self.uuid = "\(NSStringFromClass(type(of: self))) - \(UUID().uuidString)"
-        self.router.coordinator = self
-    }
-    
-    // --------------------------------------------------------------------
-    // MARK: Computed vars
-    // --------------------------------------------------------------------
-    
-    /// A computed property providing the view associated with the coordinator.
-    public var view: any View {
-        CoordinatorView(
-            viewModel: self,
-            onClean: { [weak self] in await self?.clean() },
-            onSetTag: { [weak self] tag in self?.tagId = tag }
-        )
+        
+        router.isTabbarCoordinable = isTabbarCoordinable
     }
     
     // --------------------------------------------------------------------
@@ -107,11 +94,5 @@ open class Coordinator<Route: RouteType>: ObservableObject, CoordinatorType {
     ) async throws {
         let topCoordinator = try mainCoordinator?.topCoordinator()
         await topCoordinator?.navigate(to: self, presentationStyle: presentationStyle)
-    }
-    
-    /// Cleans up the coordinator.
-    private func clean() async {
-        guard !isEmptyCoordinator else { return }
-        await finish(animated: false, withDismiss: false)
     }
 }

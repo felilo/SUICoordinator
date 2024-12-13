@@ -23,7 +23,7 @@
 //
 
 import Combine
-import SwiftUI
+import Foundation
 
 /// A class representing a router in the coordinator pattern.
 ///
@@ -37,7 +37,7 @@ public class Router<Route: RouteType>: ObservableObject, RouterType {
     // --------------------------------------------------------------------
     
     /// The first view in the navigation flow.
-    public var mainView: Route?
+    @Published public var mainView: Route?
     /// The array of routes managed by the navigation router.
     @Published public var items: [Route] = []
     // The sheet coordinator for presenting sheets.
@@ -48,7 +48,7 @@ public class Router<Route: RouteType>: ObservableObject, RouterType {
     // --------------------------------------------------------------------
     
     /// The coordinator associated with the router.
-    public var coordinator: (any CoordinatorType)?
+    public var isTabbarCoordinable: Bool = false
     
     // --------------------------------------------------------------------
     // MARK: Constructor
@@ -90,7 +90,6 @@ public class Router<Route: RouteType>: ObservableObject, RouterType {
     ///   - presentationStyle: The transition presentation style for the presentation.
     ///   - animated: A boolean value indicating whether to animate the presentation.
     @MainActor public func present(_ view: Route, presentationStyle: TransitionPresentationStyle? = .sheet, animated: Bool = true) async -> Void {
-        
         if (presentationStyle ?? view.presentationStyle) == .push {
             return await navigate(
                 to: view,
@@ -100,9 +99,10 @@ public class Router<Route: RouteType>: ObservableObject, RouterType {
         
         let item = SheetItem(
             id: view.id,
-            view: view.view,
             animated: animated,
-            presentationStyle: presentationStyle ?? view.presentationStyle)
+            presentationStyle: presentationStyle ?? view.presentationStyle,
+            view: { view.view }
+        )
         
         presentSheet(item: item)
     }
@@ -160,8 +160,8 @@ public class Router<Route: RouteType>: ObservableObject, RouterType {
     ///
     /// - Parameters:
     ///   - animated: A boolean value indicating whether to animate the dismissal.
-    @MainActor public func dismiss(animated: Bool = true) -> Void {
-        sheetCoordinator.removeLastSheet(animated: animated)
+    @MainActor public func dismiss(animated: Bool = true) async -> Void {
+        await sheetCoordinator.removeLastSheet(animated: animated)
     }
     
     /// Closes the current view or sheet, optionally finishing the associated flow.
@@ -171,7 +171,7 @@ public class Router<Route: RouteType>: ObservableObject, RouterType {
     ///   - finishFlow: A boolean value indicating whether to finish the associated flow.
     @MainActor public func close(animated: Bool = true, finishFlow: Bool = false) async -> Void {
         if !sheetCoordinator.items.isEmpty {
-            dismiss(animated: animated)
+            await dismiss(animated: animated)
         } else if !items.isEmpty {
             await pop(animated: animated)
         }
@@ -182,11 +182,15 @@ public class Router<Route: RouteType>: ObservableObject, RouterType {
     /// - Parameters:
     ///   - animated: A boolean value indicating whether to animate the cleanup process.
     ///   - withMainView: A boolean value indicating whether to clean the main view.
-    @MainActor public func clean(animated: Bool, withMainView: Bool = true) -> Void {
-        items = []
-        coordinator = nil
-        if withMainView { mainView = nil }
+    @MainActor public func clean(animated: Bool, withMainView: Bool = true) async -> Void {
+        await popToRoot(animated: false)
+        items.removeAll()
         sheetCoordinator = .init()
+        
+        if withMainView {
+            mainView = nil
+        }
+        
     }
     
     /// Restarts the current view or coordinator, optionally animating the restart.
@@ -196,7 +200,7 @@ public class Router<Route: RouteType>: ObservableObject, RouterType {
     @MainActor public func restart(animated: Bool) async -> Void {
         if !sheetCoordinator.items.isEmpty {
             await pop(animated: false)
-            sheetCoordinator.clean()
+            await sheetCoordinator.clean()
         } else {
             await popToRoot(animated: animated)
         }
@@ -206,7 +210,7 @@ public class Router<Route: RouteType>: ObservableObject, RouterType {
     ///
     /// - Parameters:
     ///   - item: The sheet item containing the view to present.
-    @MainActor func presentSheet(item: SheetItem<(any View)>) -> Void {
+    @MainActor func presentSheet(item: SheetItem<RouteType.Body>) -> Void {
         sheetCoordinator.presentSheet(item)
     }
     
@@ -226,35 +230,6 @@ public class Router<Route: RouteType>: ObservableObject, RouterType {
         }
         
         return modifiedString
-    }
-}
-
-
-fileprivate extension Router {
-    
-    // --------------------------------------------------------------------
-    // MARK: Helper funcs
-    // --------------------------------------------------------------------
-    
-    /// Runs an action asynchronously with an optional animation.
-    ///
-    /// - Parameters:
-    ///   - animated: A boolean value indicating whether to animate the action.
-    ///   - action: The asynchronous action to run.
-    @MainActor private func runActionWithAnimation(
-        _ animated: Bool,
-        action: @escaping () async -> (() -> Void)
-    ) async {
-        let customAction = await action()
-        var transaction = Transaction()
-        transaction.disablesAnimations = !animated
-        
-        await withCheckedContinuation { continuation in
-            withTransaction(transaction) {
-                customAction()
-                continuation.resume()
-            }
-        }
     }
     
     /// Handles the pop action by updating the navigation stack.

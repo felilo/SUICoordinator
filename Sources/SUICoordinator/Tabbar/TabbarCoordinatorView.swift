@@ -35,17 +35,23 @@ struct TabbarCoordinatorView<PAGE: TabbarPage>: View {
     
     @StateObject var viewModel: TabbarCoordinator<PAGE>
     @State var badges = [BadgeItem]()
+    @State var pages = [PAGE]()
+    @State var currentPage: PAGE
     
     // ---------------------------------------------------------------------
     // MARK: View
     // ---------------------------------------------------------------------
     
-    var body: some View {
+    public var body: some View {
         TabView(selection: tabSelection()){
-            ForEach(viewModel.pages, id: \.self, content: makeTabView)
+            ForEach(pages, id: \.id, content: makeTabView)
         }
         .onReceive(viewModel.$pages) { pages in
+            self.pages = pages
             badges = pages.map { (nil, $0) }
+        }
+        .onReceive(viewModel.$currentPage) { page in
+            currentPage = page
         }
         .onReceive(viewModel.setBadge) { (value, page) in
             guard let index = getBadgeIndex(page: page) else { return }
@@ -60,7 +66,7 @@ struct TabbarCoordinatorView<PAGE: TabbarPage>: View {
     @ViewBuilder
     func makeTabView(page: PAGE) -> some View {
         if let item = viewModel.getCoordinator(with: page.position) {
-            AnyView( item.view )
+            AnyView( item.getView() )
                 .tabItem {
                     Label(
                         title: { AnyView(page.title) },
@@ -88,14 +94,12 @@ extension TabbarCoordinatorView {
     
     private func tabSelection() -> Binding<PAGE> {
         Binding {
-            self.viewModel.currentPage
-        } set: { tappedTab in
-            if tappedTab == self.viewModel.currentPage {
-                Task { [weak viewModel] in
-                    await viewModel?.popToRoot()
-                }
+            currentPage
+        } set: { [weak viewModel] tappedTab in
+            if tappedTab == currentPage {
+                Task { await viewModel?.popToRoot() }
             }
-            self.viewModel.currentPage = tappedTab
+            viewModel?.currentPage = tappedTab
         }
     }
 }

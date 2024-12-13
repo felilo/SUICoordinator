@@ -36,7 +36,7 @@ public struct DefaultRoute: RouteType {
     private let _presentationStyle: TransitionPresentationStyle
     
     /// The content view for the route.
-    public var content: any View
+    public var content: () -> (Body?)
     
     // ---------------------------------------------------------
     // MARK: - Constructor
@@ -49,7 +49,7 @@ public struct DefaultRoute: RouteType {
     ///   - content: The content view for the route.
     public init(
         presentationStyle: TransitionPresentationStyle,
-        content: (any View)
+        @ViewBuilder content: @escaping () -> Body?
     ) {
         self.content = content
         self._presentationStyle = presentationStyle
@@ -65,8 +65,13 @@ public struct DefaultRoute: RouteType {
     }
     
     /// The view to be presented for the route.
-    @ViewBuilder
     public var view: any View {
-        content
+        var view = AnyView(EmptyView())
+        
+        if let v = content() {
+            view = AnyView(v)
+        }
+        
+        return view
     }
 }

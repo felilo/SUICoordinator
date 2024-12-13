@@ -60,8 +60,8 @@ public struct CoordinatorView<Route: RouteType>: CoordinatorViewType, View {
     
     public var body: some View {
         RouterView(viewModel: viewModel.router)
-            .onViewDidLoad { [weak viewModel] in
-                Task { await viewModel?.start() }
+            .onViewDidLoad {
+                Task { await viewModel.start() }
             }
     }
     

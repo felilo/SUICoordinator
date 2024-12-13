@@ -23,8 +23,6 @@
 //
 
 import Foundation
-import SwiftUI
-
 
 /// A class representing a coordinator for managing and presenting sheets.
 ///
@@ -95,11 +93,11 @@ final public class SheetCoordinator<T>: ObservableObject {
     ///
     /// - Parameters:
     ///   - animated: A boolean value indicating whether to animate the removal.
-    @MainActor func removeLastSheet(animated: Bool) -> Void {
+    @MainActor func removeLastSheet(animated: Bool) async -> Void {
         guard !items.isEmpty else { return }
         self.animated = animated
         lastPresentationStyle = items.last(where: { $0?.presentationStyle != nil })??.presentationStyle
-        makeNilItem(at: totalItems)
+        await makeNilItem(at: totalItems)
     }
     
     /// Removes the item at the specified index.
@@ -115,9 +113,10 @@ final public class SheetCoordinator<T>: ObservableObject {
     ///
     /// - Parameters:
     ///   - animated: A boolean value indicating whether to animate the cleanup process.
-    @MainActor func clean(animated: Bool = true) -> Void {
-        makeNilItem(at: 0)
+    @MainActor func clean(animated: Bool = true) async -> Void {
+        await makeNilItem(at: 0)
         lastPresentationStyle = nil
+        items.removeAll()
     }
     
     // ---------------------------------------------------------
@@ -133,7 +132,7 @@ final public class SheetCoordinator<T>: ObservableObject {
     ///
     /// - Parameters:
     ///   - index: The index at which to remove `nil` items.
-    @MainActor private func makeNilItem(at index: Int) {
+    @MainActor private func makeNilItem(at index: Int) async {
         guard isValidIndex(index) else { return }
         items[index] = nil
     }

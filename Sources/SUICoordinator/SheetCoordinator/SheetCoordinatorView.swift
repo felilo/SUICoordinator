@@ -57,9 +57,7 @@ struct SheetCoordinatorView: ViewModifier {
     func body(content: Content) -> some View {
         content
             .background {
-                if $coordinator.items.isEmpty || isLast {
-                    EmptyView()
-                } else {
+                VStack {
                     SheetView(
                         index: index,
                         items: $coordinator.items,
@@ -69,6 +67,7 @@ struct SheetCoordinatorView: ViewModifier {
                         onDismiss: onDissmis,
                         onDidLoad: onDidLoad
                     )
+                    .hidden($coordinator.items.isEmpty || isLast)
                 }
             }
     }
@@ -77,9 +76,12 @@ struct SheetCoordinatorView: ViewModifier {
     // MARK: Helper Views
     // ---------------------------------------------------------
     
-    @ViewBuilder
-    private func buildContent(with index: Int, item: SheetItem<Value>) -> some View {
-        let view = AnyView(item.view)
+    
+    private func buildContent(
+        with index: Int,
+        item: SheetItem<Value>
+    ) -> some View {
+        let view = (item.view() ?? AnyView(EmptyView()))
             .sheetCoordinator(
                 coordinator: coordinator,
                 index: coordinator.getNextIndex(index),
@@ -87,7 +89,8 @@ struct SheetCoordinatorView: ViewModifier {
                 onDissmis: onDissmis,
                 onDidLoad: onDidLoad
             )
-        addSheet(to: view, with: item.presentationStyle)
+            
+        return addSheet(to: AnyView(view), with: item.presentationStyle)
     }
     
     @ViewBuilder
@@ -99,5 +102,12 @@ struct SheetCoordinatorView: ViewModifier {
             case .detents(let data): content.presentationDetents(data)
             default: content
         }
+    }
+}
+
+
+extension View {
+    func hidden(_ shouldHide: Bool) -> some View {
+        opacity(shouldHide ? 0 : 1)
     }
 }
