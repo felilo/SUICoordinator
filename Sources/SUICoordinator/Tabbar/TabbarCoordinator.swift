@@ -103,6 +103,15 @@ open class TabbarCoordinator<Page: TabbarPage>: TabbarCoordinatorType {
     // MARK: Helper funcs
     // ---------------------------------------------------------
     
+    /// Retrieves the coordinator at a specific position within the tabbar coordinator.
+    ///
+    /// - Parameters:
+    ///   - position: The position of the coordinator.
+    /// - Returns: The coordinator at the specified position.
+    public func getCoordinator(with position: Int) -> (any CoordinatorType)? {
+        children.first { $0.tagId == "\(position)" }
+    }
+    
     /// Retrieves the selected coordinator within the tabbar coordinator.
     ///
     /// - Returns: The selected coordinator.
@@ -110,39 +119,5 @@ open class TabbarCoordinator<Page: TabbarPage>: TabbarCoordinatorType {
         guard let index = children.firstIndex(where: { $0.tagId == "\(currentPage.position)" })
         else { throw TabbarCoordinatorError.coordinatorSelected }
         return children[index]
-    }
-    
-    /// Sets the array of pages for the tabbar coordinator.
-    ///
-    /// - Parameters:
-    ///   - values: The array of pages to set.
-    ///   - currentPage: The optional current page to set.
-    open func setPages(_ values: [Page], currentPage: Page? = nil) async {
-        await removeChildren()
-        await setupPages(values, currentPage: currentPage)
-    }
-    
-    /// Retrieves the coordinator at a specific position within the tabbar coordinator.
-    ///
-    /// - Parameters:
-    ///   - position: The position of the coordinator.
-    /// - Returns: The coordinator at the specified position.
-    open func getCoordinator(with position: Int) -> (any CoordinatorType)? {
-        children.first { $0.tagId == "\(position)" }
-    }
-    
-    /// Sets up the pages for the tabbar coordinator.
-    ///
-    /// - Parameters:
-    ///   - value: The array of pages to set up.
-    @MainActor private func setupPages(_ value: [Page], currentPage: Page? = nil) {
-        for page in value {
-            let item = page.coordinator()
-            startChildCoordinator(item)
-            item.tagId = "\(page.position)"
-        }
-        
-        pages = value
-        setCurrentPage(currentPage)
     }
 }
