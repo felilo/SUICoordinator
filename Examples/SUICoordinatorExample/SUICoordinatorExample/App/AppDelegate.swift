@@ -17,6 +17,19 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil
     ) -> Bool {
         mainCoodinator = HomeCoordinator()
+        
+        // Simulate the receipt of a notification or external trigger to present the some coordinator
+        DispatchQueue.main.asyncAfter(deadline: .now() + 10) {
+            Task { [weak self] in
+                // Create and present the CustomTabbarCoordinator in a sheet presentation style
+                let coordinator = CustomTabbarCoordinator()
+                try? await coordinator.forcePresentation(
+                    presentationStyle: .fullScreenCover,
+                    mainCoordinator: self?.mainCoodinator
+                )
+            }
+        }
+        
         return true
     }
 }
