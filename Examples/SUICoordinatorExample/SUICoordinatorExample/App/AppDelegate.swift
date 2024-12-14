@@ -24,7 +24,7 @@ class AppDelegate: NSObject, UIApplicationDelegate {
                 // Create and present the CustomTabbarCoordinator in a sheet presentation style
                 let coordinator = CustomTabbarCoordinator()
                 try? await coordinator.forcePresentation(
-                    presentationStyle: .fullScreenCover,
+                    presentationStyle: .sheet,
                     mainCoordinator: self?.mainCoodinator
                 )
             }
