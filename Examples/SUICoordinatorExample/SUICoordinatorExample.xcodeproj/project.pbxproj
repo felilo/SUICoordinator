@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		D9107CFB2B6703D80039F40D /* NavigationActionListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9107CFA2B6703D80039F40D /* NavigationActionListView.swift */; };
+		D91AD1F42D0D0BDC00C0FEAA /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D91AD1F32D0D0BDC00C0FEAA /* LaunchScreen.storyboard */; };
 		D95389212B643BAD000E3357 /* SUICoordinatorExampleApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = D95389202B643BAD000E3357 /* SUICoordinatorExampleApp.swift */; };
 		D95389232B643BAD000E3357 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D95389222B643BAD000E3357 /* ContentView.swift */; };
 		D95389252B643BAE000E3357 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D95389242B643BAE000E3357 /* Assets.xcassets */; };
@@ -37,6 +38,8 @@
 
 /* Begin PBXFileReference section */
 		D9107CFA2B6703D80039F40D /* NavigationActionListView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NavigationActionListView.swift; sourceTree = "<group>"; };
+		D91AD1F32D0D0BDC00C0FEAA /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
+		D91AD1F52D0D0E6200C0FEAA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		D953891D2B643BAD000E3357 /* SUICoordinatorExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SUICoordinatorExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D95389202B643BAD000E3357 /* SUICoordinatorExampleApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SUICoordinatorExampleApp.swift; sourceTree = "<group>"; };
 		D95389222B643BAD000E3357 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -76,6 +79,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		D91AD1F12D0D0BAD00C0FEAA /* LaunchScreen */ = {
+			isa = PBXGroup;
+			children = (
+				D91AD1F32D0D0BDC00C0FEAA /* LaunchScreen.storyboard */,
+			);
+			path = LaunchScreen;
+			sourceTree = "<group>";
+		};
 		D95389142B643BAD000E3357 = {
 			isa = PBXGroup;
 			children = (
@@ -95,6 +106,8 @@
 		D953891F2B643BAD000E3357 /* SUICoordinatorExample */ = {
 			isa = PBXGroup;
 			children = (
+				D91AD1F52D0D0E6200C0FEAA /* Info.plist */,
+				D91AD1F12D0D0BAD00C0FEAA /* LaunchScreen */,
 				D9B455CE2B643FBD004DD03A /* App */,
 				D9B455EC2B643FBD004DD03A /* Coordinators */,
 				D9B455D12B643FBD004DD03A /* Modules */,
@@ -332,6 +345,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D91AD1F42D0D0BDC00C0FEAA /* LaunchScreen.storyboard in Resources */,
 				D95389282B643BAE000E3357 /* Preview Assets.xcassets in Resources */,
 				D95389252B643BAE000E3357 /* Assets.xcassets in Resources */,
 			);
@@ -505,9 +519,10 @@
 				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = SUICoordinatorExample/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
@@ -541,9 +556,10 @@
 				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = SUICoordinatorExample/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
@@ -555,6 +571,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = afl.SUICoordinatorExample;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "Developer Wildcard";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
