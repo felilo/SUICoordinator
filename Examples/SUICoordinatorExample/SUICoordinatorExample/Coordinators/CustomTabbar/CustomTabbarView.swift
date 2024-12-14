@@ -25,15 +25,15 @@
 import SwiftUI
 import SUICoordinator
 
-struct CustomTabbarView: View {
+struct CustomTabbarView<DataSource: TabbarCoordinatorType>: View where DataSource.Page: TabbarPage{
     
     // ---------------------------------------------------------------------
     // MARK: Typealias
     // ---------------------------------------------------------------------
     
     
-    typealias Page = MyTabbarPage
-    typealias BadgeItem = (value: String?, page: Page)
+    typealias Page = DataSource.Page
+    typealias BadgeItem = DataSource.BadgeItem
     
     
     // ---------------------------------------------------------------------
@@ -41,7 +41,7 @@ struct CustomTabbarView: View {
     // ---------------------------------------------------------------------
     
     
-    @StateObject private var viewModel: TabbarCoordinator<Page>
+    @StateObject private var viewModel: DataSource
     @State private var currentPage: Page
     @State private var pages: [Page]
     @State var badges = [BadgeItem]()
@@ -54,10 +54,11 @@ struct CustomTabbarView: View {
     // ---------------------------------------------------------------------
     
     
-    init(viewModel: TabbarCoordinator<Page>) {
+    init(viewModel: DataSource) {
         self._viewModel = .init(wrappedValue: viewModel)
         currentPage = viewModel.currentPage
         pages = viewModel.pages
+        badges = viewModel.pages.map { (nil, $0) }
     }
     
     
@@ -84,14 +85,17 @@ struct CustomTabbarView: View {
             .padding(.horizontal, 10)
         }
         .ignoresSafeArea(.all, edges: [.leading, .trailing, .top])
-        .onReceive(viewModel.$currentPage) { currentPage = $0 }
-        .onReceive(viewModel.$pages) { pages in
+        .onChange(of: viewModel.currentPage) { currentPage = $0 }
+        .onChange(of: viewModel.pages) { pages in
             self.pages = pages
             badges = pages.map { (nil, $0) }
         }
         .onReceive(viewModel.setBadge) { (value, page) in
             guard let index = getBadgeIndex(page: page) else { return }
             badges[index].value = value
+        }
+        .onAppear {
+            badges = pages.map { (nil, $0) }
         }
     }
     
