@@ -78,4 +78,21 @@ public extension CoordinatorType {
     @MainActor func startFlow(route: Route, transitionStyle: TransitionPresentationStyle? = nil, animated: Bool = true) async -> Void {
         router.mainView = route
     }
+    
+    /// Forces the presentation of the coordinator.
+    ///
+    /// - Parameters:
+    ///   - animated: A boolean value indicating whether to animate the presentation.
+    ///   - presentationStyle: The transition presentation style for the forced presentation.
+    ///   - mainCoordinator: The main coordinator associated with the forced presentation.
+    ///   - Throws: An error if the presentation cannot be forced.
+    ///   SeeAlso: TransitionPresentationStyle
+    public func forcePresentation(
+        animated: Bool = true,
+        presentationStyle: TransitionPresentationStyle = .sheet,
+        mainCoordinator: (any CoordinatorType)? = nil
+    ) async throws {
+        let topCoordinator = try mainCoordinator?.topCoordinator()
+        await topCoordinator?.navigate(to: self, presentationStyle: presentationStyle)
+    }
 }
