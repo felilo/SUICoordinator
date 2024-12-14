@@ -28,7 +28,7 @@ import Combine
 /// An open class representing a coordinator for managing a tabbar-based navigation.
 ///
 /// Tabbar coordinators handle the navigation and coordination of pages within a tabbar.
-open class TabbarCoordinator<Page>: Coordinator<DefaultRoute>, TabbarCoordinatorType where Page: TabbarPage {
+open class TabbarCoordinator<Page: TabbarPage>: TabbarCoordinatorType {
     
     // --------------------------------------------------------------------
     // MARK: Wrapper properties
@@ -41,6 +41,8 @@ open class TabbarCoordinator<Page>: Coordinator<DefaultRoute>, TabbarCoordinator
     @Published public var currentPage: Page
     
     // --------------------------------------------------------------------
+    // MARK: Properties
+    // MARK: Properties
     // MARK: Properties
     // --------------------------------------------------------------------
     
@@ -142,43 +144,5 @@ open class TabbarCoordinator<Page>: Coordinator<DefaultRoute>, TabbarCoordinator
         
         pages = value
         setCurrentPage(currentPage)
-    }
-    
-    /// Pops to the root of the navigation stack.
-    @MainActor public func popToRoot() async {
-        try? await getCoordinatorSelected().root.popToRoot(animated: true)
-    }
-    
-    /// Sets the current page for the tabbar coordinator.
-    ///
-    /// - Parameters:
-    ///   - coordinator: The coordinator.
-    @MainActor public func setCurrentPage(with coordinator: any CoordinatorType) {
-        let page = pages.first(where: { "\($0.position)" == coordinator.tagId })
-        
-        setCurrentPage(page)
-    }
-    
-    /// Cleans  the coordinator.
-    @MainActor public func clean() async {
-        setupPages([])
-        await router.clean(animated: false)
-        customView = nil
-    }
-    
-    // ---------------------------------------------------------------------
-    // MARK: Private helper funcs
-    // ---------------------------------------------------------------------
-    
-    /// Sets the current page for the tabbar coordinator.
-    ///
-    /// - Parameters:
-    ///   - value: The optional current page to set.
-    public func setCurrentPage(_ value: (any TabbarPage)?) {
-        guard let value, value.position != currentPage.position,
-              let item = pages.first(where: { $0.position == value.position })
-        else { return  }
-        
-        currentPage = item
     }
 }
