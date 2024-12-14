@@ -28,11 +28,14 @@ import Combine
 /// An open class representing a coordinator for managing a tabbar-based navigation.
 ///
 /// Tabbar coordinators handle the navigation and coordination of pages within a tabbar.
-open class TabbarCoordinator<Page: TabbarPage>: TabbarCoordinatorType {
+open class TabbarCoordinator<Page: TabbarPage>: TabbarCoordinatable {
     
     // --------------------------------------------------------------------
     // MARK: Wrapper properties
     // --------------------------------------------------------------------
+    
+    /// The published router associated with the coordinator.
+    @Published public var router: Router<DefaultRoute>
     
     /// The array of published pages associated with the tabbar coordinator.
     @Published public var pages: [Page] = []
@@ -41,9 +44,23 @@ open class TabbarCoordinator<Page: TabbarPage>: TabbarCoordinatorType {
     @Published public var currentPage: Page
     
     // --------------------------------------------------------------------
-    // MARK: Properties
-    // MARK: Properties
-    // MARK: Properties
+    // MARK: CoordinatorType properties
+    // --------------------------------------------------------------------
+    
+    /// The unique identifier for the coordinator.
+    public var uuid: String
+    
+    /// The parent coordinator associated with the coordinator.
+    public var parent: (any CoordinatorType)!
+    
+    /// The array of children coordinators associated with the coordinator.
+    public var children: [(any CoordinatorType)] = []
+    
+    /// The tag identifier associated with the coordinator.
+    public var tagId: String?
+    
+    // --------------------------------------------------------------------
+    // MARK: TabbarCoordinatorType properties
     // --------------------------------------------------------------------
     
     /// The presentation style for transitioning between pages.
@@ -72,12 +89,14 @@ open class TabbarCoordinator<Page: TabbarPage>: TabbarCoordinatorType {
         presentationStyle: TransitionPresentationStyle = .sheet,
         customView: (() -> Page.View)? = nil
     ) {
+        self.router = .init()
+        self.uuid = "\(NSStringFromClass(type(of: self))) - \(UUID().uuidString)"
         self.presentationStyle = presentationStyle
         self.currentPage = currentPage
         self.customView = customView
         self.pages = pages
         
-        super.init()
+        router.isTabbarCoordinable = true
     }
     
     // ---------------------------------------------------------
@@ -88,10 +107,10 @@ open class TabbarCoordinator<Page: TabbarPage>: TabbarCoordinatorType {
     ///
     /// - Parameters:
     ///   - animated: A boolean value indicating whether to animate the start process.
-    open override func start(animated: Bool = true) async {
+    open func start(animated: Bool = true) async {
         await setupPages(pages, currentPage: currentPage)
         
-        let cView = customView?() ?? TabbarCoordinatorView(viewModel: self, currentPage: currentPage)
+        let cView = customView?() ?? TabbarCoordinatorView(dataSource: self, currentPage: currentPage)
         
         await startFlow(
             route: DefaultRoute(presentationStyle: presentationStyle) { cView },
