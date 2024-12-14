@@ -25,20 +25,20 @@
 import SwiftUI
 
 
-public struct CoordinatorView<Route: RouteType>: View {
+public struct CoordinatorView<DataSource: CoordinatorType>: View {
     
     // --------------------------------------------------------------------
     // MARK: Wrapper properties
     // --------------------------------------------------------------------
     
-    @StateObject var viewModel: Coordinator<Route>
+    @StateObject var dataSource: DataSource
     
     // --------------------------------------------------------------------
     // MARK: Constructor
     // --------------------------------------------------------------------
     
-    init( viewModel: Coordinator<Route>) {
-        self._viewModel = .init(wrappedValue: viewModel)
+    init(dataSource: DataSource) {
+        self._dataSource = .init(wrappedValue: dataSource)
     }
     
     // --------------------------------------------------------------------
@@ -46,9 +46,9 @@ public struct CoordinatorView<Route: RouteType>: View {
     // --------------------------------------------------------------------
     
     public var body: some View {
-        RouterView(viewModel: viewModel.router)
+        RouterView(viewModel: dataSource.router)
             .onViewDidLoad {
-                Task(priority: .high) { await viewModel.start() }
+                Task(priority: .high) { await dataSource.start(animated: true) }
             }
     }
 }

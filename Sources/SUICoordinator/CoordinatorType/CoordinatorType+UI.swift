@@ -11,8 +11,6 @@ public extension CoordinatorType {
     
     @ViewBuilder
     func getView() -> some View {
-        if let viewModel = self as? Coordinator<Route> {
-            CoordinatorView<Route>(viewModel: viewModel)
-        }
+        CoordinatorView(dataSource: self)
     }
 }
