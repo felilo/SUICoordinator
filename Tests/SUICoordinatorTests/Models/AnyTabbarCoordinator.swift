@@ -28,7 +28,7 @@ import SwiftUI
 
 class AnyTabbarCoordinator: TabbarCoordinator<AnyEnumTabbarRoute> {
     init(currentPage: AnyEnumTabbarRoute = .tab1) {
-        super.init(pages: PAGE.sortedByPosition(), currentPage: currentPage)
+        super.init(pages: Page.sortedByPosition(), currentPage: currentPage)
     }
 }
 

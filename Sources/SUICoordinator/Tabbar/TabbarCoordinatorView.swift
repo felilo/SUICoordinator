@@ -25,18 +25,20 @@
 import SwiftUI
 import Foundation
 
-struct TabbarCoordinatorView<PAGE: TabbarPage>: View {
+struct TabbarCoordinatorView<DataSource: TabbarCoordinatorType>: View where DataSource.Page: TabbarPage {
     
-    typealias BadgeItem = (value: String?, page: PAGE)
+    typealias Page = DataSource.Page
+    typealias BadgeItem = DataSource.BadgeItem
+    
     
     // ---------------------------------------------------------------------
     // MARK: Properties
     // ---------------------------------------------------------------------
     
-    @StateObject var viewModel: TabbarCoordinator<PAGE>
+    @StateObject var dataSource: DataSource
     @State var badges = [BadgeItem]()
-    @State var pages = [PAGE]()
-    @State var currentPage: PAGE
+    @State var pages = [Page]()
+    @State var currentPage: Page
     
     // ---------------------------------------------------------------------
     // MARK: View
@@ -44,16 +46,16 @@ struct TabbarCoordinatorView<PAGE: TabbarPage>: View {
     
     public var body: some View {
         TabView(selection: tabSelection()){
-            ForEach(pages, id: \.id, content: makeTabView)
+            ForEach(pages, id: \.id, content: tabBarItem)
         }
-        .onReceive(viewModel.$pages) { pages in
+        .onChange(of: dataSource.pages) { pages in
             self.pages = pages
             badges = pages.map { (nil, $0) }
         }
-        .onReceive(viewModel.$currentPage) { page in
+        .onChange(of: dataSource.currentPage) { page in
             currentPage = page
         }
-        .onReceive(viewModel.setBadge) { (value, page) in
+        .onReceive(dataSource.setBadge) { (value, page) in
             guard let index = getBadgeIndex(page: page) else { return }
             badges[index].value = value
         }
@@ -64,27 +66,27 @@ struct TabbarCoordinatorView<PAGE: TabbarPage>: View {
     // ---------------------------------------------------------------------
     
     @ViewBuilder
-    func makeTabView(page: PAGE) -> some View {
-        if let item = viewModel.getCoordinator(with: page.position) {
+    func tabBarItem(with page: Page) -> some View {
+        if let item = dataSource.getCoordinator(with: page.position) {
             AnyView( item.getView() )
                 .tabItem {
                     Label(
                         title: { AnyView(page.title) },
                         icon: { AnyView(page.icon) } )
                 }
-                .badge(getBadge(page: page)?.value)
+                .badge(badge(of: page)?.value)
                 .tag(page)
         }
     }
     
-    private func getBadge(page: PAGE) -> BadgeItem? {
+    private func badge(of page: Page) -> BadgeItem? {
         guard let index = getBadgeIndex(page: page) else {
             return nil
         }
         return badges[index]
     }
     
-    private func getBadgeIndex(page: PAGE) -> Int? {
+    private func getBadgeIndex(page: Page) -> Int? {
         badges.firstIndex(where: { $0.1 == page })
     }
 }
@@ -92,14 +94,14 @@ struct TabbarCoordinatorView<PAGE: TabbarPage>: View {
 
 extension TabbarCoordinatorView {
     
-    private func tabSelection() -> Binding<PAGE> {
+    private func tabSelection() -> Binding<Page> {
         Binding {
             currentPage
-        } set: { [weak viewModel] tappedTab in
+        } set: { [weak dataSource] tappedTab in
             if tappedTab == currentPage {
-                Task(priority: .high) { await viewModel?.popToRoot() }
+                Task(priority: .high) { await dataSource?.popToRoot() }
             }
-            viewModel?.currentPage = tappedTab
+            dataSource?.currentPage = tappedTab
         }
     }
 }

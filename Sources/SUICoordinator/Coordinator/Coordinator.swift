@@ -62,7 +62,7 @@ open class Coordinator<Route: RouteType>: ObservableObject, CoordinatorType {
         self.router = .init()
         self.uuid = "\(NSStringFromClass(type(of: self))) - \(UUID().uuidString)"
         
-        router.isTabbarCoordinable = isTabbarCoordinable
+        router.isTabbarCoordinable = false
     }
     
     // --------------------------------------------------------------------

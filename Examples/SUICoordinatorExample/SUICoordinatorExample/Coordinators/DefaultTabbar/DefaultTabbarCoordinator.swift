@@ -32,7 +32,7 @@ class DefaultTabbarCoordinator: TabbarCoordinator<MyTabbarPage> {
     // ---------------------------------------------------------------------
     
     init() {
-        super.init(pages: PAGE.allCases, currentPage: .second)
+        super.init(pages: Page.allCases, currentPage: .second)
         
         /// Set badge of a tap
         DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in

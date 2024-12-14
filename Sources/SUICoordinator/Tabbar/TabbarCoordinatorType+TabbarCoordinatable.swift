@@ -1,5 +1,5 @@
 //
-//  ContentView.swift
+//  TabbarCoordinatorType+TabbarCoordinatable.swift
 //
 //  Copyright (c) Andres F. Lozano
 //
@@ -22,20 +22,37 @@
 //  THE SOFTWARE.
 //
 
-import SwiftUI
-
-struct ContentView: View {
-    var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
-        }
-        .padding()
+extension TabbarCoordinatorType where Self : TabbarCoordinatable {
+    
+    /// Cleans  the coordinator.
+    @MainActor func clean() async {
+        pages.removeAll()
+        await router.clean(animated: false)
+        customView = nil
     }
-}
-
-#Preview {
-    ContentView()
+    
+    /// Sets the array of pages for the tabbar coordinator.
+    ///
+    /// - Parameters:
+    ///   - values: The array of pages to set.
+    ///   - currentPage: The optional current page to set.
+    public func setPages(_ values: [Page], currentPage: Page? = nil) async {
+        await removeChildren()
+        await setupPages(values, currentPage: currentPage)
+    }
+    
+    /// Sets up the pages for the tabbar coordinator.
+    ///
+    /// - Parameters:
+    ///   - value: The array of pages to set up.
+    @MainActor func setupPages(_ value: [Page], currentPage: Page? = nil) {
+        for page in value {
+            let item = page.coordinator()
+            startChildCoordinator(item)
+            item.tagId = "\(page.position)"
+        }
+        
+        pages = value
+        setCurrentPage(currentPage)
+    }
 }

@@ -36,7 +36,7 @@ public class CustomTabbarCoordinator: TabbarCoordinator<MyTabbarPage> {
         presentationStyle: TransitionPresentationStyle = .sheet
     ) {
         super.init(
-            pages: PAGE.allCases,
+            pages: Page.allCases,
             currentPage: currentPage
         )
         
