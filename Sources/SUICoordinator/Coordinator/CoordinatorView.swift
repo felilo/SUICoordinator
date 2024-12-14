@@ -34,24 +34,11 @@ public struct CoordinatorView<Route: RouteType>: View {
     @StateObject var viewModel: Coordinator<Route>
     
     // --------------------------------------------------------------------
-    // MARK: Properties
-    // --------------------------------------------------------------------
-    
-    var onClean: (() async -> Void)?
-    var onSetTag: ((String) -> Void)?
-    
-    // --------------------------------------------------------------------
     // MARK: Constructor
     // --------------------------------------------------------------------
     
-    init(
-        viewModel: Coordinator<Route>,
-        onClean: (() async -> Void)? = nil,
-        onSetTag: ((String) -> Void)? = nil
-    ) {
+    init( viewModel: Coordinator<Route>) {
         self._viewModel = .init(wrappedValue: viewModel)
-        self.onClean = onClean
-        self.onSetTag = onSetTag
     }
     
     // --------------------------------------------------------------------

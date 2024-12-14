@@ -12,18 +12,7 @@ public extension CoordinatorType {
     @ViewBuilder
     func getView() -> some View {
         if let viewModel = self as? Coordinator<Route> {
-            CoordinatorView<Route>(
-                viewModel: viewModel,
-                onClean: { await self.clean() },
-                onSetTag: { tag in self.tagId = tag }
-            )
+            CoordinatorView<Route>(viewModel: viewModel)
         }
-    }
-    
-    private func clean() async {
-        guard !isEmptyCoordinator else {
-            return
-        }
-        await finish(animated: false, withDismiss: false)
     }
 }
