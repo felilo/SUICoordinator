@@ -92,7 +92,7 @@ class HomeCoordinator: Coordinator<HomeRoute> {
     
     func presentTabbarCoordinator() async {
         let coordinator = CustomTabbarCoordinator()
-        await navigate(to: coordinator, presentationStyle: .sheet, animated: animated)
+        await navigate(to: coordinator, presentationStyle: .sheet)
     }
     
     func close() async {
@@ -208,7 +208,7 @@ class AppDelegate: NSObject, UIApplicationDelegate {
                 let coordinator = CustomTabbarCoordinator()
                 try? await coordinator.forcePresentation(
                     presentationStyle: .fullScreenCover,
-                    mainCoordinator: self?.mainCoodinator
+                    mainCoordinator: self?.shee
                 )
             }
         }
@@ -475,6 +475,11 @@ It works the same as Coordinator but has the following additional features:
         </ul>
       </td>
       <td>Variable that allows set the badge of a tab</td>
+    </tr>
+    <tr>
+      <td><code style="color: blue;">customView</code></td>
+      <td></td>
+      <td>Is a closure that receives a <code style="color: #ec6b6f;">View</code> as parameter</td>
     </tr>
   </tbody>
 </table>

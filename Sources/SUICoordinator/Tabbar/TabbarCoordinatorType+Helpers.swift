@@ -1,5 +1,5 @@
 //
-//  ContentView.swift
+//  TabbarCoordinatorType+Helpers.swift
 //
 //  Copyright (c) Andres F. Lozano
 //
@@ -22,20 +22,31 @@
 //  THE SOFTWARE.
 //
 
-import SwiftUI
-
-struct ContentView: View {
-    var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
-        }
-        .padding()
+extension TabbarCoordinatorType {
+    
+    /// Sets the current page for the tabbar coordinator.
+    ///
+    /// - Parameters:
+    ///   - coordinator: The coordinator.
+    @MainActor func setCurrentPage(with coordinator: any CoordinatorType) {
+        let page = pages.first(where: { "\($0.position)" == coordinator.tagId })
+        
+        setCurrentPage(page)
     }
-}
-
-#Preview {
-    ContentView()
+    
+    /// Sets the current page for the tabbar coordinator.
+    ///
+    /// - Parameters:
+    ///   - value: The optional current page to set.
+    @MainActor public func setCurrentPage(_ value: (any TabbarPage)?) {
+        guard let value, value.position != currentPage.position,
+              let item = pages.first(where: { $0.position == value.position })
+        else { return  }
+        
+        currentPage = item
+    }
+    
+    @MainActor public func popToRoot() async {
+        try? await getCoordinatorSelected().root.popToRoot(animated: true)
+    }
 }
