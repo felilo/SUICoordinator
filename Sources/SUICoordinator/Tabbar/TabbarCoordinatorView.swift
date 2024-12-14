@@ -44,7 +44,7 @@ struct TabbarCoordinatorView<PAGE: TabbarPage>: View {
     
     public var body: some View {
         TabView(selection: tabSelection()){
-            ForEach(pages, id: \.id, content: makeTabView)
+            ForEach(pages, id: \.id, content: tabBarItem)
         }
         .onReceive(viewModel.$pages) { pages in
             self.pages = pages
@@ -64,7 +64,7 @@ struct TabbarCoordinatorView<PAGE: TabbarPage>: View {
     // ---------------------------------------------------------------------
     
     @ViewBuilder
-    func makeTabView(page: PAGE) -> some View {
+    func tabBarItem(with page: PAGE) -> some View {
         if let item = viewModel.getCoordinator(with: page.position) {
             AnyView( item.getView() )
                 .tabItem {
@@ -72,12 +72,12 @@ struct TabbarCoordinatorView<PAGE: TabbarPage>: View {
                         title: { AnyView(page.title) },
                         icon: { AnyView(page.icon) } )
                 }
-                .badge(getBadge(page: page)?.value)
+                .badge(badge(of: page)?.value)
                 .tag(page)
         }
     }
     
-    private func getBadge(page: PAGE) -> BadgeItem? {
+    private func badge(of page: PAGE) -> BadgeItem? {
         guard let index = getBadgeIndex(page: page) else {
             return nil
         }
