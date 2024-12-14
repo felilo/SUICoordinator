@@ -87,7 +87,7 @@ public extension CoordinatorType {
     ///   - mainCoordinator: The main coordinator associated with the forced presentation.
     ///   - Throws: An error if the presentation cannot be forced.
     ///   SeeAlso: TransitionPresentationStyle
-    public func forcePresentation(
+    func forcePresentation(
         animated: Bool = true,
         presentationStyle: TransitionPresentationStyle = .sheet,
         mainCoordinator: (any CoordinatorType)? = nil
