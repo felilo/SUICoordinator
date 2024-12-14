@@ -30,7 +30,6 @@
 		D9B4560E2B643FBD004DD03A /* DefaultTabbarCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9B455EF2B643FBD004DD03A /* DefaultTabbarCoordinator.swift */; };
 		D9B4560F2B643FBD004DD03A /* TabbarFlowCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9B455F12B643FBD004DD03A /* TabbarFlowCoordinator.swift */; };
 		D9B456102B643FBD004DD03A /* CustomTabbarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9B455F32B643FBD004DD03A /* CustomTabbarView.swift */; };
-		D9B456112B643FBD004DD03A /* CustomTabbarViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9B455F42B643FBD004DD03A /* CustomTabbarViewModel.swift */; };
 		D9B456122B643FBD004DD03A /* CustomTabbarCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9B455F52B643FBD004DD03A /* CustomTabbarCoordinator.swift */; };
 		D9B456152B643FBD004DD03A /* HomeRoute.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9B455FA2B643FBD004DD03A /* HomeRoute.swift */; };
 		D9B456162B643FBD004DD03A /* HomeCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9B455FB2B643FBD004DD03A /* HomeCoordinator.swift */; };
@@ -60,7 +59,6 @@
 		D9B455EF2B643FBD004DD03A /* DefaultTabbarCoordinator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DefaultTabbarCoordinator.swift; sourceTree = "<group>"; };
 		D9B455F12B643FBD004DD03A /* TabbarFlowCoordinator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TabbarFlowCoordinator.swift; sourceTree = "<group>"; };
 		D9B455F32B643FBD004DD03A /* CustomTabbarView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomTabbarView.swift; sourceTree = "<group>"; };
-		D9B455F42B643FBD004DD03A /* CustomTabbarViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomTabbarViewModel.swift; sourceTree = "<group>"; };
 		D9B455F52B643FBD004DD03A /* CustomTabbarCoordinator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomTabbarCoordinator.swift; sourceTree = "<group>"; };
 		D9B455FA2B643FBD004DD03A /* HomeRoute.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HomeRoute.swift; sourceTree = "<group>"; };
 		D9B455FB2B643FBD004DD03A /* HomeCoordinator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HomeCoordinator.swift; sourceTree = "<group>"; };
@@ -256,7 +254,6 @@
 			isa = PBXGroup;
 			children = (
 				D9B455F32B643FBD004DD03A /* CustomTabbarView.swift */,
-				D9B455F42B643FBD004DD03A /* CustomTabbarViewModel.swift */,
 				D9B455F52B643FBD004DD03A /* CustomTabbarCoordinator.swift */,
 			);
 			path = CustomTabbar;
@@ -357,7 +354,6 @@
 				D9B455FE2B643FBD004DD03A /* PushView.swift in Sources */,
 				D9B456022B643FBD004DD03A /* FullscreenViewModel.swift in Sources */,
 				D9B456072B643FBD004DD03A /* DetentsViewModel.swift in Sources */,
-				D9B456112B643FBD004DD03A /* CustomTabbarViewModel.swift in Sources */,
 				D9B456012B643FBD004DD03A /* SheetViewModel.swift in Sources */,
 				D9B4560A2B643FBD004DD03A /* TabbarActionListViewModel.swift in Sources */,
 				D9B456062B643FBD004DD03A /* DetentsView.swift in Sources */,
@@ -538,12 +534,11 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"SUICoordinatorExample/Preview Content\"";
 				DEVELOPMENT_TEAM = "";
-				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = V2N6VV2M54;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -560,7 +555,6 @@
 				PRODUCT_BUNDLE_IDENTIFIER = afl.SUICoordinatorExample;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "Developer Wildcard";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
