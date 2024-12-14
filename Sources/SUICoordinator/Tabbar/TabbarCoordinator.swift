@@ -51,7 +51,7 @@ open class TabbarCoordinator<Page>: Coordinator<DefaultRoute>, TabbarCoordinator
     public var setBadge: PassthroughSubject<(String?, Page), Never> = .init()
     
     /// A custom view associated with the tabbar coordinator.
-    var customView: Page.View?
+    public var customView: (() -> (Page.View))?
     
     // ---------------------------------------------------------
     // MARK: Constructor
@@ -64,16 +64,18 @@ open class TabbarCoordinator<Page>: Coordinator<DefaultRoute>, TabbarCoordinator
     ///   - currentPage: The initial current page for the tabbar coordinator.
     ///   - presentationStyle: The presentation style for transitioning between pages.
     ///   - customView: A custom view associated with the tabbar coordinator.
-    public init( pages: [Page], currentPage: Page, presentationStyle: TransitionPresentationStyle = .sheet, customView: Page.View? = nil) {
+    public init(
+        pages: [Page],
+        currentPage: Page,
+        presentationStyle: TransitionPresentationStyle = .sheet,
+        customView: (() -> Page.View)? = nil
+    ) {
         self.presentationStyle = presentationStyle
         self.currentPage = currentPage
         self.customView = customView
+        self.pages = pages
+        
         super.init()
-        
-        Task { [weak self] in
-            await self?.setPages(pages, currentPage: currentPage)
-        }
-        
     }
     
     // ---------------------------------------------------------
@@ -85,13 +87,12 @@ open class TabbarCoordinator<Page>: Coordinator<DefaultRoute>, TabbarCoordinator
     /// - Parameters:
     ///   - animated: A boolean value indicating whether to animate the start process.
     open override func start(animated: Bool = true) async {
-        let route = DefaultRoute(
-            presentationStyle: presentationStyle,
-            content: customView ?? TabbarCoordinatorView(viewModel: self)
-        )
+        await setupPages(pages, currentPage: currentPage)
+        
+        let cView = customView?() ?? TabbarCoordinatorView(viewModel: self, currentPage: currentPage)
         
         await startFlow(
-            route: route,
+            route: DefaultRoute(presentationStyle: presentationStyle) { cView },
             transitionStyle: presentationStyle,
             animated: animated)
     }
@@ -116,21 +117,7 @@ open class TabbarCoordinator<Page>: Coordinator<DefaultRoute>, TabbarCoordinator
     ///   - currentPage: The optional current page to set.
     open func setPages(_ values: [Page], currentPage: Page? = nil) async {
         await removeChildren()
-        setupPages(values)
-        pages = values
-        setCurrentPage(currentPage)
-    }
-    
-    /// Sets up the pages for the tabbar coordinator.
-    ///
-    /// - Parameters:
-    ///   - value: The array of pages to set up.
-    private func setupPages(_ value: [Page]) {
-        value.forEach({
-            let item = $0.coordinator()
-            startChildCoordinator(item)
-            item.tagId = "\($0.position)"
-        })
+        await setupPages(values, currentPage: currentPage)
     }
     
     /// Retrieves the coordinator at a specific position within the tabbar coordinator.
@@ -138,14 +125,45 @@ open class TabbarCoordinator<Page>: Coordinator<DefaultRoute>, TabbarCoordinator
     /// - Parameters:
     ///   - position: The position of the coordinator.
     /// - Returns: The coordinator at the specified position.
-    public func getCoordinator(with position: Int) -> (any CoordinatorType)? {
-        children.first(where: {
-            $0.tagId == "\(position)"
-        })
+    open func getCoordinator(with position: Int) -> (any CoordinatorType)? {
+        children.first { $0.tagId == "\(position)" }
     }
     
-    public func popToRoot() async {
+    /// Sets up the pages for the tabbar coordinator.
+    ///
+    /// - Parameters:
+    ///   - value: The array of pages to set up.
+    @MainActor private func setupPages(_ value: [Page], currentPage: Page? = nil) {
+        for page in value {
+            let item = page.coordinator()
+            startChildCoordinator(item)
+            item.tagId = "\(page.position)"
+        }
+        
+        pages = value
+        setCurrentPage(currentPage)
+    }
+    
+    /// Pops to the root of the navigation stack.
+    @MainActor public func popToRoot() async {
         try? await getCoordinatorSelected().root.popToRoot(animated: true)
+    }
+    
+    /// Sets the current page for the tabbar coordinator.
+    ///
+    /// - Parameters:
+    ///   - coordinator: The coordinator.
+    @MainActor public func setCurrentPage(with coordinator: any CoordinatorType) {
+        let page = pages.first(where: { "\($0.position)" == coordinator.tagId })
+        
+        setCurrentPage(page)
+    }
+    
+    /// Cleans  the coordinator.
+    @MainActor public func clean() async {
+        setupPages([])
+        await router.clean(animated: false)
+        customView = nil
     }
     
     // ---------------------------------------------------------------------
@@ -156,7 +174,7 @@ open class TabbarCoordinator<Page>: Coordinator<DefaultRoute>, TabbarCoordinator
     ///
     /// - Parameters:
     ///   - value: The optional current page to set.
-    private func setCurrentPage(_ value: (any TabbarPage)?) {
+    public func setCurrentPage(_ value: (any TabbarPage)?) {
         guard let value, value.position != currentPage.position,
               let item = pages.first(where: { $0.position == value.position })
         else { return  }

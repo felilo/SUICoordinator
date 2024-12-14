@@ -41,6 +41,6 @@ class TabbarActionListViewModel: ObservableObject {
     }
     
     func finsh() async {
-        await coordinator.finish()
+        await coordinator.finishFlow()
     }
 }

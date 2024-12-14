@@ -37,13 +37,15 @@ final public class SheetItem<T>: SCHashable, SheetItemType {
     public var id: String
     
     /// The view or coordinator associated with the sheet item.
-    let view: T
+    let view: () -> T?
     
     /// A boolean value indicating whether to animate the presentation.
     var animated: Bool
     
     /// The transition presentation style for presenting the sheet item.
     var presentationStyle: TransitionPresentationStyle
+    
+    var onFinish: (() -> Void)?
     
     // ---------------------------------------------------------
     // MARK: Constructor
@@ -56,11 +58,18 @@ final public class SheetItem<T>: SCHashable, SheetItemType {
     ///   - view: The view or coordinator to present.
     ///   - animated: A boolean value indicating whether to animate the presentation.
     ///   - presentationStyle: The transition presentation style for presenting the sheet item.
-    init(id: String, view: T, animated: Bool, presentationStyle: TransitionPresentationStyle) {
+    init(
+        id: String,
+        animated: Bool,
+        presentationStyle: TransitionPresentationStyle,
+        view: @escaping () -> T?,
+        onFinish: (() -> Void)? = nil
+    ) {
         self.view = view
         self.animated = animated
         self.presentationStyle = presentationStyle
         self.id = id
+        self.onFinish = onFinish
     }
     
     // ---------------------------------------------------------
@@ -68,9 +77,7 @@ final public class SheetItem<T>: SCHashable, SheetItemType {
     // ---------------------------------------------------------
     
     deinit {
-        // Clean up the view if it conforms to CoordinatorViewType protocol.
-        if let view = view as? CoordinatorViewType {
-            view.clean()
-        }
+        onFinish?()
+        onFinish = nil
     }
 }

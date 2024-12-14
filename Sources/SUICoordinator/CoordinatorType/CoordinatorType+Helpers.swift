@@ -36,6 +36,13 @@ extension CoordinatorType {
         self is (any TabbarCoordinatable)
     }
     
+    /// A boolean value indicating whether the coordinator is empty.
+    var isEmptyCoordinator: Bool {
+        parent == nil &&
+        router.items.isEmpty &&
+        router.sheetCoordinator.items.isEmpty &&
+        (router.mainView == nil)
+    }
     
     /// Cleans the view associated with the coordinator.
     ///
@@ -43,7 +50,12 @@ extension CoordinatorType {
     ///   - animated: A boolean value indicating whether to animate the cleaning process.
     ///   - withMainView: A boolean value indicating whether to clean the main view.
     func cleanView(animated: Bool = false, withMainView: Bool = true) async {
-        await router.clean(animated: animated, withMainView: withMainView)
+        if let coordinator = self as? (any TabbarCoordinatable) {
+            await coordinator.clean()
+        } else {
+            await router.clean(animated: animated, withMainView: withMainView)
+        }
+        
         parent = nil
     }
     
@@ -74,7 +86,6 @@ extension CoordinatorType {
         }
         children.remove(at: index)
         await coordinator.removeChildren()
-        await removeChild(coordinator: coordinator)
     }
     
     /// Removes all child coordinators associated with this coordinator.
@@ -83,7 +94,12 @@ extension CoordinatorType {
     ///   - animated: A boolean value indicating whether to animate the removal process.
     func removeChildren(animated: Bool = false) async {
         guard let first = children.first else { return }
-        await first.handleFinish(animated: animated, withDismiss: false)
+        
+        if let parent = first.parent as? (any TabbarCoordinatable) {
+            await parent.setCurrentPage(with: first)
+        }
+        
+        await first.emptyCoordinator(animated: animated)
         await removeChildren()
     }
     
@@ -105,12 +121,12 @@ extension CoordinatorType {
         coordinator.parent = self
     }
     
-    /// Dismisses the last presented sheet.
+    /// Dismisses or pops the last presented sheet.
     ///
     /// - Parameters:
     ///   - animated: A boolean value indicating whether to animate the dismissal.
-    func dismissLastSheet(animated: Bool = true) async {
-        await router.dismiss(animated: animated)
+    func closeLastSheet(animated: Bool = true) async {
+        await router.close(animated: animated)
     }
     
     /// Cleans up the coordinator, preparing it for dismissal.
@@ -119,26 +135,12 @@ extension CoordinatorType {
     ///   - animated: A boolean value indicating whether to animate the cleanup process.
     func emptyCoordinator(animated: Bool) async {
         guard let parent = parent else {
-            await router.restart(animated: animated)
-            await cleanView(animated: false)
-            return await removeChildren()
+            await removeChildren()
+            return await router.clean(animated: animated)
         }
         
         await parent.removeChild(coordinator: self)
         await cleanView(animated: false)
-    }
-    
-    /// Handles the finish event, optionally dismissing the coordinator.
-    ///
-    /// - Parameters:
-    ///   - animated: A boolean value indicating whether to animate the finish process.
-    ///   - withDismiss: A boolean value indicating whether to dismiss the coordinator.
-    func handleFinish(animated: Bool = true, withDismiss: Bool = true) async {
-        guard withDismiss else {
-            return await emptyCoordinator(animated: animated)
-        }
-        await router.close(animated: animated, finishFlow: true)
-        await emptyCoordinator(animated: animated)
     }
     
     /// Finishes the coordinator, optionally dismissing it.
@@ -149,17 +151,25 @@ extension CoordinatorType {
     /// - Returns: An asynchronous void task representing the finish process.
     func finish(animated: Bool = true, withDismiss: Bool = true) async -> Void {
         let handleFinish = { (coordinator: TCoordinatorType) async -> Void in
-            await coordinator.handleFinish(
-                animated: animated,
-                withDismiss: withDismiss
-            )
+            await coordinator.emptyCoordinator(animated: animated)
         }
         
-        if let parent, (parent is (any TabbarCoordinatable)) {
-            await router.close(animated: animated, finishFlow: true)
-            await handleFinish(parent)
-        } else {
-            await handleFinish(self)
+        guard let parent, withDismiss else {
+            return await handleFinish(self)
         }
+        
+        if parent is (any TabbarCoordinatable) {
+            await parent.parent?.closeLastSheet(animated: animated)
+            return await handleFinish(parent)
+        }
+        
+        await parent.closeLastSheet(animated: animated)
+        await handleFinish(self)
+    }
+    
+    /// Cleans up the coordinator.
+    func swipedAway() async {
+        guard !isEmptyCoordinator else { return }
+        await finish(animated: false, withDismiss: false)
     }
 }

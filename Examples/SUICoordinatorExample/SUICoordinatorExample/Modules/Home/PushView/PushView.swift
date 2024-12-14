@@ -29,12 +29,17 @@ struct PushView: View {
     typealias ViewModel = PushViewModel
     
     @StateObject var viewModel: ViewModel
+    @State private var counter = 0
+    
+    let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
+    
     
     var body: some View {
         ZStack {
             VStack {
                 Text("Hello, PushView!")
                     .font(.largeTitle)
+                Text("Time: \(counter)")
                 
                 VStack {
                     Button("Presents SheetView") {
@@ -47,6 +52,7 @@ struct PushView: View {
                 }
             }
         }
+        .onReceive(timer) { _ in counter += 1 }
     }
 }
 

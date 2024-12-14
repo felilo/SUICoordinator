@@ -64,6 +64,18 @@ enum AnyEnumRoute: RouteType {
 }
 
 struct PushStepView: View {
+    
+    let someParameter: Bool
+    
+    init(someParameter: Bool) {
+        self.someParameter = someParameter
+    }
+    
+    init() {
+        self.init(someParameter: true)
+    }
+    
+    
     var body: some View {
         Text("pushStep")
     }

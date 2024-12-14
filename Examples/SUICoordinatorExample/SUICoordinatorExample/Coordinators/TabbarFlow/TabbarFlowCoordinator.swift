@@ -36,7 +36,7 @@ class TabbarFlowCoordinator: Coordinator<DefaultRoute> {
         
         let route = DefaultRoute(
             presentationStyle: .push,
-            content: TabbarActionListView(viewModel: viewModel)
+            content: { TabbarActionListView(viewModel: viewModel) }
         )
         
         await startFlow(route: route )
@@ -54,9 +54,5 @@ class TabbarFlowCoordinator: Coordinator<DefaultRoute> {
     func presentCustomTabbarCoordinator() async {
         let coordinator = CustomTabbarCoordinator()
         await navigate(to: coordinator, presentationStyle: .sheet)
-    }
-    
-    func finish() async {
-        await finishFlow(animated: true)
     }
 }

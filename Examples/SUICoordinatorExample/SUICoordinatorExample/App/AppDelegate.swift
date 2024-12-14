@@ -10,13 +10,13 @@ import SUICoordinator
 
 class AppDelegate: NSObject, UIApplicationDelegate {
     
-    var mainCoodinator: (any CoordinatorType)?
+    var mainCoodinator: HomeCoordinator?
     
     func application(
         _ application: UIApplication,
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil
     ) -> Bool {
-        mainCoodinator = MainCoordinator()
+        mainCoodinator = HomeCoordinator()
         return true
     }
 }

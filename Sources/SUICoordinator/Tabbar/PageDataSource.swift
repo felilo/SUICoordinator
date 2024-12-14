@@ -60,5 +60,5 @@ public extension PageDataSource where Self: CaseIterable {
 }
 
 /// A type alias representing a page in a tabbar navigation with both `PageDataSource` and `TabbarNavigationRouter` conformances.
-public typealias TabbarPage = PageDataSource & TabbarNavigationRouter
+public typealias TabbarPage = PageDataSource & TabbarNavigationRouter & SCEquatable
 

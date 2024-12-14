@@ -47,18 +47,8 @@ struct RouterView<Router: RouterType>: View {
     // --------------------------------------------------------------------
     
     var body: some View {
-        ZStack {
-            if viewModel.isTabbarCoordinable {
-                addSheetTo(view: mainView)
-            } else {
-                let view = NavigationStack(path: $viewModel.items) {
-                    mainView.navigationDestination(for: Router.Route.self) {
-                        AnyView($0.view)
-                    }
-                }
-                addSheetTo(view: view)
-            }
-        }
+        ZStack { buildBody() }
+        .onChange(of: viewModel.mainView, perform: onChangeFirstView)
         .onViewDidLoad { onChangeFirstView(viewModel.mainView) }
     }
     
@@ -66,22 +56,41 @@ struct RouterView<Router: RouterType>: View {
     // MARK: Helper funcs
     // --------------------------------------------------------------------
     
+    
     @ViewBuilder
-    private func addSheetTo(view: some View ) -> some View {
+    private func buildBody() -> some View {
+        if viewModel.isTabbarCoordinable {
+            addSheetTo(view: mainView)
+        } else {
+            let view = NavigationStack(path: $viewModel.items) {
+                mainView.navigationDestination(for: Router.Route.self) {
+                    AnyView($0.view)
+                }
+            }
+            addSheetTo(view: view)
+        }
+    }
+    
+    @ViewBuilder
+    private func addSheetTo(view: (some View)?) -> some View {
         view
-            .onChange(of: viewModel.mainView, perform: onChangeFirstView)
             .sheetCoordinator(
                 coordinator: viewModel.sheetCoordinator,
-                onDissmis: { index in Task {
-                    viewModel.removeNilItemsFromSheetCoordinator()
+                onDissmis: { index in
                     viewModel.removeItemFromSheetCoordinator(at: index)
-                }},
-                onDidLoad: { _ in Task(operation: viewModel.removeNilItemsFromSheetCoordinator) }
+                    viewModel.removeNilItemsFromSheetCoordinator()
+                },
+                onDidLoad: { _ in
+                    viewModel.removeNilItemsFromSheetCoordinator()
+                }
             )
     }
     
-    private func onChangeFirstView(_ value: Router.Route?)  {
-        guard let view = value?.view else { return }
+    private func onChangeFirstView(_ value: Router.Route?) {
+        guard let view = value?.view else {
+            return (mainView = nil)
+        }
+        
         mainView = AnyView(view)
     }
 }

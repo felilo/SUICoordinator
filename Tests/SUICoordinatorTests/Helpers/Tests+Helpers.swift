@@ -36,20 +36,21 @@ extension XCTestCase {
     
     func navigateToCoordinator(
         _ nextCoordinator: (any CoordinatorType),
-        in coordinator: (any CoordinatorType)
+        in coordinator: (any CoordinatorType),
+        animated: Bool = false
     ) async {
         await coordinator.navigate(
             to: nextCoordinator,
             presentationStyle: .fullScreenCover,
-            animated: false)
-        await nextCoordinator.start(animated: false)
+            animated: animated)
+        await nextCoordinator.start(animated: animated)
     }
     
-    func finishFlow(sut: (any CoordinatorType)) async {
-        async let _ = await sut.finishFlow(animated: false)
+    func finishFlow(sut: (any CoordinatorType), animated: Bool = false) async {
+        await sut.finishFlow(animated: animated)
     }
     
     func getNameOf<T>(object: T) -> String {
-        String(describing: object.self).replacingOccurrences(of: "()", with: "")
+        Router<AnyEnumRoute>.removingParenthesesContent(String(describing: object.self))
     }
 }

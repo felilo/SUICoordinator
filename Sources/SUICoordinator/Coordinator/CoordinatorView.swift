@@ -25,14 +25,13 @@
 import SwiftUI
 
 
-public struct CoordinatorView<Route: RouteType>: CoordinatorViewType, View {
+public struct CoordinatorView<Route: RouteType>: View {
     
     // --------------------------------------------------------------------
     // MARK: Wrapper properties
     // --------------------------------------------------------------------
     
     @StateObject var viewModel: Coordinator<Route>
-    @State private var isLoaded = false
     
     // --------------------------------------------------------------------
     // MARK: Properties
@@ -61,18 +60,8 @@ public struct CoordinatorView<Route: RouteType>: CoordinatorViewType, View {
     
     public var body: some View {
         RouterView(viewModel: viewModel.router)
-            .onViewDidLoad { [weak viewModel] in
-                isLoaded = true
-                Task { await viewModel?.start() }
+            .onViewDidLoad {
+                Task(priority: .high) { await viewModel.start() }
             }
-    }
-    
-    // --------------------------------------------------------------------
-    // MARK: CoordinatorViewType
-    // --------------------------------------------------------------------
-    
-    func clean() {
-        guard isLoaded else { return }
-        Task { await onClean?() }
     }
 }

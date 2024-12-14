@@ -30,10 +30,7 @@
 		D9B4560E2B643FBD004DD03A /* DefaultTabbarCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9B455EF2B643FBD004DD03A /* DefaultTabbarCoordinator.swift */; };
 		D9B4560F2B643FBD004DD03A /* TabbarFlowCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9B455F12B643FBD004DD03A /* TabbarFlowCoordinator.swift */; };
 		D9B456102B643FBD004DD03A /* CustomTabbarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9B455F32B643FBD004DD03A /* CustomTabbarView.swift */; };
-		D9B456112B643FBD004DD03A /* CustomTabbarViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9B455F42B643FBD004DD03A /* CustomTabbarViewModel.swift */; };
 		D9B456122B643FBD004DD03A /* CustomTabbarCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9B455F52B643FBD004DD03A /* CustomTabbarCoordinator.swift */; };
-		D9B456132B643FBD004DD03A /* MainRoute.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9B455F72B643FBD004DD03A /* MainRoute.swift */; };
-		D9B456142B643FBD004DD03A /* MainCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9B455F82B643FBD004DD03A /* MainCoordinator.swift */; };
 		D9B456152B643FBD004DD03A /* HomeRoute.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9B455FA2B643FBD004DD03A /* HomeRoute.swift */; };
 		D9B456162B643FBD004DD03A /* HomeCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9B455FB2B643FBD004DD03A /* HomeCoordinator.swift */; };
 /* End PBXBuildFile section */
@@ -62,10 +59,7 @@
 		D9B455EF2B643FBD004DD03A /* DefaultTabbarCoordinator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DefaultTabbarCoordinator.swift; sourceTree = "<group>"; };
 		D9B455F12B643FBD004DD03A /* TabbarFlowCoordinator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TabbarFlowCoordinator.swift; sourceTree = "<group>"; };
 		D9B455F32B643FBD004DD03A /* CustomTabbarView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomTabbarView.swift; sourceTree = "<group>"; };
-		D9B455F42B643FBD004DD03A /* CustomTabbarViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomTabbarViewModel.swift; sourceTree = "<group>"; };
 		D9B455F52B643FBD004DD03A /* CustomTabbarCoordinator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomTabbarCoordinator.swift; sourceTree = "<group>"; };
-		D9B455F72B643FBD004DD03A /* MainRoute.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainRoute.swift; sourceTree = "<group>"; };
-		D9B455F82B643FBD004DD03A /* MainCoordinator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainCoordinator.swift; sourceTree = "<group>"; };
 		D9B455FA2B643FBD004DD03A /* HomeRoute.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HomeRoute.swift; sourceTree = "<group>"; };
 		D9B455FB2B643FBD004DD03A /* HomeCoordinator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HomeCoordinator.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -234,7 +228,6 @@
 				D9B455ED2B643FBD004DD03A /* DefaultTabbar */,
 				D9B455F02B643FBD004DD03A /* TabbarFlow */,
 				D9B455F22B643FBD004DD03A /* CustomTabbar */,
-				D9B455F62B643FBD004DD03A /* MainCoordinator */,
 				D9B455F92B643FBD004DD03A /* HomeCoordinator */,
 			);
 			path = Coordinators;
@@ -261,19 +254,9 @@
 			isa = PBXGroup;
 			children = (
 				D9B455F32B643FBD004DD03A /* CustomTabbarView.swift */,
-				D9B455F42B643FBD004DD03A /* CustomTabbarViewModel.swift */,
 				D9B455F52B643FBD004DD03A /* CustomTabbarCoordinator.swift */,
 			);
 			path = CustomTabbar;
-			sourceTree = "<group>";
-		};
-		D9B455F62B643FBD004DD03A /* MainCoordinator */ = {
-			isa = PBXGroup;
-			children = (
-				D9B455F72B643FBD004DD03A /* MainRoute.swift */,
-				D9B455F82B643FBD004DD03A /* MainCoordinator.swift */,
-			);
-			path = MainCoordinator;
 			sourceTree = "<group>";
 		};
 		D9B455F92B643FBD004DD03A /* HomeCoordinator */ = {
@@ -371,7 +354,6 @@
 				D9B455FE2B643FBD004DD03A /* PushView.swift in Sources */,
 				D9B456022B643FBD004DD03A /* FullscreenViewModel.swift in Sources */,
 				D9B456072B643FBD004DD03A /* DetentsViewModel.swift in Sources */,
-				D9B456112B643FBD004DD03A /* CustomTabbarViewModel.swift in Sources */,
 				D9B456012B643FBD004DD03A /* SheetViewModel.swift in Sources */,
 				D9B4560A2B643FBD004DD03A /* TabbarActionListViewModel.swift in Sources */,
 				D9B456062B643FBD004DD03A /* DetentsView.swift in Sources */,
@@ -380,11 +362,9 @@
 				D9B4560C2B643FBD004DD03A /* SplashView.swift in Sources */,
 				D9B456102B643FBD004DD03A /* CustomTabbarView.swift in Sources */,
 				D95389232B643BAD000E3357 /* ContentView.swift in Sources */,
-				D9B456132B643FBD004DD03A /* MainRoute.swift in Sources */,
 				D9B455FF2B643FBD004DD03A /* PushViewModel.swift in Sources */,
 				D9B4560D2B643FBD004DD03A /* MyTabbarPage.swift in Sources */,
 				D95389212B643BAD000E3357 /* SUICoordinatorExampleApp.swift in Sources */,
-				D9B456142B643FBD004DD03A /* MainCoordinator.swift in Sources */,
 				D9B456152B643FBD004DD03A /* HomeRoute.swift in Sources */,
 				D9B456032B643FBD004DD03A /* FullscreenView.swift in Sources */,
 			);
@@ -518,7 +498,8 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"SUICoordinatorExample/Preview Content\"";
 				DEVELOPMENT_TEAM = "";
@@ -553,12 +534,11 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"SUICoordinatorExample/Preview Content\"";
 				DEVELOPMENT_TEAM = "";
-				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = V2N6VV2M54;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -572,10 +552,9 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.felilo.SUICoordinatorExample;
+				PRODUCT_BUNDLE_IDENTIFIER = afl.SUICoordinatorExample;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "Developer Wildcard";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;

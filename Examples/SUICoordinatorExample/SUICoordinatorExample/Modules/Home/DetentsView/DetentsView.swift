@@ -32,6 +32,9 @@ struct DetentsView: View {
     
     var body: some View {
         ZStack {
+            
+            Color.yellow.ignoresSafeArea()
+            
             VStack {
                 Text("Hello, DetentsView!")
                     .font(.largeTitle)

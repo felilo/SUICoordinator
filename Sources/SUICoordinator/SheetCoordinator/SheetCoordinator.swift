@@ -23,8 +23,6 @@
 //
 
 import Foundation
-import SwiftUI
-
 
 /// A class representing a coordinator for managing and presenting sheets.
 ///
@@ -45,14 +43,11 @@ final public class SheetCoordinator<T>: ObservableObject {
     /// The stack of sheet items managed by the coordinator.
     @Published var items: [Item?]
     
-    /// A flag indicating whether the coordinator is in the process of cleaning up.
-    private var isCleaning: Bool = false
+    /// The presentation style of the last presented sheet.
+    public private(set) var lastPresentationStyle: TransitionPresentationStyle?
     
     /// The presentation style of the last presented sheet.
-    public private (set) var lastPresentationStyle: TransitionPresentationStyle?
-    
-    /// The presentation style of the last presented sheet.
-    public private (set) var animated: Bool?
+    public private(set) var animated: Bool?
     
     // ---------------------------------------------------------
     // MARK: Constructor
@@ -68,8 +63,12 @@ final public class SheetCoordinator<T>: ObservableObject {
     // ---------------------------------------------------------
     
     /// The total number of sheet items in the stack.
-    var totalItems: Int {
-        items.count - 1
+    private var totalItems: Int {
+        guard !items.isEmpty else {
+            return 0
+        }
+        
+        return items.count - 1
     }
     
     // ---------------------------------------------------------
@@ -94,11 +93,11 @@ final public class SheetCoordinator<T>: ObservableObject {
     ///
     /// - Parameters:
     ///   - animated: A boolean value indicating whether to animate the removal.
-    func removeLastSheet(animated: Bool) -> Void {
-        guard !items.isEmpty, !isCleaning else { return }
+    @MainActor func removeLastSheet(animated: Bool) async -> Void {
+        guard !items.isEmpty else { return }
         self.animated = animated
         lastPresentationStyle = items.last(where: { $0?.presentationStyle != nil })??.presentationStyle
-        makeNilItem(at: totalItems)
+        await makeNilItem(at: totalItems)
     }
     
     /// Removes the item at the specified index.
@@ -106,7 +105,7 @@ final public class SheetCoordinator<T>: ObservableObject {
     /// - Parameters:
     ///   - index: The index of the item to remove.
     @MainActor func remove(at index: Int) {
-        guard totalItems >= index, !isCleaning else { return }
+        guard isValidIndex(index) else { return }
         items.remove(at: index)
     }
     
@@ -114,12 +113,10 @@ final public class SheetCoordinator<T>: ObservableObject {
     ///
     /// - Parameters:
     ///   - animated: A boolean value indicating whether to animate the cleanup process.
-    func clean(animated: Bool = true) -> Void {
-        guard !items.isEmpty, !isCleaning else { return }
-        
-        isCleaning = true
-        makeNilItem(at: 0)
-        resetValues()
+    @MainActor func clean(animated: Bool = true) async -> Void {
+        await makeNilItem(at: 0)
+        lastPresentationStyle = nil
+        items.removeAll()
     }
     
     // ---------------------------------------------------------
@@ -135,14 +132,20 @@ final public class SheetCoordinator<T>: ObservableObject {
     ///
     /// - Parameters:
     ///   - index: The index at which to remove `nil` items.
-    private func makeNilItem(at index: Int) {
+    @MainActor private func makeNilItem(at index: Int) async {
+        guard isValidIndex(index) else { return }
         items[index] = nil
     }
     
-    /// Resets values associated with the sheet coordinator.
-    private func resetValues() {
-        items = []
-        lastPresentationStyle = nil
-        isCleaning = false
+    func getNextIndex(_ index: Int) -> Int {
+        index + 1
+    }
+    
+    func isLastIndex(_ index: Int) -> Bool {
+        items.isEmpty || index == totalItems
+    }
+    
+    func isValidIndex(_ index: Int) -> Bool {
+        !items.isEmpty && items.indices.contains(index)
     }
 }

@@ -39,4 +39,8 @@ class DetentsViewModel: ObservableObject {
     func close() async {
         await coordinator.close()
     }
+    
+    func finishFlow() async {
+        await coordinator.finish()
+    }
 }

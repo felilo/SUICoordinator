@@ -53,8 +53,7 @@ public protocol SCIdentifiable: Identifiable {}
 extension SCIdentifiable {
     /// The default identifier based on the type's name.
     public var id: String {
-        let string = String(describing: self.self)
-        return string
+        String(describing: self.self)
     }
 }
 
@@ -81,10 +80,3 @@ extension SCHashable {
 // ---------------------------------------------------------
 // MARK: CoordinatableView
 // ---------------------------------------------------------
-
-/// A protocol for views associated with coordinators.
-/// Conforming types should implement a `clean` method to perform cleanup when the view is being dismissed or deallocated.
-protocol CoordinatorViewType {
-    /// Cleans up resources associated with the view.
-    func clean() -> Void
-}

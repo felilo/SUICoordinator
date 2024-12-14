@@ -23,7 +23,6 @@
 //
 
 import Foundation
-import SwiftUI
 
 /// A protocol representing a coordinator in the coordinator pattern.
 ///
@@ -66,9 +65,6 @@ public protocol CoordinatorType: SCHashable, AnyObject {
     /// The router responsible for navigation within the coordinator.
     var router: Router<Route> { get set }
     
-    /// The view associated with the coordinator.
-    var view: (any View) { get }
-    
     // ---------------------------------------------------------
     // MARK: Helper Functions
     // ---------------------------------------------------------
@@ -80,4 +76,3 @@ public protocol CoordinatorType: SCHashable, AnyObject {
     /// - Returns: An asynchronous void task representing the start process.
     func start(animated: Bool) async -> Void
 }
-

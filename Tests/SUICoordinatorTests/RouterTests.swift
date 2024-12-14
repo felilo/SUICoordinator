@@ -23,7 +23,6 @@
 //
 
 import XCTest
-import SwiftUI
 @testable import SUICoordinator
 
 
@@ -105,20 +104,21 @@ final class RouterTests: XCTestCase {
         }
     }
     
-    func test_navigationStack_popToView_with_customRoute() async throws {
+    @MainActor func test_navigationStack_popToView_with_customRoute() async throws {
         let sut = Router<DefaultRoute>()
         let view = PushStepView.self
-        sut.mainView = DefaultRoute(presentationStyle: .push, content: PushStepView())
+        sut.mainView = DefaultRoute(presentationStyle: .push, content: { PushStepView() })
         
-        await sut.navigate(to: .init(presentationStyle: .push, content: PushStepView()), animated: false)
-        await sut.navigate(to: .init(presentationStyle: .push, content: PushStep2View()), animated: false)
-        await sut.navigate(to: .init(presentationStyle: .push, content: PushStep3View()), animated: false)
-        await sut.navigate(to: .init(presentationStyle: .push, content: FullScreenStepView()), animated: false)
+        await sut.navigate(to: .init(presentationStyle: .push, content: { PushStepView() } ), animated: false)
+        await sut.navigate(to: .init(presentationStyle: .push, content: { PushStep2View() } ), animated: false)
+        await sut.navigate(to: .init(presentationStyle: .push, content: { PushStep3View() } ), animated: false)
+        await sut.navigate(to: .init(presentationStyle: .push, content: { FullScreenStepView() } ), animated: false)
         
         let result = await sut.popToView(view, animated: false)
-        XCTAssertTrue(result)
         
+        XCTAssertTrue(result)
         XCTAssertEqual(sut.items.count, 1)
+        
         if let lastItem = sut.items.last {
             XCTAssertEqual(getNameOf(object: lastItem.view), getNameOf(object: view))
             XCTAssertEqual(lastItem.presentationStyle, .push)
@@ -153,6 +153,6 @@ final class RouterTests: XCTestCase {
     }
     
     private func makeSheetItem(_ item: any RouteType, animated: Bool = true) -> SheetItem<RouteType.Body> {
-        .init(id: UUID().uuidString, view: item.view, animated: animated, presentationStyle: item.presentationStyle)
+        .init(id: UUID().uuidString, animated: animated, presentationStyle: item.presentationStyle, view: { item.view })
     }
 }

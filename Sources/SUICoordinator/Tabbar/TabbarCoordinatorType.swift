@@ -55,6 +55,15 @@ public protocol TabbarCoordinatorType {
     ///
     /// - Returns: The selected coordinator.
     func getCoordinatorSelected() throws -> (any CoordinatorType)
+    
+    /// Cleans up the tabbar coordinator.
+    @MainActor func clean() async
+    
+    /// Sets the current page for the tabbar coordinator.
+    ///
+    /// - Parameters:
+    ///   - coordinator: The coordinator.
+    @MainActor func setCurrentPage(with coordinator: any CoordinatorType)
 }
 
 /// A type alias representing a coordinator that conforms to both `CoordinatorType` and `TabbarCoordinatorType`.

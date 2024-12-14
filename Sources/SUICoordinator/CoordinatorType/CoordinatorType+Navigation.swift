@@ -49,9 +49,13 @@ public extension CoordinatorType {
         
         let item = SheetItem(
             id: "\(coordinator.uuid) - \(presentationStyle.id)",
-            view: coordinator.view,
             animated: animated,
-            presentationStyle: (presentationStyle != .push) ? presentationStyle :  .sheet)
+            presentationStyle: (presentationStyle != .push) ? presentationStyle :  .sheet,
+            view: { [weak coordinator] in coordinator?.getView() },
+            onFinish: { Task(priority: .low) {
+                @MainActor [weak coordinator] in await coordinator?.swipedAway()
+            }}
+        )
         
         await router.presentSheet(item: item)
     }
@@ -72,7 +76,6 @@ public extension CoordinatorType {
     ///   - transitionStyle: The transition presentation style for the flow.
     ///   - animated: A boolean value indicating whether to animate the start flow process.
     @MainActor func startFlow(route: Route, transitionStyle: TransitionPresentationStyle? = nil, animated: Bool = true) async -> Void {
-        await router.restart(animated: animated)
         router.mainView = route
     }
 }
