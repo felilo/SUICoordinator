@@ -31,12 +31,15 @@ struct CustomTabbarView: View {
     // MARK: Typealias
     // ---------------------------------------------------------------------
     
+    
     typealias Page = MyTabbarPage
     typealias BadgeItem = (value: String?, page: Page)
+    
     
     // ---------------------------------------------------------------------
     // MARK: Properties
     // ---------------------------------------------------------------------
+    
     
     @StateObject private var viewModel: TabbarCoordinator<Page>
     @State private var currentPage: Page
@@ -45,9 +48,11 @@ struct CustomTabbarView: View {
     
     let widthIcon: CGFloat = 22
     
+    
     // ---------------------------------------------------------------------
     // MARK: Init
     // ---------------------------------------------------------------------
+    
     
     init(viewModel: TabbarCoordinator<Page>) {
         self._viewModel = .init(wrappedValue: viewModel)
@@ -55,14 +60,16 @@ struct CustomTabbarView: View {
         pages = viewModel.pages
     }
     
+    
     // ---------------------------------------------------------------------
     // MARK: View
     // ---------------------------------------------------------------------
     
+    
     var body: some View {
         ZStack(alignment: .bottomLeading) {
             TabView(selection: $currentPage) {
-                ForEach(pages, id: \.id, content: makeTabView)
+                ForEach(pages, id: \.id, content: tabBarItem)
             }
             
             VStack() {
@@ -71,9 +78,10 @@ struct CustomTabbarView: View {
             }.background(
                 .gray.opacity(0.5),
                 in: RoundedRectangle(cornerRadius: 0, style: .continuous)
-            ).frame(maxWidth: .infinity, maxHeight: 60)
-                .clipShape(RoundedRectangle(cornerRadius: 30, style: .continuous))
-                .padding(.horizontal, 10)
+            )
+            .frame(maxWidth: .infinity, maxHeight: 60)
+            .clipShape(RoundedRectangle(cornerRadius: 30, style: .continuous))
+            .padding(.horizontal, 10)
         }
         .ignoresSafeArea(.all, edges: [.leading, .trailing, .top])
         .onReceive(viewModel.$currentPage) { currentPage = $0 }
@@ -94,7 +102,7 @@ struct CustomTabbarView: View {
     
     
     @ViewBuilder
-    func makeTabView(page: Page) -> some View {
+    func tabBarItem(page: Page) -> some View {
         if let item = viewModel.getCoordinator(with: page.position) {
             AnyView( item.getView() )
                 .toolbar(.hidden)
@@ -103,7 +111,7 @@ struct CustomTabbarView: View {
     }
     
     
-    private func tabbarButton(@State page: Page, size: CGRect) -> some View {
+    private func customTabBarItem(@State page: Page, size: CGRect) -> some View {
         Button {
             viewModel.setCurrentPage(page)
         } label: {
@@ -115,34 +123,34 @@ struct CustomTabbarView: View {
             }
         }
         .frame(width: getWidthButton(with: size))
-        .overlay( buildCustomBadge(with: page) )
+        .overlay( customBadge(with: page) )
     }
     
+    
     @ViewBuilder
-    func buildCustomBadge(with page: Page) -> some View {
-        HStack {
-            if let value = getBadge(page: page)?.value {
-                HStack(alignment: .top) {
-                    Text(value)
-                        .font(.footnote)
-                        .foregroundStyle(.white)
-                        .padding(5)
-                    
-                }
-                .frame(height: 40 / 2 )
-                .background(.red)
-                .clipShape(Capsule())
-                .offset(x: 15, y:  -15)
+    func customBadge(with page: Page) -> some View {
+        if let value = getBadge(page: page)?.value {
+            HStack(alignment: .top) {
+                Text(value)
+                    .font(.footnote)
+                    .foregroundStyle(.white)
+                    .padding(5)
+                
             }
+            .frame(height: 40 / 2 )
+            .background(.red)
+            .clipShape(Capsule())
+            .offset(x: 15, y:  -15)
         }
     }
+    
     
     @ViewBuilder
     func customTabbar() -> some View {
         GeometryReader { proxy in
             HStack(spacing: 0) {
                 ForEach(pages, id: \.id) {
-                    tabbarButton(
+                    customTabBarItem(
                         page: $0,
                         size: proxy.frame(in: .global)
                     )
@@ -151,6 +159,7 @@ struct CustomTabbarView: View {
         }
     }
     
+    
     private func getBadge(page: Page) -> BadgeItem? {
         guard let index = getBadgeIndex(page: page) else {
             return nil
@@ -158,13 +167,16 @@ struct CustomTabbarView: View {
         return badges[index]
     }
     
+    
     private func getBadgeIndex(page: Page) -> Int? {
         badges.firstIndex(where: { $0.1 == page })
     }
     
+    
     // ---------------------------------------------------------------------
     // MARK: Helper funcs
     // ---------------------------------------------------------------------
+    
     
     private func getWidthButton(with size: CGRect) -> CGFloat {
         size.width / CGFloat(pages.count)
