@@ -39,19 +39,20 @@ enum HomeRoute: RouteType {
                 return .push
         }
     }
-    
+
+    @ViewBuilder
     var view: Body {
         switch self {
             case .push(let viewModel):
-                return PushView(viewModel: viewModel)
+                PushView(viewModel: viewModel)
             case .sheet(let viewModel):
-                return SheetView(viewModel: viewModel)
+                SheetView(viewModel: viewModel)
             case .fullscreen(let viewModel):
-                return FullscreenView(viewModel: viewModel)
+                FullscreenView(viewModel: viewModel)
             case .detents(let viewModel):
-                return DetentsView(viewModel: viewModel)
+                DetentsView(viewModel: viewModel)
             case .actionListView(let viewModel):
-                return NavigationActionListView(viewModel: viewModel)
+                NavigationActionListView(viewModel: viewModel)
         }
     }
 }
@@ -90,8 +91,8 @@ class HomeCoordinator: Coordinator<HomeRoute> {
     }
     
     func presentTabbarCoordinator() async {
-        let coordinator = TabbarFlowCoordinator()
-        await navigate(to: coordinator, presentationStyle: .sheet)
+        let coordinator = CustomTabbarCoordinator()
+        await navigate(to: coordinator, presentationStyle: .sheet, animated: animated)
     }
     
     func close() async {
@@ -178,54 +179,6 @@ struct NavigationActionListView: View {
     }
 }
 ```
-
-_____
-
-### 3. Create MainCoordinator and its Routes
-
-```swift
-import SUICoordinator
-
-class MainCoordinator: Coordinator<MainRoute> {
-    
-    override init() {
-        super.init()
-        Task {
-            await startFlow(route: .splash, animated: false)
-        }
-    }
-    
-    override func start(animated: Bool = true) async {
-        let coordinator = HomeCoordinator()
-        await navigate(to: coordinator, presentationStyle: .fullScreenCover, animated: animated)
-    }
-}
-```
-
-```swift
-import SUICoordinator
-import SwiftUI
-
-enum MainRoute: RouteType {
-    
-    case splash
-    
-    public var presentationStyle: TransitionPresentationStyle {
-        switch self {
-            case .splash:
-                return .push
-        }
-    }
-    
-    @ViewBuilder
-    public var view: any View {
-        switch self {
-            case .splash:
-                SplashView()
-        }
-    }
-}
-```
 _____
 
 ### Setup project
@@ -240,13 +193,26 @@ import SUICoordinator
 
 class AppDelegate: NSObject, UIApplicationDelegate {
     
-    var mainCoodinator: (any CoordinatorType)?
+    var mainCoodinator: HomeCoordinator?
     
     func application(
         _ application: UIApplication,
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil
     ) -> Bool {
-        mainCoodinator = MainCoordinator()
+        mainCoodinator = HomeCoordinator()
+
+        // Simulate the receipt of a notification or external trigger to present some coordinator
+        DispatchQueue.main.asyncAfter(deadline: .now() + 10) {
+            Task { [weak self] in
+                // Create and present the CustomTabbarCoordinator in a sheet presentation style
+                let coordinator = CustomTabbarCoordinator()
+                try? await coordinator.forcePresentation(
+                    presentationStyle: .fullScreenCover,
+                    mainCoordinator: self?.mainCoodinator
+                )
+            }
+        }
+
         return true
     }
 }
@@ -266,9 +232,7 @@ struct SUICoordinatorDemoApp: App {
     
     var body: some Scene {
         WindowGroup {
-            if let view = appDelegate.mainCoodinator?.view {
-                AnyView(view)
-            }
+            appDelegate.mainCoodinator?.getView()
         }
     }
 }
