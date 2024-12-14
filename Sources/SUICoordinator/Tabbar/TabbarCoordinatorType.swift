@@ -35,14 +35,16 @@ public protocol TabbarCoordinatorType {
     // ---------------------------------------------------------
     
     /// The associated type representing the page associated with the tabbar coordinator.
-    associatedtype PAGE
+    associatedtype Page: TabbarPage
+    
+    typealias BadgeItem = (value: String?, page: Page)
     
     // ---------------------------------------------------------
     // MARK: Properties
     // ---------------------------------------------------------
     
     /// The current page associated with the tabbar coordinator.
-    var currentPage: PAGE { get set }
+    var currentPage: Page { get set }
     
     /// A subject for setting badge values.
     var setBadge: PassthroughSubject<(String?, PAGE), Never> { get set }
