@@ -208,7 +208,7 @@ class AppDelegate: NSObject, UIApplicationDelegate {
                 let coordinator = CustomTabbarCoordinator()
                 try? await coordinator.forcePresentation(
                     presentationStyle: .fullScreenCover,
-                    mainCoordinator: self?.mainCoodinator
+                    mainCoordinator: self?.shee
                 )
             }
         }
