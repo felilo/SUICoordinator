@@ -201,17 +201,19 @@ class AppDelegate: NSObject, UIApplicationDelegate {
     ) -> Bool {
         mainCoodinator = HomeCoordinator()
 
+
         // Simulate the receipt of a notification or external trigger to present some coordinator
         DispatchQueue.main.asyncAfter(deadline: .now() + 10) {
             Task { [weak self] in
                 // Create and present the CustomTabbarCoordinator in a sheet presentation style
                 let coordinator = CustomTabbarCoordinator()
                 try? await coordinator.forcePresentation(
-                    presentationStyle: .fullScreenCover,
-                    mainCoordinator: self?.shee
+                    presentationStyle: .sheet,
+                    mainCoordinator: self
                 )
             }
         }
+
 
         return true
     }
@@ -478,8 +480,12 @@ It works the same as Coordinator but has the following additional features:
     </tr>
     <tr>
       <td><code style="color: blue;">customView</code></td>
-      <td></td>
-      <td>Is a closure that receives a <code style="color: #ec6b6f;">View</code> as parameter</td>
+      <td>
+        <ul>
+          <li><b>view:</b> <code>View</code></li>
+        </ul>
+      </td>
+      <td>Is a closure that receives a view as parameter, to create a custom tab bar </td>
     </tr>
   </tbody>
 </table>
