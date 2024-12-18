@@ -81,7 +81,7 @@ struct SheetCoordinatorView: ViewModifier {
         with index: Int,
         item: SheetItem<Value>
     ) -> some View {
-        let view = (item.view() ?? AnyView(EmptyView()))
+        let view = (item.view?() ?? AnyView(EmptyView()))
             .sheetCoordinator(
                 coordinator: coordinator,
                 index: coordinator.getNextIndex(index),

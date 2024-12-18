@@ -71,7 +71,7 @@ public protocol TabbarCoordinatorType: ObservableObject {
     ///
     /// This closure provides a SwiftUI view for customization, which can be associated with a specific
     /// `Page`. The view is optional and can be left `nil` if no custom view is needed.
-    var customView: (() -> (Page.View))? { get set }
+    var customView: (() -> (Page.View?))? { get set }
     
     // ---------------------------------------------------------
     // MARK: Functions

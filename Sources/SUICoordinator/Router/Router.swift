@@ -185,6 +185,7 @@ public class Router<Route: RouteType>: ObservableObject, RouterType {
     @MainActor public func clean(animated: Bool, withMainView: Bool = true) async -> Void {
         await popToRoot(animated: false)
         items.removeAll()
+        await sheetCoordinator.clean()
         sheetCoordinator = .init()
         
         if withMainView {
