@@ -50,3 +50,16 @@ public protocol RouteType: SCHashable {
     /// The body of the route, conforming to the View protocol.
     @ViewBuilder @MainActor var view: Body { get }
 }
+
+extension RouteType {
+    
+    func getView(from content: () -> (Body?)) -> any View {
+        var view = AnyView(EmptyView()).id(UUID().uuidString)
+        
+        if let v = content() {
+            view = AnyView(v).id(String(describing: v.self))
+        }
+        
+        return view
+    }
+}

@@ -50,11 +50,11 @@ public extension CoordinatorType {
         let item = SheetItem(
             id: "\(coordinator.uuid) - \(presentationStyle.id)",
             animated: animated,
-            presentationStyle: (presentationStyle != .push) ? presentationStyle :  .sheet,
-            view: { [weak coordinator] in coordinator?.getView() },
-            onFinish: {[weak coordinator] in coordinator?.swipedAway()}
+            presentationStyle: (presentationStyle != .push) ? presentationStyle : .sheet,
+            view: { [weak coordinator] in coordinator?.getView() }
         )
         
+        swipedAway(coordinator: coordinator)
         router.presentSheet(item: item)
     }
     

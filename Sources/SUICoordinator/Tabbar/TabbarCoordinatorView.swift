@@ -25,7 +25,7 @@
 import SwiftUI
 import Foundation
 
-struct TabbarCoordinatorView<DataSource: TabbarCoordinatorType>: View where DataSource.Page: TabbarPage {
+struct TabbarCoordinatorView<DataSource: TabbarCoordinatorType>: View {
     
     typealias Page = DataSource.Page
     typealias BadgeItem = DataSource.BadgeItem
