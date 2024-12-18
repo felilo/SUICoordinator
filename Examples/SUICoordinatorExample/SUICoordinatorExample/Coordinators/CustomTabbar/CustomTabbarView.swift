@@ -25,7 +25,7 @@
 import SwiftUI
 import SUICoordinator
 
-struct CustomTabbarView<DataSource: TabbarCoordinatorType>: View where DataSource.Page: TabbarPage{
+struct CustomTabbarView<DataSource: TabbarCoordinatorType>: View {
     
     // ---------------------------------------------------------------------
     // MARK: Typealias
