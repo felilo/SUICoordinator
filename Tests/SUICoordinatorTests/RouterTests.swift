@@ -28,7 +28,7 @@ import XCTest
 
 final class RouterTests: XCTestCase {
     
-    func test_navigationStack_pushToRoute() async throws {
+    @MainActor func test_navigationStack_pushToRoute() async throws {
         let sut = makeSUT()
         let route = AnyEnumRoute.pushStep
         
@@ -37,7 +37,7 @@ final class RouterTests: XCTestCase {
         XCTAssertEqual(sut.items.last?.id, route.id)
     }
     
-    func test_navigationStack_pop() async throws {
+    @MainActor func test_navigationStack_pop() async throws {
         let sut = makeSUT()
         
         await sut.navigate(to: .pushStep, animated: false)
@@ -46,7 +46,7 @@ final class RouterTests: XCTestCase {
         XCTAssertNil(sut.items.last ?? nil)
     }
     
-    func test_navigationStack_popToRoot() async throws {
+    @MainActor func test_navigationStack_popToRoot() async throws {
         let sut = makeSUT()
         
         await sut.navigate(to: .pushStep, animated: false)
@@ -58,7 +58,7 @@ final class RouterTests: XCTestCase {
         XCTAssertNil(sut.items.last ?? nil)
     }
     
-    func test_closeRoute() async throws {
+    @MainActor func test_closeRoute() async throws {
         let sut = makeSUT()
         
         await sut.navigate(to: .pushStep, animated: false)
@@ -67,11 +67,11 @@ final class RouterTests: XCTestCase {
         
         await sut.navigate(to: .sheetStep, animated: false)
         await sut.close(animated: false)
-        await sut.sheetCoordinator.removeAllNilItems()
+        sut.sheetCoordinator.removeAllNilItems()
         XCTAssertEqual(sut.sheetCoordinator.items.count, 0)
     }
     
-    func test_cleanRouter() async throws {
+    @MainActor func test_cleanRouter() async throws {
         let sut = makeSUT()
         
         await sut.navigate(to: .pushStep, animated: false)
@@ -85,7 +85,7 @@ final class RouterTests: XCTestCase {
         XCTAssertEqual(sut.sheetCoordinator.items.count, 0)
     }
     
-    func test_navigationStack_popToView() async throws {
+    @MainActor func test_navigationStack_popToView() async throws {
         let sut = makeSUT()
         let view = PushStepView.self
         
@@ -127,7 +127,7 @@ final class RouterTests: XCTestCase {
         }
     }
     
-    func test_navigationStack_popToViewFail() async throws {
+    @MainActor  func test_navigationStack_popToViewFail() async throws {
         let sut = makeSUT()
         let route = AnyEnumRoute.fullScreenStep
         
@@ -145,14 +145,14 @@ final class RouterTests: XCTestCase {
     // MARK: Helpers
     // --------------------------------------------------------------------
     
-    private func makeSUT(file: StaticString = #filePath, line: UInt = #line) -> Router<AnyEnumRoute> {
+    @MainActor private func makeSUT(file: StaticString = #filePath, line: UInt = #line) -> Router<AnyEnumRoute> {
         let router = Router<AnyEnumRoute>()
         router.mainView = .pushStep
         trackForMemoryLeaks(router, file: file, line: line)
         return router
     }
     
-    private func makeSheetItem(_ item: any RouteType, animated: Bool = true) -> SheetItem<RouteType.Body> {
+    @MainActor private func makeSheetItem(_ item: any RouteType, animated: Bool = true) -> SheetItem<RouteType.Body> {
         .init(id: UUID().uuidString, animated: animated, presentationStyle: item.presentationStyle, view: { item.view })
     }
 }

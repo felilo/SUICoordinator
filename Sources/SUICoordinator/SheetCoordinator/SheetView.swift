@@ -128,6 +128,6 @@ struct SheetView<Content: View, T: SheetItemType>: View {
             return transitionStyle
         }
         
-        return items[index]?.presentationStyle ?? transitionStyle
+        return items[index]?.getPresentationStyle() ?? transitionStyle
     }
 }

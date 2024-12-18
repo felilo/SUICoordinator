@@ -28,6 +28,7 @@ import Combine
 /// A protocol representing a type for managing and coordinating a tabbar-based navigation.
 ///
 /// Tabbar coordinator types define the interface for handling the selected page and badge updates.
+@MainActor
 public protocol TabbarCoordinatorType: ObservableObject {
     
     // ---------------------------------------------------------
@@ -70,7 +71,7 @@ public protocol TabbarCoordinatorType: ObservableObject {
     ///
     /// This closure provides a SwiftUI view for customization, which can be associated with a specific
     /// `Page`. The view is optional and can be left `nil` if no custom view is needed.
-    var customView: (() -> (Page.View))? { get set }
+    var customView: (() -> (Page.View?))? { get set }
     
     // ---------------------------------------------------------
     // MARK: Functions
@@ -87,6 +88,8 @@ public protocol TabbarCoordinatorType: ObservableObject {
     /// - Returns: The coordinator that corresponds to the selected tab.
     /// - Throws: An error if the selected coordinator cannot be determined.
     func getCoordinatorSelected() throws -> (any CoordinatorType)
+    
+    @MainActor func clean() async
 }
 
 /// A type alias representing a coordinator that conforms to both `CoordinatorType` and `TabbarCoordinatorType`.

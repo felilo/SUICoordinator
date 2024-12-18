@@ -27,17 +27,17 @@ import XCTest
 
 final class SheetCoordinatorTests: XCTestCase {
     
-    func test_presentRoute() async throws {
+    @MainActor func test_presentRoute() async throws {
         let sut = makeSUT()
         let item = makeSheetItem("Custom Item")
         
-        await sut.presentSheet(item)
+        sut.presentSheet(item)
         
         XCTAssertFalse(sut.items.isEmpty)
         XCTAssertEqual(sut.items.last??.view(), item.view())
     }
     
-    func test_presentRouteTwice() async throws {
+    @MainActor func test_presentRouteTwice() async throws {
         let sut = makeSUT()
         let finalRoute = makeSheetItem("Final Item")
         
@@ -48,7 +48,7 @@ final class SheetCoordinatorTests: XCTestCase {
         XCTAssertEqual(sut.items.last??.id, finalRoute.id)
     }
     
-    func test_dismiss_lastRoute() async throws {
+    @MainActor func test_dismiss_lastRoute() async throws {
         let sut = makeSUT()
         let item = makeSheetItem("Custom Item")
         
@@ -56,25 +56,25 @@ final class SheetCoordinatorTests: XCTestCase {
         XCTAssertEqual(sut.items.count, 1)
         
         await sut.removeLastSheet(animated: false)
-        await sut.removeAllNilItems()
+        sut.removeAllNilItems()
         
         XCTAssertEqual(sut.items.count, 0)
     }
     
-    func test_dismiss_route_atPositon() async throws {
+    @MainActor func test_dismiss_route_atPositon() async throws {
         let sut = makeSUT()
         
         await presentSheet(makeSheetItem("First Item"), with: sut)
         await presentSheet(makeSheetItem("Second Item"), with: sut)
         await presentSheet(makeSheetItem("Third Item"), with: sut)
         
-        await sut.remove(at: 1)
+        sut.remove(at: 1)
         
         XCTAssertEqual(sut.items.count, 2)
         XCTAssertEqual(sut.items.last??.view(), "Third Item")
     }
     
-    func test_cleanCoordinator() async throws {
+    @MainActor func test_cleanCoordinator() async throws {
         let sut = makeSUT()
         
         await presentSheet(makeSheetItem("First Item"), with: sut)
@@ -90,7 +90,7 @@ final class SheetCoordinatorTests: XCTestCase {
     // MARK: Helpers
     // --------------------------------------------------------------------
     
-    private func makeSUT(file: StaticString = #filePath, line: UInt = #line) -> SheetCoordinator<String> {
+    @MainActor private func makeSUT(file: StaticString = #filePath, line: UInt = #line) -> SheetCoordinator<String> {
         let coordinator = SheetCoordinator<String>()
         trackForMemoryLeaks(coordinator, file: file, line: line)
         return coordinator
@@ -104,8 +104,8 @@ final class SheetCoordinatorTests: XCTestCase {
         .init(id: UUID().uuidString, animated: animated, presentationStyle: presentationStyle, view: { item })
     }
     
-    private func presentSheet( _ item: SheetItem<String>, with sut: SheetCoordinator<String>) async {
-        await sut.presentSheet(item)
-        await sut.removeAllNilItems()
+    @MainActor private func presentSheet( _ item: SheetItem<String>, with sut: SheetCoordinator<String>) async {
+        sut.presentSheet(item)
+        sut.removeAllNilItems()
     }
 }

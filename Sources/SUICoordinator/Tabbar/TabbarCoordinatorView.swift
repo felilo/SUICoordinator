@@ -30,7 +30,6 @@ struct TabbarCoordinatorView<DataSource: TabbarCoordinatorType>: View where Data
     typealias Page = DataSource.Page
     typealias BadgeItem = DataSource.BadgeItem
     
-    
     // ---------------------------------------------------------------------
     // MARK: Properties
     // ---------------------------------------------------------------------
@@ -40,12 +39,17 @@ struct TabbarCoordinatorView<DataSource: TabbarCoordinatorType>: View where Data
     @State var pages = [Page]()
     @State var currentPage: Page
     
+    init(dataSource: DataSource, currentPage: Page) {
+        self._dataSource = .init(wrappedValue: dataSource)
+        self.currentPage = dataSource.currentPage
+    }
+    
     // ---------------------------------------------------------------------
     // MARK: View
     // ---------------------------------------------------------------------
     
     public var body: some View {
-        TabView(selection: tabSelection()){
+        TabView(selection: $dataSource.currentPage){
             ForEach(pages, id: \.id, content: tabBarItem)
         }
         .onChange(of: dataSource.pages) { pages in
@@ -58,6 +62,10 @@ struct TabbarCoordinatorView<DataSource: TabbarCoordinatorType>: View where Data
         .onReceive(dataSource.setBadge) { (value, page) in
             guard let index = getBadgeIndex(page: page) else { return }
             badges[index].value = value
+        }
+        .task {
+            pages = dataSource.pages
+            badges = pages.map { (nil, $0) }
         }
     }
     
@@ -88,20 +96,5 @@ struct TabbarCoordinatorView<DataSource: TabbarCoordinatorType>: View where Data
     
     private func getBadgeIndex(page: Page) -> Int? {
         badges.firstIndex(where: { $0.1 == page })
-    }
-}
-
-
-extension TabbarCoordinatorView {
-    
-    private func tabSelection() -> Binding<Page> {
-        Binding {
-            currentPage
-        } set: { [weak dataSource] tappedTab in
-            if tappedTab == currentPage {
-                Task(priority: .high) { await dataSource?.popToRoot() }
-            }
-            dataSource?.currentPage = tappedTab
-        }
     }
 }

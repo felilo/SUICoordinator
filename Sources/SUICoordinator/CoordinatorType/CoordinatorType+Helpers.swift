@@ -96,7 +96,7 @@ extension CoordinatorType {
         guard let first = children.first else { return }
         
         if let parent = first.parent as? (any TabbarCoordinatable) {
-            await parent.setCurrentPage(with: first)
+            parent.setCurrentPage(with: first)
         }
         
         await first.emptyCoordinator(animated: animated)
@@ -150,26 +150,25 @@ extension CoordinatorType {
     ///   - withDismiss: A boolean value indicating whether to dismiss the coordinator.
     /// - Returns: An asynchronous void task representing the finish process.
     func finish(animated: Bool = true, withDismiss: Bool = true) async -> Void {
-        let handleFinish = { (coordinator: TCoordinatorType) async -> Void in
-            await coordinator.emptyCoordinator(animated: animated)
-        }
-        
         guard let parent, withDismiss else {
-            return await handleFinish(self)
+            return await emptyCoordinator(animated: animated)
         }
         
         if parent is (any TabbarCoordinatable) {
             await parent.parent?.closeLastSheet(animated: animated)
-            return await handleFinish(parent)
+            return await parent.emptyCoordinator(animated: animated)
         }
         
         await parent.closeLastSheet(animated: animated)
-        await handleFinish(self)
+        await emptyCoordinator(animated: animated)
     }
     
     /// Cleans up the coordinator.
-    func swipedAway() async {
+    func swipedAway()  {
         guard !isEmptyCoordinator else { return }
-        await finish(animated: false, withDismiss: false)
+        
+        Task(priority: .low) { [weak self] in
+            await self?.finish(animated: false, withDismiss: false)
+        }
     }
 }
