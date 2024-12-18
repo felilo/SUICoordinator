@@ -31,7 +31,7 @@ final class TabbarCoordinatorTests: XCTestCase {
     
     private let animated: Bool = false
     
-    func test_setPages() async throws {
+    @MainActor func test_setPages() async throws {
         let sut = makeSUT()
         let pages = [AnyEnumTabbarRoute.tab2]
         
@@ -42,7 +42,7 @@ final class TabbarCoordinatorTests: XCTestCase {
         await finishFlow(sut: sut)
     }
     
-    func test_changeTab() async throws {
+    @MainActor func test_changeTab() async throws {
         let sut = makeSUT(currentPage: .tab1)
         
         XCTAssertEqual(sut.currentPage, .tab1)
@@ -51,7 +51,7 @@ final class TabbarCoordinatorTests: XCTestCase {
         await finishFlow(sut: sut)
     }
     
-    func test_get_coordinator_selected_fail() async {
+    @MainActor func test_get_coordinator_selected_fail() async {
         let sut = makeSUT(currentPage: .tab1)
         
         await sut.start(animated: animated)
@@ -66,7 +66,7 @@ final class TabbarCoordinatorTests: XCTestCase {
         await finishFlow(sut: sut)
     }
     
-    func test_navigateToCoordinator() async throws {
+    @MainActor func test_navigateToCoordinator() async throws {
         let sut = makeSUT(currentPage: .tab1)
         let coordinator = AnyCoordinator()
         
@@ -78,7 +78,7 @@ final class TabbarCoordinatorTests: XCTestCase {
         await finishFlow(sut: sut)
     }
     
-    func test_popToRoot_in_tab() async throws {
+    @MainActor func test_popToRoot_in_tab() async throws {
         let sut = makeSUT(currentPage: .tab1)
         await sut.start(animated: animated)
         
@@ -93,13 +93,13 @@ final class TabbarCoordinatorTests: XCTestCase {
         await finishFlow(sut: sut)
     }
     
-    func test_siTabbarCoordinator() async throws {
+    @MainActor func test_siTabbarCoordinator() async throws {
         let sut = makeSUT(currentPage: .tab1)
         XCTAssertTrue(sut.isTabbarCoordinable)
         await finishFlow(sut: sut)
     }
     
-    func test_finshCoordinator() async throws {
+    @MainActor func test_finshCoordinator() async throws {
         let sut = makeSUT()
         let coordinator1 = OtherCoordinator()
         let coordinator2 = AnyCoordinator()
@@ -111,7 +111,7 @@ final class TabbarCoordinatorTests: XCTestCase {
         XCTAssertTrue(sut.isEmptyCoordinator)
     }
     
-    func test_force_to_present_coordinator() async throws {
+    @MainActor func test_force_to_present_coordinator() async throws {
         let sut = makeSUT(currentPage: .tab1)
         let coordinator = AnyCoordinator()
         
@@ -133,7 +133,7 @@ final class TabbarCoordinatorTests: XCTestCase {
     // MARK: Helpers
     // --------------------------------------------------------------------
     
-    private func makeSUT(
+    @MainActor private func makeSUT(
         currentPage: AnyEnumTabbarRoute = AnyEnumTabbarRoute.tab1,
         file: StaticString = #filePath,
         line: UInt = #line

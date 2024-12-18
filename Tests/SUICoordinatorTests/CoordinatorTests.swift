@@ -30,7 +30,7 @@ final class CoordinatorTests: XCTestCase {
     
     private let animated: Bool = false
     
-    func test_finshFlow() async throws {
+    @MainActor func test_finshFlow() async throws {
         let sut = makeSUT()
         
         await sut.router.navigate(to: .pushStep2, animated: animated )
@@ -41,7 +41,7 @@ final class CoordinatorTests: XCTestCase {
         XCTAssertEqual(sut.router.sheetCoordinator.items.count, 0)
     }
     
-    func test_finshFlow_mainCoordinator() async throws {
+    @MainActor func test_finshFlow_mainCoordinator() async throws {
         let sut = AnyCoordinator()
         let coordinator = OtherCoordinator()
         
@@ -55,7 +55,7 @@ final class CoordinatorTests: XCTestCase {
         XCTAssertEqual(sut.router.sheetCoordinator.items.count, 0)
     }
     
-    func test_starFlow() async throws {
+    @MainActor func test_starFlow() async throws {
         let sut = makeSUT()
         let route = AnyEnumRoute.fullScreenStep
 
@@ -68,7 +68,7 @@ final class CoordinatorTests: XCTestCase {
         await finishFlow(sut: sut)
     }
     
-    func test_parentCoordinator_not_nil() async throws {
+    @MainActor func test_parentCoordinator_not_nil() async throws {
         let sut = makeSUT()
         let coordinator = OtherCoordinator()
         
@@ -78,7 +78,7 @@ final class CoordinatorTests: XCTestCase {
         await finishFlow(sut: sut)
     }
     
-    func test_navigateToCoordinator() async throws {
+    @MainActor func test_navigateToCoordinator() async throws {
         let sut = makeSUT()
         let coordinator = OtherCoordinator()
         
@@ -89,7 +89,7 @@ final class CoordinatorTests: XCTestCase {
         await finishFlow(sut: sut)
     }
     
-    func test_getTopmostCoordinator() async throws {
+    @MainActor func test_getTopmostCoordinator() async throws {
         let sut = makeSUT()
         let coordinator1 = OtherCoordinator()
         let coordinator2 = AnyCoordinator()
@@ -101,7 +101,7 @@ final class CoordinatorTests: XCTestCase {
         await finishFlow(sut: sut)
     }
     
-    func test_force_to_present_coordinator() async throws {
+    @MainActor func test_force_to_present_coordinator() async throws {
         let sut = makeSUT()
         let coordinator1 = OtherCoordinator()
         let coordinator2 = AnyCoordinator()
@@ -117,7 +117,7 @@ final class CoordinatorTests: XCTestCase {
         await finishFlow(sut: sut)
     }
     
-    func test_finishCoordinatorWhichHasChildren() async throws {
+    @MainActor func test_finishCoordinatorWhichHasChildren() async throws {
         let sut = makeSUT()
         let coordinator1 = OtherCoordinator()
         let coordinator2 = AnyCoordinator()
@@ -141,7 +141,7 @@ final class CoordinatorTests: XCTestCase {
     // MARK: Helpers
     // --------------------------------------------------------------------
     
-    private func makeSUT(file: StaticString = #filePath, line: UInt = #line) -> AnyCoordinator {
+    @MainActor private func makeSUT(file: StaticString = #filePath, line: UInt = #line) -> AnyCoordinator {
         let coordinator = AnyCoordinator()
         trackForMemoryLeaks(coordinator, file: file, line: line)
         return coordinator
