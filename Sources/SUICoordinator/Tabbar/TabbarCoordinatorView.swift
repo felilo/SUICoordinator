@@ -30,7 +30,6 @@ struct TabbarCoordinatorView<DataSource: TabbarCoordinatorType>: View where Data
     typealias Page = DataSource.Page
     typealias BadgeItem = DataSource.BadgeItem
     
-    
     // ---------------------------------------------------------------------
     // MARK: Properties
     // ---------------------------------------------------------------------
@@ -43,8 +42,6 @@ struct TabbarCoordinatorView<DataSource: TabbarCoordinatorType>: View where Data
     init(dataSource: DataSource, currentPage: Page) {
         self._dataSource = .init(wrappedValue: dataSource)
         self.currentPage = dataSource.currentPage
-        pages = dataSource.pages
-        badges = dataSource.pages.map { (nil, $0) }
     }
     
     // ---------------------------------------------------------------------
@@ -66,7 +63,8 @@ struct TabbarCoordinatorView<DataSource: TabbarCoordinatorType>: View where Data
             guard let index = getBadgeIndex(page: page) else { return }
             badges[index].value = value
         }
-        .onAppear {
+        .task {
+            pages = dataSource.pages
             badges = pages.map { (nil, $0) }
         }
     }
