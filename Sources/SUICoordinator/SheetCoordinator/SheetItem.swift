@@ -45,8 +45,6 @@ public struct SheetItem<T>:SCHashable, SheetItemType {
     /// The transition presentation style for presenting the sheet item.
     let presentationStyle: TransitionPresentationStyle
     
-    private var itemDeallocate: SheetItemDeallocator?
-    
     // ---------------------------------------------------------
     // MARK: Constructor
     // ---------------------------------------------------------
@@ -62,15 +60,12 @@ public struct SheetItem<T>:SCHashable, SheetItemType {
         id: String,
         animated: Bool,
         presentationStyle: TransitionPresentationStyle,
-        view: @escaping () -> T?,
-        onFinish: (() -> Void)? = nil
+        view: @escaping () -> T?
     ) {
         self.view = view
         self.animated = animated
         self.presentationStyle = presentationStyle
         self.id = id
-        
-        itemDeallocate = .init(onFinish: onFinish)
     }
     
     // ---------------------------------------------------------
@@ -84,28 +79,5 @@ public struct SheetItem<T>:SCHashable, SheetItemType {
     
     func isAnimated() -> Bool {
         animated
-    }
-}
-
-
-/// A utility class to handle deallocation of sheet items, providing a callback
-/// that is executed upon deinitialization of the object.
-class SheetItemDeallocator {
-    
-    /// A closure that is invoked when the instance is deallocated.
-    var onFinish: (() -> Void)?
-    
-    /// Initializes a new `SheetItemDeallocator` instance.
-    ///
-    /// - Parameter onFinish: A closure to be executed when the instance is deallocated. Defaults to `nil`.
-    init(onFinish: (() -> Void)? = nil ) {
-        self.onFinish = onFinish
-    }
-    
-    /// Deinitializes the instance, invoking the `onFinish` closure if set, and
-    /// cleans up the closure reference to avoid potential memory leaks.
-    deinit {
-        onFinish?()
-        onFinish = nil
     }
 }

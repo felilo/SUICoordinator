@@ -49,6 +49,10 @@ final public class SheetCoordinator<T>: ObservableObject {
     /// The presentation style of the last presented sheet.
     public private(set) var animated: Bool?
     
+    private var backUpItems: [Int: String] = [:]
+    
+    var onRemoveItem: ((String) -> Void)?
+    
     // ---------------------------------------------------------
     // MARK: Constructor
     // ---------------------------------------------------------
@@ -87,6 +91,7 @@ final public class SheetCoordinator<T>: ObservableObject {
         animated = sheet.animated
         lastPresentationStyle = sheet.presentationStyle
         items.append(sheet)
+        backUpItems[totalItems - 1] = sheet.id
     }
     
     /// Removes the last presented sheet.
@@ -106,6 +111,12 @@ final public class SheetCoordinator<T>: ObservableObject {
     ///   - index: The index of the item to remove.
     @MainActor func remove(at index: Int) {
         guard isValidIndex(index) else { return }
+        
+        if let id = backUpItems[index] {
+            onRemoveItem?(id)
+            backUpItems.removeValue(forKey: index)
+        }
+        
         items.remove(at: index)
     }
     
@@ -117,6 +128,7 @@ final public class SheetCoordinator<T>: ObservableObject {
         await makeNilItem(at: 0)
         lastPresentationStyle = nil
         items.removeAll()
+        backUpItems.removeAll()
     }
     
     // ---------------------------------------------------------

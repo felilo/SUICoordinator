@@ -150,6 +150,8 @@ extension CoordinatorType {
     ///   - withDismiss: A boolean value indicating whether to dismiss the coordinator.
     /// - Returns: An asynchronous void task representing the finish process.
     func finish(animated: Bool = true, withDismiss: Bool = true) async -> Void {
+        guard !isEmptyCoordinator else { return }
+        
         guard let parent, withDismiss else {
             return await emptyCoordinator(animated: animated)
         }
@@ -164,11 +166,16 @@ extension CoordinatorType {
     }
     
     /// Cleans up the coordinator.
-    func swipedAway()  {
-        guard !isEmptyCoordinator else { return }
+    func swipedAway(coordinator: TCoordinatorType) {
+        let sheetCoordinator = router.sheetCoordinator
         
-        Task(priority: .low) { [weak self] in
-            await self?.finish(animated: false, withDismiss: false)
+        sheetCoordinator.onRemoveItem = { [weak coordinator] id in
+            if let uuid = coordinator?.uuid, id.contains(uuid) {
+                Task(priority: .utility) { [weak coordinator] in
+                    await coordinator?.finish(animated: false, withDismiss: false)
+                    sheetCoordinator.onRemoveItem = nil
+                }
+            }
         }
     }
 }
