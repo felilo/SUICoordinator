@@ -65,7 +65,7 @@ public protocol RouterType: ObservableObject {
     ///   - route: The route to navigate to.
     ///   - presentationStyle: The transition presentation style for the navigation.
     ///   - animated: A boolean value indicating whether to animate the navigation.
-    func navigate(to route: Route, presentationStyle: TransitionPresentationStyle?, animated: Bool) async
+    @MainActor func navigate(to route: Route, presentationStyle: TransitionPresentationStyle?, animated: Bool) async
     
     /// Presents a view or coordinator with optional presentation style and animation.
     ///
@@ -73,19 +73,19 @@ public protocol RouterType: ObservableObject {
     ///   - view: The view or coordinator to present.
     ///   - presentationStyle: The transition presentation style for the presentation.
     ///   - animated: A boolean value indicating whether to animate the presentation.
-    func present(_ view: Route, presentationStyle: TransitionPresentationStyle?, animated: Bool) async
+    @MainActor func present(_ view: Route, presentationStyle: TransitionPresentationStyle?, animated: Bool) async
     
     /// Pops the top view or coordinator from the navigation stack.
     ///
     /// - Parameters:
     ///   - animated: A boolean value indicating whether to animate the pop action.
-    func pop(animated: Bool) async
+    @MainActor func pop(animated: Bool) async
     
     /// Pops to the root of the navigation stack.
     ///
     /// - Parameters:
     ///   - animated: A boolean value indicating whether to animate the pop action.
-    func popToRoot(animated: Bool) async
+    @MainActor func popToRoot(animated: Bool) async
     
     /// Pops to a specific view or coordinator in the navigation stack.
     ///
@@ -93,13 +93,13 @@ public protocol RouterType: ObservableObject {
     ///   - view: The target view or coordinator to pop to.
     ///   - animated: A boolean value indicating whether to animate the pop action.
     /// - Returns: A boolean value indicating whether the pop action was successful.
-    func popToView<T>(_ view: T, animated: Bool) async -> Bool
+    @MainActor func popToView<T>(_ view: T, animated: Bool) async -> Bool
     
     /// Dismisses the currently presented view or coordinator.
     ///
     /// - Parameters:
     ///   - animated: A boolean value indicating whether to animate the dismissal.
-    func dismiss(animated: Bool) async
+    @MainActor func dismiss(animated: Bool) async
     
     /// Cleans up the current view or coordinator, optionally preserving the main view.
     ///
@@ -113,7 +113,7 @@ public protocol RouterType: ObservableObject {
     /// - Parameters:
     ///   - animated: A boolean value indicating whether to animate the closing action.
     ///   - finishFlow: A boolean value indicating whether to finish the associated flow.
-    func close(animated: Bool, finishFlow: Bool) async -> Void
+    @MainActor func close(animated: Bool, finishFlow: Bool) async -> Void
     
     /// Restarts the current view or coordinator, optionally animating the restart.
     ///

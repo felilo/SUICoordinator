@@ -24,13 +24,6 @@
 
 extension TabbarCoordinatorType where Self : TabbarCoordinatable {
     
-    /// Cleans  the coordinator.
-    @MainActor func clean() async {
-        pages.removeAll()
-        await router.clean(animated: false)
-        customView = nil
-    }
-    
     /// Sets the array of pages for the tabbar coordinator.
     ///
     /// - Parameters:
@@ -38,14 +31,14 @@ extension TabbarCoordinatorType where Self : TabbarCoordinatable {
     ///   - currentPage: The optional current page to set.
     public func setPages(_ values: [Page], currentPage: Page? = nil) async {
         await removeChildren()
-        await setupPages(values, currentPage: currentPage)
+        setupPages(values, currentPage: currentPage)
     }
     
     /// Sets up the pages for the tabbar coordinator.
     ///
     /// - Parameters:
     ///   - value: The array of pages to set up.
-    @MainActor func setupPages(_ value: [Page], currentPage: Page? = nil) {
+    func setupPages(_ value: [Page], currentPage: Page? = nil) {
         for page in value {
             let item = page.coordinator()
             startChildCoordinator(item)

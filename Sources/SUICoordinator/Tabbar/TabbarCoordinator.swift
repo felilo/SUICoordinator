@@ -70,7 +70,7 @@ open class TabbarCoordinator<Page: TabbarPage>: TabbarCoordinatable {
     public var setBadge: PassthroughSubject<(String?, Page), Never> = .init()
     
     /// A custom view associated with the tabbar coordinator.
-    public var customView: (() -> (Page.View))?
+    public var customView: (() -> (Page.View?))?
     
     // ---------------------------------------------------------
     // MARK: Constructor
@@ -87,7 +87,7 @@ open class TabbarCoordinator<Page: TabbarPage>: TabbarCoordinatable {
         pages: [Page],
         currentPage: Page,
         presentationStyle: TransitionPresentationStyle = .sheet,
-        customView: (() -> Page.View)? = nil
+        customView: (() -> Page.View?)? = nil
     ) {
         self.router = .init()
         self.uuid = "\(NSStringFromClass(type(of: self))) - \(UUID().uuidString)"
@@ -108,7 +108,7 @@ open class TabbarCoordinator<Page: TabbarPage>: TabbarCoordinatable {
     /// - Parameters:
     ///   - animated: A boolean value indicating whether to animate the start process.
     open func start(animated: Bool = true) async {
-        await setupPages(pages, currentPage: currentPage)
+        setupPages(pages, currentPage: currentPage)
         
         let cView = customView?() ?? TabbarCoordinatorView(dataSource: self, currentPage: currentPage)
         
@@ -138,5 +138,12 @@ open class TabbarCoordinator<Page: TabbarPage>: TabbarCoordinatable {
         guard let index = children.firstIndex(where: { $0.tagId == "\(currentPage.position)" })
         else { throw TabbarCoordinatorError.coordinatorSelected }
         return children[index]
+    }
+    
+    @MainActor public func clean() async {
+        await setPages([], currentPage: nil)
+        await router.clean(animated: false)
+        router = .init()
+        customView = nil
     }
 }

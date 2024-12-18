@@ -28,13 +28,13 @@ import Combine
 
 extension XCTestCase {
     
-    func trackForMemoryLeaks(_ instance: AnyObject, file: StaticString = #filePath, line: UInt = #line) {
-        addTeardownBlock { [weak instance] in
+    @MainActor func trackForMemoryLeaks(_ instance: AnyObject, file: StaticString = #filePath, line: UInt = #line) {
+        addTeardownBlock { @MainActor [weak instance] in
             XCTAssertNil(instance, "Potential memory leak.", file: file, line: line)
         }
     }
     
-    func navigateToCoordinator(
+    @MainActor func navigateToCoordinator(
         _ nextCoordinator: (any CoordinatorType),
         in coordinator: (any CoordinatorType),
         animated: Bool = false
@@ -43,10 +43,11 @@ extension XCTestCase {
             to: nextCoordinator,
             presentationStyle: .fullScreenCover,
             animated: animated)
+        
         await nextCoordinator.start(animated: animated)
     }
     
-    func finishFlow(sut: (any CoordinatorType), animated: Bool = false) async {
+    @MainActor func finishFlow(sut: (any CoordinatorType), animated: Bool = false) async {
         await sut.finishFlow(animated: animated)
     }
     

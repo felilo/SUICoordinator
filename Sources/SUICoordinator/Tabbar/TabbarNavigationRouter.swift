@@ -25,7 +25,7 @@
 import Foundation
 
 /// A protocol representing a type for managing and providing a coordinator for tabbar navigation.
-public protocol TabbarNavigationRouter {
+public protocol TabbarNavigationRouter: Sendable {
     
     // ---------------------------------------------------------
     // MARK: Functions
@@ -34,5 +34,5 @@ public protocol TabbarNavigationRouter {
     /// Retrieves a coordinator associated with tabbar navigation.
     ///
     /// - Returns: The coordinator associated with tabbar navigation.
-    func coordinator() -> (any CoordinatorType)
+    @MainActor func coordinator() -> (any CoordinatorType)
 }

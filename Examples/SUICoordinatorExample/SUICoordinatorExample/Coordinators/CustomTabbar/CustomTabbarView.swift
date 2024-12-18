@@ -43,7 +43,7 @@ struct CustomTabbarView<DataSource: TabbarCoordinatorType>: View where DataSourc
     
     @StateObject private var viewModel: DataSource
     @State private var currentPage: Page
-    @State private var pages: [Page]
+    @State private var pages: [Page] = []
     @State var badges = [BadgeItem]()
     
     let widthIcon: CGFloat = 22
@@ -57,8 +57,6 @@ struct CustomTabbarView<DataSource: TabbarCoordinatorType>: View where DataSourc
     init(viewModel: DataSource) {
         self._viewModel = .init(wrappedValue: viewModel)
         currentPage = viewModel.currentPage
-        pages = viewModel.pages
-        badges = viewModel.pages.map { (nil, $0) }
     }
     
     
@@ -94,8 +92,10 @@ struct CustomTabbarView<DataSource: TabbarCoordinatorType>: View where DataSourc
             guard let index = getBadgeIndex(page: page) else { return }
             badges[index].value = value
         }
-        .onAppear {
-            badges = pages.map { (nil, $0) }
+        .task {
+            currentPage = viewModel.currentPage
+            pages = viewModel.pages
+            badges = viewModel.pages.map { (nil, $0) }
         }
     }
     

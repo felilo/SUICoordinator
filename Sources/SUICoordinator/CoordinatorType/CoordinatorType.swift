@@ -30,6 +30,7 @@ import Foundation
 /// of a specific module or feature in an application.
 ///
 /// - Important: Adopt this protocol in your custom coordinator implementations.
+@MainActor
 public protocol CoordinatorType: SCHashable, ObservableObject {
     
     // ---------------------------------------------------------

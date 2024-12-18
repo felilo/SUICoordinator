@@ -26,8 +26,8 @@ import Foundation
 
 protocol SheetItemType: SCIdentifiable {
     /// A boolean value indicating whether to animate the presentation.
-    var animated: Bool { get set }
+    func isAnimated() -> Bool
     
     /// The transition presentation style for presenting the sheet item.
-    var presentationStyle: TransitionPresentationStyle { get set }
+    func getPresentationStyle() -> TransitionPresentationStyle
 }
