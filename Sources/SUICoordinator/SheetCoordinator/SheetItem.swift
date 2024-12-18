@@ -37,7 +37,7 @@ public struct SheetItem<T>:SCHashable, SheetItemType {
     public let id: String
     
     /// The view or coordinator associated with the sheet item.
-    let view: (() -> T?)?
+    let view: () -> T?
     
     /// A boolean value indicating whether to animate the presentation.
     let animated: Bool
@@ -62,7 +62,7 @@ public struct SheetItem<T>:SCHashable, SheetItemType {
         id: String,
         animated: Bool,
         presentationStyle: TransitionPresentationStyle,
-        view: (() -> T?)?,
+        view: @escaping () -> T?,
         onFinish: (() -> Void)? = nil
     ) {
         self.view = view

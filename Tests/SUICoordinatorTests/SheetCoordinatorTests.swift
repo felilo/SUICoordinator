@@ -34,7 +34,7 @@ final class SheetCoordinatorTests: XCTestCase {
         sut.presentSheet(item)
         
         XCTAssertFalse(sut.items.isEmpty)
-        XCTAssertEqual(sut.items.last??.view?(), item.view?())
+        XCTAssertEqual(sut.items.last??.view(), item.view())
     }
     
     @MainActor func test_presentRouteTwice() async throws {
@@ -71,7 +71,7 @@ final class SheetCoordinatorTests: XCTestCase {
         sut.remove(at: 1)
         
         XCTAssertEqual(sut.items.count, 2)
-        XCTAssertEqual(sut.items.last??.view?(), "Third Item")
+        XCTAssertEqual(sut.items.last??.view(), "Third Item")
     }
     
     @MainActor func test_cleanCoordinator() async throws {
