@@ -48,5 +48,5 @@ public protocol RouteType: SCHashable {
     var presentationStyle: TransitionPresentationStyle { get }
     
     /// The body of the route, conforming to the View protocol.
-    @ViewBuilder var view: Body { get }
+    @ViewBuilder @MainActor var view: Body { get }
 }

@@ -139,4 +139,11 @@ open class TabbarCoordinator<Page: TabbarPage>: TabbarCoordinatable {
         else { throw TabbarCoordinatorError.coordinatorSelected }
         return children[index]
     }
+    
+    @MainActor public func clean() async {
+        await setPages([], currentPage: nil)
+        await router.clean(animated: false)
+        router = .init()
+        customView = nil
+    }
 }
