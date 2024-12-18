@@ -56,9 +56,6 @@ struct CustomTabbarView<DataSource: TabbarCoordinatorType>: View where DataSourc
     
     init(viewModel: DataSource) {
         self._viewModel = .init(wrappedValue: viewModel)
-        currentPage = viewModel.currentPage
-        pages = viewModel.pages
-        badges = viewModel.pages.map { (nil, $0) }
     }
     
     
@@ -94,8 +91,10 @@ struct CustomTabbarView<DataSource: TabbarCoordinatorType>: View where DataSourc
             guard let index = getBadgeIndex(page: page) else { return }
             badges[index].value = value
         }
-        .onAppear {
-            badges = pages.map { (nil, $0) }
+        .task {
+            currentPage = viewModel.currentPage
+            pages = viewModel.pages
+            badges = viewModel.pages.map { (nil, $0) }
         }
     }
     
