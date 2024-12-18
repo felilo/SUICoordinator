@@ -43,7 +43,7 @@ struct CustomTabbarView<DataSource: TabbarCoordinatorType>: View where DataSourc
     
     @StateObject private var viewModel: DataSource
     @State private var currentPage: Page
-    @State private var pages: [Page]
+    @State private var pages: [Page] = []
     @State var badges = [BadgeItem]()
     
     let widthIcon: CGFloat = 22
@@ -56,6 +56,7 @@ struct CustomTabbarView<DataSource: TabbarCoordinatorType>: View where DataSourc
     
     init(viewModel: DataSource) {
         self._viewModel = .init(wrappedValue: viewModel)
+        currentPage = viewModel.currentPage
     }
     
     
