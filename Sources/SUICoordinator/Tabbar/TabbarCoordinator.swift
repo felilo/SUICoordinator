@@ -143,7 +143,6 @@ open class TabbarCoordinator<Page: TabbarPage>: TabbarCoordinatable {
     @MainActor public func clean() async {
         await setPages([], currentPage: nil)
         await router.clean(animated: false)
-        router = .init()
         customView = nil
     }
 }
