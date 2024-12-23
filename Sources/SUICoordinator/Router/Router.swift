@@ -195,11 +195,11 @@ public class Router<Route: RouteType>: ObservableObject, RouterType {
     /// - Parameters:
     ///   - animated: A boolean value indicating whether to animate the restart action.
     @MainActor public func restart(animated: Bool) async -> Void {
-        if !sheetCoordinator.items.isEmpty {
-            await pop(animated: false)
-            await sheetCoordinator.clean()
-        } else {
+        if sheetCoordinator.items.isEmpty {
             await popToRoot(animated: animated)
+        } else {
+            await popToRoot(animated: false)
+            sheetCoordinator = .init()
         }
     }
     
