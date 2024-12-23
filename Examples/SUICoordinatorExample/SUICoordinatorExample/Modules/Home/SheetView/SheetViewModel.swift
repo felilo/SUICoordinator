@@ -32,11 +32,28 @@ class SheetViewModel: ObservableObject {
         self.coordinator = coordinator
     }
     
+    
+    @MainActor func navigateToPushView() async {
+        await coordinator.navigateToPushView()
+    }
+    
     @MainActor func navigateToNextView() async {
         await coordinator.presentFullscreen()
     }
     
+    @MainActor func presentSheetView() async {
+        await coordinator.presentSheet()
+    }
+    
+    @MainActor func presentDetentsView() async {
+        await coordinator.presentDetents()
+    }
+    
     @MainActor func close() async {
         await coordinator.close()
+    }
+    
+    @MainActor func restart() async {
+        await coordinator.restart(animated: true)
     }
 }

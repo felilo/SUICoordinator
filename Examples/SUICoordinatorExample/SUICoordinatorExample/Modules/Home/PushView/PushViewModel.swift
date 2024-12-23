@@ -36,6 +36,18 @@ class PushViewModel: ObservableObject {
         await coordinator.presentSheet()
     }
     
+    @MainActor func presentFullscreen() async {
+        await coordinator.presentFullscreen()
+    }
+    
+    @MainActor func presentDetentsView() async {
+        await coordinator.presentDetents()
+    }
+    
+    @MainActor func navigateToPushView() async {
+        await coordinator.navigateToPushView()
+    }
+    
     @MainActor func close() async {
         await coordinator.close()
     }
