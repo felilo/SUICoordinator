@@ -128,6 +128,50 @@ final class TabbarCoordinatorTests: XCTestCase {
         await finishFlow(sut: sut)
     }
     
+    @MainActor func test_get_coordinator_at_position() async throws {
+        let sut = makeSUT()
+        let pages = [AnyEnumTabbarRoute.tab2, .tab1]
+        
+        await sut.start(animated: animated)
+        await sut.setPages(pages)
+        
+        let coordinator = sut.getCoordinator(with: AnyEnumTabbarRoute.tab2.position)
+        XCTAssertNotNil(coordinator)
+        
+        let coordinatorNil = sut.getCoordinator(with: 500)
+        XCTAssertNil(coordinatorNil)
+        
+        await finishFlow(sut: sut)
+    }
+    
+    @MainActor func test_start_coordinator() async throws {
+        let sut = makeSUT()
+        let pages = [AnyEnumTabbarRoute.tab2, .tab1]
+        
+        await sut.start(animated: animated)
+        await sut.setPages(pages)
+        
+        let view = try XCTUnwrap(sut.router.mainView?.view)
+        
+        XCTAssertEqual(self.getNameOf(object: view), self.getNameOf(object: TabbarCoordinatorView<TabbarCoordinator<AnyEnumTabbarRoute>>.self))
+        
+        await finishFlow(sut: sut)
+    }
+    
+    @MainActor func test_finishCoordinator_from_child() async throws {
+        let sut = makeSUT()
+        let pages = [AnyEnumTabbarRoute.tab2, .tab1]
+        
+        await sut.start(animated: animated)
+        await sut.setPages(pages)
+        
+        let coordinator = sut.getCoordinator(with: AnyEnumTabbarRoute.tab2.position)
+        
+        await coordinator?.finishFlow(animated: animated)
+        
+        XCTAssertTrue(sut.isEmptyCoordinator)
+    }
+    
     
     // --------------------------------------------------------------------
     // MARK: Helpers

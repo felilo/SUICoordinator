@@ -41,13 +41,41 @@ final class CoordinatorTests: XCTestCase {
         XCTAssertEqual(sut.router.sheetCoordinator.items.count, 0)
     }
     
-    @MainActor func test_finshFlow_mainCoordinator() async throws {
+    @MainActor func test_finishFlow_swipedAway() async throws {
+        let sut = makeSUT()
+        let anyCoordinator = AnyCoordinator()
+        
+        await sut.navigate(to: anyCoordinator, presentationStyle: .sheet)
+        
+        sut.router.sheetCoordinator.remove(at: 0)
+        sut.swipedAway(coordinator: anyCoordinator)
+        
+        try await Task.sleep(for: .seconds(0.5))
+        
+        XCTAssertEqual(anyCoordinator.router.items.count, 0)
+        XCTAssertEqual(anyCoordinator.router.sheetCoordinator.items.count, 0)
+    }
+    
+    @MainActor func test_finishFlow_mainCoordinator() async throws {
         let sut = AnyCoordinator()
         let coordinator = OtherCoordinator()
         
         await sut.start(animated: animated)
         await sut.router.navigate(to: .pushStep2, animated: animated )
         await navigateToCoordinator(coordinator, in: sut)
+        
+        await finishFlow(sut: sut)
+        XCTAssertEqual(sut.router.items.count, 0)
+        XCTAssertTrue(sut.children.isEmpty)
+        XCTAssertEqual(sut.router.sheetCoordinator.items.count, 0)
+    }
+    
+    @MainActor func test_finishFlow_childCoordinator() async throws {
+        let coordinator = OtherCoordinator()
+        let sut = makeSUT()
+        
+        await sut.start(animated: animated)
+        await navigateToCoordinator(sut, in: coordinator)
         
         await finishFlow(sut: sut)
         XCTAssertEqual(sut.router.items.count, 0)
@@ -133,9 +161,19 @@ final class CoordinatorTests: XCTestCase {
         XCTAssertTrue(sut.children.isEmpty)
         XCTAssertTrue(sut.router.items.isEmpty)
         XCTAssertTrue(sut.router.sheetCoordinator.items.isEmpty)
-        await finishFlow(sut: sut)
     }
     
+    @MainActor func test_restartCoordinator() async throws {
+        let sut = makeSUT()
+        
+        await sut.router.navigate(to: .pushStep2, animated: animated )
+        await sut.router.present(.fullScreenStep)
+        await sut.restart()
+        
+        XCTAssertEqual(sut.children.count, 0)
+        XCTAssertEqual(sut.router.items.count, 0)
+        XCTAssertEqual(sut.router.sheetCoordinator.items.count, 0)
+    }
     
     // --------------------------------------------------------------------
     // MARK: Helpers
