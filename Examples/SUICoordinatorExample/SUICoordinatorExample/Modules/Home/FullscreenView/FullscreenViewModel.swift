@@ -32,11 +32,23 @@ class FullscreenViewModel: ObservableObject {
         self.coordinator = coordinator
     }
     
-    @MainActor func navigateToNextView() async {
+    @MainActor func presentDetentsView() async {
         await coordinator.presentDetents()
+    }
+    
+    @MainActor func presentFullscreen() async {
+        await coordinator.presentFullscreen()
     }
     
     @MainActor func close() async {
         await coordinator.close()
+    }
+    
+    @MainActor func presentSheetView() async {
+        await coordinator.presentSheet()
+    }
+    
+    @MainActor func finish() async {
+        await coordinator.finish()
     }
 }

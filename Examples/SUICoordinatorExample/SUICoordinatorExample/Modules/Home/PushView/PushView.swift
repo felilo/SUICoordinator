@@ -42,8 +42,20 @@ struct PushView: View {
                 Text("Time: \(counter)")
                 
                 VStack {
+                    Button("navigate to PushView") {
+                        Task { await  viewModel.navigateToPushView() }
+                    }.buttonStyle(.borderedProminent)
+                    
                     Button("Presents SheetView") {
                         Task { await  viewModel.navigateToNextView() }
+                    }.buttonStyle(.borderedProminent)
+                    
+                    Button("Presents FullscreenView") {
+                        Task { await viewModel.presentFullscreen() }
+                    }.buttonStyle(.borderedProminent)
+                    
+                    Button("Presents DetentsView") {
+                        Task { await viewModel.presentDetentsView() }
                     }.buttonStyle(.borderedProminent)
                     
                     Button("Close view") {
