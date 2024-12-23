@@ -62,10 +62,9 @@ public extension CoordinatorType {
     ///
     /// - Parameters:
     ///   - animated: A boolean value indicating whether to animate the finish flow process.
-    @MainActor func finishFlow(animated: Bool = true) async -> Void {
+    func finishFlow(animated: Bool = true) async -> Void {
         await finish(animated: animated, withDismiss: true)
     }
-    
     
     /// Starts a flow in the coordinator with a specified route and transition style.
     ///
@@ -73,7 +72,7 @@ public extension CoordinatorType {
     ///   - route: The route to start the flow.
     ///   - transitionStyle: The transition presentation style for the flow.
     ///   - animated: A boolean value indicating whether to animate the start flow process.
-    @MainActor func startFlow(route: Route, transitionStyle: TransitionPresentationStyle? = nil, animated: Bool = true) async -> Void {
+    func startFlow(route: Route, transitionStyle: TransitionPresentationStyle? = nil, animated: Bool = true) async -> Void {
         router.mainView = route
     }
     
@@ -92,5 +91,13 @@ public extension CoordinatorType {
     ) async throws {
         let topCoordinator = try mainCoordinator?.topCoordinator()
         await topCoordinator?.navigate(to: self, presentationStyle: presentationStyle)
+    }
+    
+    /// Restarts the current view or coordinator, optionally animating the restart.
+    ///
+    /// - Parameters:
+    ///   - animated: A boolean value indicating whether to animate the restart action.
+    func restart(animated: Bool = true) async {
+        await router.restart(animated: animated)
     }
 }

@@ -85,6 +85,38 @@ final class RouterTests: XCTestCase {
         XCTAssertEqual(sut.sheetCoordinator.items.count, 0)
     }
     
+    @MainActor func test_restartRouter() async throws {
+        let sut = makeSUT()
+        
+        await sut.navigate(to: .pushStep, animated: false)
+        await sut.navigate(to: .pushStep2, animated: false)
+        await sut.navigate(to: .sheetStep, animated: false)
+        await sut.present(.fullScreenStep)
+        await sut.restart(animated: false)
+        
+        XCTAssertEqual(sut.items.count, 0)
+        XCTAssertEqual(sut.sheetCoordinator.items.count, 0)
+        XCTAssertNotNil(sut.mainView)
+    }
+    
+    @MainActor func test_presentItem_with_presentationStyle_not_valid() async throws {
+        let sut = makeSUT()
+        
+        await sut.present(.sheetStep, presentationStyle: .push, animated: false)
+        
+        XCTAssertEqual(sut.items.count, 1)
+        XCTAssertEqual(sut.sheetCoordinator.items.count, 0)
+    }
+    
+    @MainActor func test_presentItem_with_presentationStyle_valid() async throws {
+        let sut = makeSUT()
+        
+        await sut.present(.sheetStep, presentationStyle: .sheet, animated: false)
+        
+        XCTAssertEqual(sut.items.count, 0)
+        XCTAssertEqual(sut.sheetCoordinator.items.count, 1)
+    }
+    
     @MainActor func test_navigationStack_popToView() async throws {
         let sut = makeSUT()
         let view = PushStepView.self
@@ -127,7 +159,7 @@ final class RouterTests: XCTestCase {
         }
     }
     
-    @MainActor  func test_navigationStack_popToViewFail() async throws {
+    @MainActor func test_navigationStack_popToViewFail() async throws {
         let sut = makeSUT()
         let route = AnyEnumRoute.fullScreenStep
         
@@ -139,6 +171,20 @@ final class RouterTests: XCTestCase {
         XCTAssertFalse(result)
         
         XCTAssertEqual(sut.items.count, 3)
+    }
+    
+    @MainActor func test_dissmiss_sheet_swipedAway() async throws {
+        let sut = makeSUT()
+        let index = 0
+        
+        await sut.navigate(to: .pushStep, presentationStyle: .sheet, animated: false)
+        
+        XCTAssertEqual(sut.sheetCoordinator.items.count, 1)
+        
+        sut.removeNilItemsFromSheetCoordinator()
+        sut.removeItemFromSheetCoordinator(at: index)
+        
+        XCTAssertEqual(sut.sheetCoordinator.items.count, 0)
     }
     
     // --------------------------------------------------------------------

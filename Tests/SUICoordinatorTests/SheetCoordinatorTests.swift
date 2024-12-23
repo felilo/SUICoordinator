@@ -34,6 +34,8 @@ final class SheetCoordinatorTests: XCTestCase {
         sut.presentSheet(item)
         
         XCTAssertFalse(sut.items.isEmpty)
+        XCTAssertEqual(item.getPresentationStyle(), .fullScreenCover)
+        XCTAssertEqual(item.isAnimated(), false)
         XCTAssertEqual(sut.items.last??.view(), item.view())
     }
     
@@ -72,6 +74,21 @@ final class SheetCoordinatorTests: XCTestCase {
         
         XCTAssertEqual(sut.items.count, 2)
         XCTAssertEqual(sut.items.last??.view(), "Third Item")
+    }
+    
+    @MainActor func test_calculation_of_index() async throws {
+        let sut = makeSUT()
+        let iterations = 5
+        
+        XCTAssertTrue(sut.isLastIndex(iterations))
+        
+        for index in 0..<iterations {
+            XCTAssertEqual(sut.getNextIndex(index), index + 1)
+            await presentSheet(makeSheetItem("Item \(index)"), with: sut)
+            XCTAssertTrue(sut.isLastIndex(index))
+        }
+        
+        XCTAssertTrue(sut.isLastIndex(iterations - 1))
     }
     
     @MainActor func test_cleanCoordinator() async throws {

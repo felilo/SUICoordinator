@@ -29,6 +29,9 @@ struct SheetView: View {
     typealias ViewModel = SheetViewModel
     
     @StateObject var viewModel: ViewModel
+    @State private var counter = 0
+    
+    let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
     
     var body: some View {
         ZStack {
@@ -38,18 +41,32 @@ struct SheetView: View {
             VStack {
                 Text("Hello, SheetView!")
                     .font(.largeTitle)
+                Text("Time: \(counter)")
                 
                 VStack {
                     Button("Presents FullscreenView") {
                         Task { await viewModel.navigateToNextView() }
                     }.buttonStyle(.borderedProminent)
                     
+                    Button("Presents SheetView") {
+                        Task { await viewModel.presentSheetView() }
+                    }.buttonStyle(.borderedProminent)
+                    
+                    Button("Presents DetentsView") {
+                        Task { await viewModel.presentDetentsView() }
+                    }.buttonStyle(.borderedProminent)
+                    
                     Button("Close view") {
                         Task { await viewModel.close() }
+                    }.buttonStyle(.borderedProminent)
+                    
+                    Button("Restart coordinator") {
+                        Task { await viewModel.restart() }
                     }.buttonStyle(.borderedProminent)
                 }
             }
         }
+        .onReceive(timer) { _ in counter += 1 }
     }
 }
 

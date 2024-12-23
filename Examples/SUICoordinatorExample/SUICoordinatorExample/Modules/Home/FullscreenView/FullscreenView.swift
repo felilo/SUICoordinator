@@ -40,8 +40,16 @@ struct FullscreenView: View {
                     .font(.largeTitle)
                 
                 VStack {
+                    Button("Presents FullscreenView") {
+                        Task { await viewModel.presentFullscreen() }
+                    }.buttonStyle(.borderedProminent)
+                    
+                    Button("Presents SheetView") {
+                        Task { await viewModel.presentSheetView() }
+                    }.buttonStyle(.borderedProminent)
+                    
                     Button("Presents DetentsView") {
-                        Task { await viewModel.navigateToNextView() }
+                        Task { await viewModel.presentDetentsView() }
                     }.buttonStyle(.borderedProminent)
                     
                     Button("Close view") {

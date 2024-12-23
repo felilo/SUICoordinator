@@ -98,7 +98,7 @@ public class Router<Route: RouteType>: ObservableObject, RouterType {
         }
         
         let item = SheetItem(
-            id: view.id,
+            id: "\(view.id) - \(UUID())",
             animated: animated,
             presentationStyle: presentationStyle ?? view.presentationStyle,
             view: { view.view }
@@ -172,6 +172,7 @@ public class Router<Route: RouteType>: ObservableObject, RouterType {
     @MainActor public func close(animated: Bool = true, finishFlow: Bool = false) async -> Void {
         if !sheetCoordinator.items.isEmpty {
             await dismiss(animated: animated)
+            try? await Task.sleep(for: .seconds(animated ? 0.2 : 1))
         } else if !items.isEmpty {
             await pop(animated: animated)
         }
@@ -184,14 +185,9 @@ public class Router<Route: RouteType>: ObservableObject, RouterType {
     ///   - withMainView: A boolean value indicating whether to clean the main view.
     @MainActor public func clean(animated: Bool, withMainView: Bool = true) async -> Void {
         await popToRoot(animated: false)
-        items.removeAll()
-        await sheetCoordinator.clean()
         sheetCoordinator = .init()
         
-        if withMainView {
-            mainView = nil
-        }
-        
+        if withMainView { mainView = nil }
     }
     
     /// Restarts the current view or coordinator, optionally animating the restart.
@@ -199,11 +195,11 @@ public class Router<Route: RouteType>: ObservableObject, RouterType {
     /// - Parameters:
     ///   - animated: A boolean value indicating whether to animate the restart action.
     @MainActor public func restart(animated: Bool) async -> Void {
-        if !sheetCoordinator.items.isEmpty {
-            await pop(animated: false)
-            await sheetCoordinator.clean()
-        } else {
+        if sheetCoordinator.items.isEmpty {
             await popToRoot(animated: animated)
+        } else {
+            await popToRoot(animated: false)
+            sheetCoordinator = .init()
         }
     }
     
