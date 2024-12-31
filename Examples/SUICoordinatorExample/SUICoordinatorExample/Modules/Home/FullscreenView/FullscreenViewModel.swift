@@ -51,4 +51,8 @@ class FullscreenViewModel: ObservableObject {
     @MainActor func finish() async {
         await coordinator.finish()
     }
+    
+    @MainActor func restart() async {
+        await coordinator.restart()
+    }
 }
