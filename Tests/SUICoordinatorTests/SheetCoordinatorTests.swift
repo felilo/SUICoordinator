@@ -34,7 +34,7 @@ final class SheetCoordinatorTests: XCTestCase {
         sut.presentSheet(item)
         
         XCTAssertFalse(sut.items.isEmpty)
-        XCTAssertEqual(item.getPresentationStyle(), .fullScreenCover)
+        XCTAssertEqual(item.getPresentationStyle(), .sheet)
         XCTAssertEqual(item.isAnimated(), false)
         XCTAssertEqual(sut.items.last??.view(), item.view())
     }
@@ -115,7 +115,7 @@ final class SheetCoordinatorTests: XCTestCase {
     
     private func makeSheetItem(
         _ item: String,
-        presentationStyle: TransitionPresentationStyle = .fullScreenCover,
+        presentationStyle: TransitionPresentationStyle = .sheet,
         animated: Bool = false
     ) -> SheetItem<String> {
         .init(id: UUID().uuidString, animated: animated, presentationStyle: presentationStyle, view: { item })
