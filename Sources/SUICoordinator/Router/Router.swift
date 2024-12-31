@@ -198,7 +198,9 @@ public class Router<Route: RouteType>: ObservableObject, RouterType {
         if sheetCoordinator.items.isEmpty {
             await popToRoot(animated: animated)
         } else {
-            await popToRoot(animated: false)
+            async let _ = await popToRoot(animated: false)
+            await sheetCoordinator.clean(animated: animated)
+            
             sheetCoordinator = .init()
         }
     }

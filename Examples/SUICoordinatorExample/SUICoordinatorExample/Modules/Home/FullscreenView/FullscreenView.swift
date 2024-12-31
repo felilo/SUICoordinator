@@ -52,6 +52,10 @@ struct FullscreenView: View {
                         Task { await viewModel.presentDetentsView() }
                     }.buttonStyle(.borderedProminent)
                     
+                    Button("Restart coordinator") {
+                        Task { await viewModel.restart() }
+                    }.buttonStyle(.borderedProminent)
+                    
                     Button("Close view") {
                         Task { await viewModel.close() }
                     }.buttonStyle(.borderedProminent)

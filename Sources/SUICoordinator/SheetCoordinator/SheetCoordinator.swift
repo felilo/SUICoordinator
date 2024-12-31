@@ -118,7 +118,20 @@ final public class SheetCoordinator<T>: ObservableObject {
         guard !items.isEmpty else { return }
         self.animated = animated
         lastPresentationStyle = items.last(where: { $0?.presentationStyle != nil })??.presentationStyle
+        
         await makeNilItem(at: totalItems, animated: animated)
+    }
+    
+    /// Removes the first presented sheet.
+    ///
+    /// - Parameters:
+    ///   - animated: A boolean value indicating whether to animate the removal.
+    @MainActor func removeFirstSheet(animated: Bool) async -> Void {
+        guard !items.isEmpty else { return }
+        self.animated = animated
+        lastPresentationStyle = items.last(where: { $0?.presentationStyle != nil })??.presentationStyle
+        
+        await makeNilItem(at: 0, animated: animated)
     }
     
     /// Removes the item at the specified index.
@@ -141,9 +154,13 @@ final public class SheetCoordinator<T>: ObservableObject {
     /// - Parameters:
     ///   - animated: A boolean value indicating whether to animate the cleanup process.
     @MainActor func clean(animated: Bool = true) async -> Void {
-        await makeNilItem(at: 0, animated: animated)
+        if !items.contains(where: { $0?.presentationStyle == .fullScreenCover }) {
+            await removeFirstSheet(animated: animated)
+            try? await Task.sleep(for: .seconds(animated ? 0.3 : 0))
+            items.removeAll()
+        }
+        
         lastPresentationStyle = nil
-        items.removeAll()
         backUpItems.removeAll()
     }
     
@@ -180,13 +197,8 @@ final public class SheetCoordinator<T>: ObservableObject {
     @MainActor private func makeNilItem(at index: Int, animated: Bool) async {
         guard isValidIndex(index) else { return }
         
-        for dIndex in items.indices {
-            if dIndex > index {
-                items[dIndex] = nil
-            }
-        }
-        
         items[index] = nil
+        
         try? await Task.sleep(for: .seconds(animated ? 0.3 : 0))
     }
     

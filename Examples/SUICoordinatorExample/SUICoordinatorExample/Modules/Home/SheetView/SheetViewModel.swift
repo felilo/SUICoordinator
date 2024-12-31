@@ -54,6 +54,6 @@ class SheetViewModel: ObservableObject {
     }
     
     @MainActor func restart() async {
-        await coordinator.restart(animated: true)
+        await coordinator.restart()
     }
 }
