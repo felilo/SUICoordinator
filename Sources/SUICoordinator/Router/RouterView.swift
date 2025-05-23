@@ -76,17 +76,12 @@ struct RouterView<Router: RouterType>: View {
         view
             .transaction { $0.disablesAnimations = !viewModel.animated }
             .sheetCoordinator(
-                coordinator: viewModel.sheetCoordinator,
-                onDissmis: { index in
-                    Task(priority: .high) { @MainActor [weak viewModel] in
-                        viewModel?.removeItemFromSheetCoordinator(at: index)
-                        viewModel?.removeNilItemsFromSheetCoordinator()
-                    }
-                },
-                onDidLoad: { _ in
-                    viewModel.removeNilItemsFromSheetCoordinator()
-                }
-            )
+            coordinator: viewModel.sheetCoordinator,
+            onDissmis: { index in Task(priority: .high) { @MainActor [weak viewModel] in
+                await viewModel?.removeItemFromSheetCoordinator(at: index)
+            }},
+            onDidLoad: nil
+        )
     }
     
     private func onChangeFirstView(_ value: Router.Route?) {
