@@ -66,7 +66,8 @@ struct RouterView<Router: RouterType>: View {
                 mainView.navigationDestination(for: Router.Route.self) {
                     AnyView($0.view)
                 }
-            }
+            }.transaction { $0.disablesAnimations = !viewModel.animated }
+            
             addSheetTo(view: view)
         }
     }
@@ -74,7 +75,6 @@ struct RouterView<Router: RouterType>: View {
     @ViewBuilder
     private func addSheetTo(view: (some View)?) -> some View {
         view
-            .transaction { $0.disablesAnimations = !viewModel.animated }
             .sheetCoordinator(
             coordinator: viewModel.sheetCoordinator,
             onDissmis: { index in Task(priority: .high) { @MainActor [weak viewModel] in
