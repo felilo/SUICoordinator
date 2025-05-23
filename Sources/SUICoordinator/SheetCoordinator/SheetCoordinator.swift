@@ -46,6 +46,10 @@ final public class SheetCoordinator<T>: ObservableObject {
     /// certain items might need to be removed or temporarily set to `nil`.
     @Published var items: [Item?]
     
+    // Instance of the actor
+    private let itemManager = ItemManager<Item?>()
+
+    
     /// The presentation style of the last presented sheet.
     ///
     /// This property is updated whenever a new sheet is presented. It reflects the most recent
@@ -67,7 +71,7 @@ final public class SheetCoordinator<T>: ObservableObject {
     /// The closure receives a `String` value representing the identifier or metadata
     /// associated with the removed item. This can be used to handle clean-up operations
     /// or perform additional tasks upon item removal.
-    var onRemoveItem: ((String) -> Void)?
+    var onRemoveItem: ((String) async -> Void)?
     
     // ---------------------------------------------------------
     // MARK: Constructor
@@ -83,12 +87,13 @@ final public class SheetCoordinator<T>: ObservableObject {
     // ---------------------------------------------------------
     
     /// The total number of sheet items in the stack.
+    @MainActor
     private var totalItems: Int {
-        guard !items.isEmpty else {
-            return 0
-        }
-        
-        return items.count - 1
+        get async { await itemManager.totalItems }
+    }
+    
+    var areEmptyItems: Bool {
+        get async { await itemManager.areItemsEmpty() }
     }
     
     // ---------------------------------------------------------
@@ -100,14 +105,14 @@ final public class SheetCoordinator<T>: ObservableObject {
     /// - Parameters:
     ///   - sheet: The item representing the sheet to present.
     ///   - animated: A boolean value indicating whether to animate the sheet presentation.
-    @MainActor public func presentSheet(_ sheet: Item) -> Void {
-        if sheet.animated {
-            items.append(nil)
-        }
+    @MainActor public func presentSheet(_ sheet: Item) async -> Void {
         animated = sheet.animated
         lastPresentationStyle = sheet.presentationStyle
-        items.append(sheet)
-        backUpItems[totalItems - 1] = sheet.id
+        let id = sheet.id
+        
+        await itemManager.addItem(sheet)
+        await backUpItems[totalItems] = sheet.id
+        await updateItems()
     }
     
     /// Removes the last presented sheet.
@@ -115,11 +120,20 @@ final public class SheetCoordinator<T>: ObservableObject {
     /// - Parameters:
     ///   - animated: A boolean value indicating whether to animate the removal.
     @MainActor func removeLastSheet(animated: Bool) async -> Void {
-        guard !items.isEmpty else { return }
-        self.animated = animated
-        lastPresentationStyle = items.last(where: { $0?.presentationStyle != nil })??.presentationStyle
+        guard !(await areEmptyItems) else { return await updateItems() }
         
-        await makeNilItem(at: totalItems, animated: animated)
+        self.animated = animated
+        
+        let totalItems = await totalItems
+        
+        if lastPresentationStyle?.isCustom == true {
+            await itemManager.getItem(at: totalItems)?.willDismiss.send()
+        } else {
+            await itemManager.makeItemsNil(at: totalItems)
+        }
+        
+        await updateItems()
+        await updateLastPresentationStyle()
     }
     
     /// Removes the first presented sheet.
@@ -127,26 +141,58 @@ final public class SheetCoordinator<T>: ObservableObject {
     /// - Parameters:
     ///   - animated: A boolean value indicating whether to animate the removal.
     @MainActor func removeFirstSheet(animated: Bool) async -> Void {
-        guard !items.isEmpty else { return }
+        await removeSheet(at: 0, animated: animated)
+    }
+    
+    func removeSheet(at index: [Int], animated: Bool) async -> Void {
         self.animated = animated
-        lastPresentationStyle = items.last(where: { $0?.presentationStyle != nil })??.presentationStyle
         
-        await makeNilItem(at: 0, animated: animated)
+        await itemManager.makeItemsNil(at: index)
+        await updateItems()
+        await updateLastPresentationStyle()
+    }
+    
+    func removeSheet(at index: Int..., animated: Bool) async -> Void {
+        await removeSheet(at: index, animated: animated)
     }
     
     /// Removes the item at the specified index.
     ///
     /// - Parameters:
     ///   - index: The index of the item to remove.
-    @MainActor func remove(at index: Int) {
-        guard isValidIndex(index) else { return }
+    @MainActor func remove(at index: String) async {
+        guard let index = Int(index),
+              (await itemManager.isValid(index: index))
+        else { return }
+        
+        
         
         if let id = backUpItems[index] {
-            onRemoveItem?(id)
+            await onRemoveItem?(id)
             backUpItems.removeValue(forKey: index)
         }
         
-        items.remove(at: index)
+        await itemManager.removeItem(at: index)
+        
+        let items = await itemManager.getAllItems()
+        
+        for i in (index)..<items.count {
+            if let item = items[i],
+                item.isCoordinator == true,
+                let element = getBackupItemIndex(by: item.id)
+            {
+                backUpItems.removeValue(forKey: element.key)
+                await onRemoveItem?(element.value)
+            }
+        }
+        
+        await itemManager.makeItemsNil(after: index - 1)
+        await updateLastPresentationStyle()
+    }
+    
+    
+    private func getBackupItemIndex(by value: String) -> Dictionary<Int, String>.Element? {
+        backUpItems.first(where: { $0.value == value})
     }
     
     /// Cleans up the sheet coordinator, optionally animating the cleanup process.
@@ -154,14 +200,18 @@ final public class SheetCoordinator<T>: ObservableObject {
     /// - Parameters:
     ///   - animated: A boolean value indicating whether to animate the cleanup process.
     @MainActor func clean(animated: Bool = true) async -> Void {
-        if !items.contains(where: { $0?.presentationStyle == .fullScreenCover }) {
-            await removeFirstSheet(animated: animated)
-            try? await Task.sleep(for: .seconds(animated ? 0.3 : 0))
-            items.removeAll()
+        let items = await itemManager.getAllItems()
+        var indexes = [0]
+        
+        if let firstFSIndex = items.firstIndex(where: { $0?.presentationStyle == .fullScreenCover }) {
+            indexes = [firstFSIndex]
+            if let firstSheetIndex = items.firstIndex(where: { $0 != nil && $0?.presentationStyle != .fullScreenCover }) {
+                indexes.append(firstSheetIndex)
+            }
         }
         
-        lastPresentationStyle = nil
-        backUpItems.removeAll()
+        await removeSheet(at: indexes, animated: animated)
+        try? await Task.sleep(for: .seconds(animated ? 0.1 : 0))
     }
     
     /// Returns the next index based on the given index.
@@ -177,8 +227,10 @@ final public class SheetCoordinator<T>: ObservableObject {
     /// - Parameter index: The current index.
     /// - Returns: A boolean value indicating whether the given index is the last index
     ///   or if the items array is empty.
-    func isLastIndex(_ index: Int) -> Bool {
-        items.isEmpty || index == totalItems
+    @MainActor func isLastIndex(_ index: Int) -> Bool {
+        let totalItems = items.count - 1
+        
+        return items.isEmpty || index == totalItems
     }
     
     // ---------------------------------------------------------
@@ -186,27 +238,22 @@ final public class SheetCoordinator<T>: ObservableObject {
     // ---------------------------------------------------------
     
     /// Removes all `nil` items from the items array.
-    @MainActor func removeAllNilItems() {
-        items.removeAll(where: { $0 == nil || $0?.view == nil })
+    @MainActor func removeAllNilItems() async {
+        await itemManager.removeAllNilItems()
     }
     
-    /// Makes item `nil` at the specified index.
-    ///
-    /// - Parameters:
-    ///   - index: The index at which to remove `nil` items.
-    @MainActor private func makeNilItem(at index: Int, animated: Bool) async {
-        guard isValidIndex(index) else { return }
-        
-        items[index] = nil
-        
-        try? await Task.sleep(for: .seconds(animated ? 0.3 : 0))
+    @MainActor
+    func updateItems() async {
+        items = await itemManager.getAllItems()
     }
     
-    /// Validates whether the given index is within the bounds of the items array.
-    ///
-    /// - Parameter index: The index to validate.
-    /// - Returns: A boolean value indicating whether the index is valid and within the bounds.
-    private func isValidIndex(_ index: Int) -> Bool {
-        !items.isEmpty && items.indices.contains(index)
+    private func updateLastPresentationStyle() async {
+        let presentationStyle = await itemManager.getAllItems().last(where: {
+            $0?.presentationStyle != nil
+        })??.presentationStyle
+        
+        guard presentationStyle != lastPresentationStyle else { return }
+        
+        lastPresentationStyle = presentationStyle
     }
 }
