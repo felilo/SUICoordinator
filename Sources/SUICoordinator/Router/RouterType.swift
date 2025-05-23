@@ -55,6 +55,9 @@ public protocol RouterType: ObservableObject {
     /// The main view associated with the router.
     var mainView: Route? { get set }
     
+    /// The main view associated with the router.
+    var animated: Bool { get set }
+    
     // --------------------------------------------------------------------
     // MARK: Functions
     // --------------------------------------------------------------------

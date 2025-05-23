@@ -43,6 +43,10 @@ public class Router<Route: RouteType>: ObservableObject, RouterType {
     // The sheet coordinator for presenting sheets.
     @Published public var sheetCoordinator: SheetCoordinator<Route.Body> = .init()
     
+    @Published public var animated: Bool = true
+    
+    private let itemManager = ItemManager<Route>()
+    
     // --------------------------------------------------------------------
     // MARK: Properties
     // --------------------------------------------------------------------
@@ -72,10 +76,10 @@ public class Router<Route: RouteType>: ObservableObject, RouterType {
         presentationStyle: TransitionPresentationStyle? = nil,
         animated: Bool = true
     ) async -> Void {
+        self.animated = animated
         if (presentationStyle ?? route.presentationStyle) == .push {
-            return await runActionWithAnimation(animated) { [weak self] in
-                return { self?.items.append(route) }
-            }
+            await itemManager.addItem(route)
+            return await updateItems()
         }
         await present(
             route,
@@ -90,6 +94,8 @@ public class Router<Route: RouteType>: ObservableObject, RouterType {
     ///   - presentationStyle: The transition presentation style for the presentation.
     ///   - animated: A boolean value indicating whether to animate the presentation.
     @MainActor public func present(_ view: Route, presentationStyle: TransitionPresentationStyle? = .sheet, animated: Bool = true) async -> Void {
+        self.animated = animated
+        
         if (presentationStyle ?? view.presentationStyle) == .push {
             return await navigate(
                 to: view,
@@ -104,7 +110,7 @@ public class Router<Route: RouteType>: ObservableObject, RouterType {
             view: { view.view }
         )
         
-        presentSheet(item: item)
+        await presentSheet(item: item)
     }
     
     /// Pops the top view or coordinator from the navigation stack.
@@ -112,9 +118,9 @@ public class Router<Route: RouteType>: ObservableObject, RouterType {
     /// - Parameters:
     ///   - animated: A boolean value indicating whether to animate the pop action.
     @MainActor public func pop(animated: Bool) async -> Void {
-        await runActionWithAnimation(animated) { [weak self] in
-            return { self?.handlePopAction() }
-        }
+        self.animated = animated
+        await self.handlePopAction()
+        await self.updateItems()
     }
     
     /// Pops to the root of the navigation stack.
@@ -122,9 +128,10 @@ public class Router<Route: RouteType>: ObservableObject, RouterType {
     /// - Parameters:
     ///   - animated: A boolean value indicating whether to animate the pop action.
     @MainActor public func popToRoot(animated: Bool = true) async -> Void {
-        await runActionWithAnimation(animated) { [weak self] in
-            return { self?.items.removeAll() }
-        }
+        self.animated = animated
+        
+        await itemManager.removeAll()
+        await updateItems()
     }
     
     /// Pops to a specific `Route`in the navigation stack.
@@ -141,6 +148,7 @@ public class Router<Route: RouteType>: ObservableObject, RouterType {
             Self.removingParenthesesContent(name(route.view)) == name(view)
         }
         
+        let items = await itemManager.getAllItems()
         guard let index = items.firstIndex(where: isValidName) else {
             return false
         }
@@ -149,9 +157,10 @@ public class Router<Route: RouteType>: ObservableObject, RouterType {
         let range = position..<items.count
         if position >= items.count { return true }
         
-        await runActionWithAnimation(animated) { [weak self] in
-            return { self?.items.remove(atOffsets: IndexSet.init(integersIn: range)) }
-        }
+        self.animated = animated
+        
+        await itemManager.removeItemsIn(range: range)
+        await updateItems()
         
         return true
     }
@@ -170,10 +179,10 @@ public class Router<Route: RouteType>: ObservableObject, RouterType {
     ///   - animated: A boolean value indicating whether to animate the closing action.
     ///   - finishFlow: A boolean value indicating whether to finish the associated flow.
     @MainActor public func close(animated: Bool = true, finishFlow: Bool = false) async -> Void {
-        if !sheetCoordinator.items.isEmpty {
+        if !(await sheetCoordinator.areEmptyItems) {
             await dismiss(animated: animated)
             try? await Task.sleep(for: .seconds(animated ? 0.2 : 1))
-        } else if !items.isEmpty {
+        } else if !(await itemManager.areItemsEmpty()) {
             await pop(animated: animated)
         }
     }
@@ -198,8 +207,9 @@ public class Router<Route: RouteType>: ObservableObject, RouterType {
         if sheetCoordinator.items.isEmpty {
             await popToRoot(animated: animated)
         } else {
-            async let _ = await popToRoot(animated: false)
+            await popToRoot(animated: false)
             await sheetCoordinator.clean(animated: animated)
+            self.animated = animated
             
             sheetCoordinator = .init()
         }
@@ -209,8 +219,8 @@ public class Router<Route: RouteType>: ObservableObject, RouterType {
     ///
     /// - Parameters:
     ///   - item: The sheet item containing the view to present.
-    @MainActor func presentSheet(item: SheetItem<RouteType.Body>) -> Void {
-        sheetCoordinator.presentSheet(item)
+    @MainActor func presentSheet(item: SheetItem<RouteType.Body>) async -> Void {
+        await sheetCoordinator.presentSheet(item)
     }
     
     /// Removes all content inside parentheses, including nested parentheses, from the string.
@@ -245,8 +255,14 @@ public class Router<Route: RouteType>: ObservableObject, RouterType {
     }
     
     /// Handles the pop action by updating the navigation stack.
-    private func handlePopAction() {
-        guard !items.isEmpty else { return }
-        items.removeLast()
+    private func handlePopAction() async {
+        guard !(await itemManager.areItemsEmpty()) else { return }
+        
+        await itemManager.removeLastItem()
+    }
+    
+    @MainActor
+    func updateItems() async {
+        items = await itemManager.getAllItems()
     }
 }
