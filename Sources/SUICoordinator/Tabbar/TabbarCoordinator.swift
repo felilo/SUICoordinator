@@ -110,7 +110,7 @@ open class TabbarCoordinator<Page: TabbarPage>: TabbarCoordinatable {
     open func start(animated: Bool = true) async {
         setupPages(pages, currentPage: currentPage)
         
-        let cView = customView?() ?? TabbarCoordinatorView(dataSource: self, currentPage: currentPage)
+        let cView = customView?() ?? TabViewCoordinator(dataSource: self, currentPage: currentPage)
         
         await startFlow(
             route: DefaultRoute(presentationStyle: presentationStyle) { cView },
