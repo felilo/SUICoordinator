@@ -23,11 +23,12 @@
 //
 
 import Foundation
+import Combine
 
 /// A class representing a sheet item for presenting views or coordinators in a coordinator-based architecture.
 ///
 /// Sheet items encapsulate information about the view, animation, and presentation style.
-public struct SheetItem<T>:SCHashable, SheetItemType {
+public struct SheetItem<T>:SCEquatable, SheetItemType {
     
     // ---------------------------------------------------------
     // MARK: Properties
@@ -45,6 +46,9 @@ public struct SheetItem<T>:SCHashable, SheetItemType {
     /// The transition presentation style for presenting the sheet item.
     let presentationStyle: TransitionPresentationStyle
     
+    let willDismiss: PassthroughSubject<Void, Never> = .init()
+    let isCoordinator: Bool
+    
     // ---------------------------------------------------------
     // MARK: Constructor
     // ---------------------------------------------------------
@@ -60,12 +64,14 @@ public struct SheetItem<T>:SCHashable, SheetItemType {
         id: String,
         animated: Bool,
         presentationStyle: TransitionPresentationStyle,
+        isCoordinator: Bool = false,
         view: @escaping () -> T?
     ) {
         self.view = view
         self.animated = animated
         self.presentationStyle = presentationStyle
         self.id = id
+        self.isCoordinator = isCoordinator
     }
     
     // ---------------------------------------------------------
