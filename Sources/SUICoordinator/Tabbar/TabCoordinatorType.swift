@@ -29,7 +29,7 @@ import Combine
 ///
 /// Tabbar coordinator types define the interface for handling the selected page and badge updates.
 @MainActor
-public protocol TabbarCoordinatorType: ObservableObject {
+public protocol TabCoordinatorType: ObservableObject {
     
     // ---------------------------------------------------------
     // MARK: Associated Type
@@ -93,4 +93,4 @@ public protocol TabbarCoordinatorType: ObservableObject {
 }
 
 /// A type alias representing a coordinator that conforms to both `CoordinatorType` and `TabbarCoordinatorType`.
-public typealias TabbarCoordinatable = CoordinatorType & TabbarCoordinatorType
+public typealias TabCoordinatable = CoordinatorType & TabCoordinatorType

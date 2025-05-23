@@ -22,7 +22,7 @@
 //  THE SOFTWARE.
 //
 
-extension TabbarCoordinatorType {
+extension TabCoordinatorType {
     
     /// Sets the current page for the tabbar coordinator.
     ///

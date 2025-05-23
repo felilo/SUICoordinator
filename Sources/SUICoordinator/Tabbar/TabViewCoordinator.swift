@@ -25,7 +25,7 @@
 import SwiftUI
 import Foundation
 
-struct TabViewCoordinator<DataSource: TabbarCoordinatorType>: View {
+struct TabViewCoordinator<DataSource: TabCoordinatorType>: View {
     
     typealias Page = DataSource.Page
     typealias BadgeItem = DataSource.BadgeItem
@@ -49,7 +49,7 @@ struct TabViewCoordinator<DataSource: TabbarCoordinatorType>: View {
     // ---------------------------------------------------------------------
     
     public var body: some View {
-        TabView(selection: $dataSource.currentPage){
+        TabView(selection: $currentPage){
             ForEach(pages, id: \.id, content: tabBarItem)
         }
         .onChange(of: dataSource.pages) { pages in

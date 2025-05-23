@@ -28,7 +28,7 @@ import Combine
 /// An open class representing a coordinator for managing a tabbar-based navigation.
 ///
 /// Tabbar coordinators handle the navigation and coordination of pages within a tabbar.
-open class TabbarCoordinator<Page: TabbarPage>: TabbarCoordinatable {
+open class TabbarCoordinator<Page: TabbarPage>: TabCoordinatable {
     
     // --------------------------------------------------------------------
     // MARK: Wrapper properties

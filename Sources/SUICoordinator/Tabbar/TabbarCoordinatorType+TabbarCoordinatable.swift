@@ -1,5 +1,5 @@
 //
-//  TabbarCoordinatorType+TabbarCoordinatable.swift
+//  TabbarCoordinatorType+TabCoordinatable.swift
 //
 //  Copyright (c) Andres F. Lozano
 //
@@ -22,7 +22,7 @@
 //  THE SOFTWARE.
 //
 
-extension TabbarCoordinatorType where Self : TabbarCoordinatable {
+extension TabCoordinatorType where Self : TabCoordinatable {
     
     /// Sets the array of pages for the tabbar coordinator.
     ///
