@@ -166,16 +166,52 @@ extension CoordinatorType {
     }
     
     /// Cleans up the coordinator.
-    func swipedAway(coordinator: TCoordinatorType) {
+    func swipedAway(coordinator: TCoordinatorType) async {
         let sheetCoordinator = router.sheetCoordinator
+        let uuid = coordinator.uuid
         
-        sheetCoordinator.onRemoveItem = { [weak coordinator] id in
-            if let uuid = coordinator?.uuid, id.contains(uuid) {
-                Task(priority: .utility) { [weak coordinator] in
-                    await coordinator?.finish(animated: false, withDismiss: false)
-                    sheetCoordinator.onRemoveItem = nil
-                }
+        await sheetCoordinator.onRemoveItem = { [weak sheetCoordinator, weak coordinator] id in
+            if id.contains(uuid) {
+                await coordinator?.finish(animated: false, withDismiss: false)
+                sheetCoordinator?.onRemoveItem = nil
             }
         }
+    }
+
+    /// Prepares a `SheetItem` for navigating to another coordinator.
+    ///
+    /// This function configures a `SheetItem` which is used by the `SheetCoordinator`
+    /// to present the view of the target coordinator. It handles the presentation style,
+    /// particularly adjusting `.push` transitions to a custom animation suitable for
+    /// coordinator navigation.
+    ///
+    /// - Parameters:
+    ///   - coordinator: The coordinator to navigate to. Its view will be embedded in the `SheetItem`.
+    ///   - presentationStyle: The desired presentation style for the navigation.
+    ///     If `.push` is provided, it's converted to a custom transition (`.opacity.combined(with: .move(edge: .trailing))`).
+    ///   - animated: A Boolean value indicating whether the transition should be animated.
+    /// - Returns: A `SheetItem` configured to present the target coordinator's view.
+    func buildSheetItemForCoordinator(
+        _ coordinator: TCoordinatorType,
+        presentationStyle: TransitionPresentationStyle,
+        animated: Bool
+    ) -> SheetItem<RouteType.Body> {
+        var effectivePresentationStyle = presentationStyle
+        
+        if effectivePresentationStyle == .push {
+            effectivePresentationStyle = .custom(
+                transition: .opacity.combined(with: .move(edge: .trailing)),
+                animation: .default,
+                fullScreen: false
+            )
+        }
+        
+        return SheetItem(
+            id: "\(coordinator.uuid) - \(effectivePresentationStyle.id)",
+            animated: animated,
+            presentationStyle: effectivePresentationStyle,
+            isCoordinator: true,
+            view: { [weak coordinator] in coordinator?.getView() }
+        )
     }
 }

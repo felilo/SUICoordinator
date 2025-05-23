@@ -44,18 +44,18 @@ public extension CoordinatorType {
     ///   - coordinator: The coordinator to navigate to.
     ///   - presentationStyle: The transition presentation style for the navigation.
     ///   - animated: A boolean value indicating whether to animate the navigation.
-    func navigate(to coordinator: TCoordinatorType, presentationStyle: TransitionPresentationStyle, animated: Bool = true ) async -> Void {
+    func navigate(
+        to coordinator: TCoordinatorType,
+        presentationStyle: TransitionPresentationStyle,
+        animated: Bool = true
+    ) async -> Void {
         startChildCoordinator(coordinator)
         
-        let item = SheetItem(
-            id: "\(coordinator.uuid) - \(presentationStyle.id)",
-            animated: animated,
-            presentationStyle: (presentationStyle != .push) ? presentationStyle : .sheet,
-            view: { [weak coordinator] in coordinator?.getView() }
-        )
+        let item = buildSheetItemForCoordinator(coordinator, presentationStyle: presentationStyle, animated: animated)
         
-        swipedAway(coordinator: coordinator)
-        router.presentSheet(item: item)
+        await swipedAway(coordinator: coordinator)
+        
+        await router.presentSheet(item: item)
     }
     
     /// Finishes the flow of the coordinator.
