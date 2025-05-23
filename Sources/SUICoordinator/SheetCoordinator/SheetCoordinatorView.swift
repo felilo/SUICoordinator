@@ -31,7 +31,7 @@ struct SheetCoordinatorView: ViewModifier {
     // MARK: typealias
     // ---------------------------------------------------------
     
-    typealias Action = ((Int) -> Void)
+    typealias Action = ((String) -> Void)
     typealias Value = (any View)
     
     // ---------------------------------------------------------
@@ -46,8 +46,8 @@ struct SheetCoordinatorView: ViewModifier {
     // ---------------------------------------------------------
     
     public var isLast: Bool
-    public var onDissmis: Action?
-    public var onDidLoad: Action?
+    public var onDissmis: ActionClosure?
+    public var onDidLoad: ActionClosure?
     
     // ---------------------------------------------------------
     // MARK: ViewModifier

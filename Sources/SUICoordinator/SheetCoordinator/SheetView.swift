@@ -40,8 +40,8 @@ struct SheetView<Content: View, T: SheetItemType>: View {
     
     let index: Int
     let content: ( (Int, (Item)) -> Content)
-    let onDismiss: ((Int) -> Void)?
-    let onDidLoad: ((Int) -> Void)?
+    let onDismiss: ActionClosure?
+    let onDidLoad: ActionClosure?
     let transitionStyle: TransitionPresentationStyle?
     let animated: Bool
     
@@ -52,11 +52,11 @@ struct SheetView<Content: View, T: SheetItemType>: View {
     init(
         index: Int,
         items: Binding<[Item?]>,
-        @ViewBuilder content: @escaping (Int, (Item)) -> Content,
         transitionStyle: TransitionPresentationStyle?,
         animated: Bool,
-        onDismiss: ((Int) -> Void)? = nil,
-        onDidLoad: ((Int) -> Void)?
+        @ViewBuilder content: @escaping (Int, (Item)) -> Content,
+        onDismiss: ActionClosure? = nil,
+        onDidLoad: ActionClosure?
     ) {
         self.index = index
         self._items = items
