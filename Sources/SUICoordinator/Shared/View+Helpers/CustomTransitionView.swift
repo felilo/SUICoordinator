@@ -44,7 +44,6 @@ struct CustomTransitionView<Item: SheetItemType, Content: View>: View {
     var transition: AnyTransition
     var animation: Animation?
     let animated: Bool
-    let itemID: String
     
     // ---------------------------------------------------------
     // MARK: Constructor
@@ -66,7 +65,6 @@ struct CustomTransitionView<Item: SheetItemType, Content: View>: View {
         self.animated = animated
         self.onDismiss = onDismiss
         self.onDidLoad = onDidLoad
-        itemID = item.wrappedValue?.id ?? "Vacio"
     }
     
     // ---------------------------------------------------------
@@ -86,7 +84,7 @@ struct CustomTransitionView<Item: SheetItemType, Content: View>: View {
         }
         .animation(animation, value: showContent)
         .onViewDidLoad { Task { @MainActor in
-            onDidLoad?(itemID)
+            onDidLoad?("")
             await start(with: item)
         }}
     }
@@ -99,8 +97,7 @@ struct CustomTransitionView<Item: SheetItemType, Content: View>: View {
     var contentItem: some View {
         if let item = item {
             content(item)
-                .onReceive(item.willDismiss) { value in
-                    guard value else { return }
+                .onReceive(item.willDismiss) { _ in
                     Task { await finish() }
                 }
         }

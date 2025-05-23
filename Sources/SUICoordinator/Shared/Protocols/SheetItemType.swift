@@ -23,8 +23,20 @@
 //
 
 import Foundation
+import Combine
 
-protocol SheetItemType: SCIdentifiable {
+/// A protocol defining the requirements for an item that can be presented as a sheet.
+///
+/// This protocol ensures that any conforming type can provide necessary information
+/// for sheet presentation, such as an identifier, animation preference, and presentation style.
+protocol SheetItemType: SCEquatable {
+    
+    /// A `String` that uniquely identifies the sheet item.
+    var id: String { get }
+    
+    /// A `PassthroughSubject` that emits a void value just before the sheet is dismissed.
+    var willDismiss: PassthroughSubject<Void, Never> { get }
+    
     /// A boolean value indicating whether to animate the presentation.
     func isAnimated() -> Bool
     
