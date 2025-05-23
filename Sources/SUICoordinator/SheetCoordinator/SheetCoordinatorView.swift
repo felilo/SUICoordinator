@@ -56,14 +56,14 @@ struct SheetCoordinatorView: ViewModifier {
     @ViewBuilder
     func body(content: Content) -> some View {
         content
-            .background {
+            .overlay {
                 VStack {
                     SheetView(
                         index: index,
                         items: $coordinator.items,
-                        content: buildContent,
                         transitionStyle: coordinator.lastPresentationStyle,
                         animated: coordinator.animated ?? true,
+                        content: buildContent,
                         onDismiss: onDissmis,
                         onDidLoad: onDidLoad
                     )
