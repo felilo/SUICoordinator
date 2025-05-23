@@ -48,8 +48,8 @@ struct RouterView<Router: RouterType>: View {
     
     var body: some View {
         ZStack { buildBody() }
-        .onChange(of: viewModel.mainView, perform: onChangeFirstView)
-        .onViewDidLoad { onChangeFirstView(viewModel.mainView) }
+            .onChange(of: viewModel.mainView, perform: onChangeFirstView)
+            .onViewDidLoad { onChangeFirstView(viewModel.mainView) }
     }
     
     // --------------------------------------------------------------------
@@ -74,6 +74,7 @@ struct RouterView<Router: RouterType>: View {
     @ViewBuilder
     private func addSheetTo(view: (some View)?) -> some View {
         view
+            .transaction { $0.disablesAnimations = !viewModel.animated }
             .sheetCoordinator(
                 coordinator: viewModel.sheetCoordinator,
                 onDissmis: { index in
