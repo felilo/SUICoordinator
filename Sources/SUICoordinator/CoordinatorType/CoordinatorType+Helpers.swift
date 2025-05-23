@@ -33,7 +33,7 @@ extension CoordinatorType {
     
     /// A boolean value indicating whether the coordinator is tabbar-coordinable.
     var isTabbarCoordinable: Bool {
-        self is (any TabbarCoordinatable)
+        self is (any TabCoordinatable)
     }
     
     /// A boolean value indicating whether the coordinator is empty.
@@ -50,7 +50,7 @@ extension CoordinatorType {
     ///   - animated: A boolean value indicating whether to animate the cleaning process.
     ///   - withMainView: A boolean value indicating whether to clean the main view.
     func cleanView(animated: Bool = false, withMainView: Bool = true) async {
-        if let coordinator = self as? (any TabbarCoordinatable) {
+        if let coordinator = self as? (any TabCoordinatable) {
             await coordinator.clean()
         } else {
             await router.clean(animated: animated, withMainView: withMainView)
@@ -95,7 +95,7 @@ extension CoordinatorType {
     func removeChildren(animated: Bool = false) async {
         guard let first = children.first else { return }
         
-        if let parent = first.parent as? (any TabbarCoordinatable) {
+        if let parent = first.parent as? (any TabCoordinatable) {
             parent.setCurrentPage(with: first)
         }
         
@@ -107,9 +107,9 @@ extension CoordinatorType {
     ///
     /// - Parameters:
     ///   - coordinator: The coordinator for which to retrieve the tabbar-coordinable object.
-    /// - Returns: An optional tabbar-coordinable object conforming to any TabbarCoordinatable.
-    func getTabbarCoordinable(_ coordinator: TCoordinatorType) ->  (any TabbarCoordinatable)? {
-        coordinator as? (any TabbarCoordinatable)
+    /// - Returns: An optional tabbar-coordinable object conforming to any TabCoordinatable.
+    func getTabbarCoordinable(_ coordinator: TCoordinatorType) ->  (any TabCoordinatable)? {
+        coordinator as? (any TabCoordinatable)
     }
     
     /// Starts a child coordinator.
@@ -156,7 +156,7 @@ extension CoordinatorType {
             return await emptyCoordinator(animated: animated)
         }
         
-        if parent is (any TabbarCoordinatable) {
+        if parent is (any TabCoordinatable) {
             await parent.parent?.closeLastSheet(animated: animated)
             return await parent.emptyCoordinator(animated: animated)
         }
