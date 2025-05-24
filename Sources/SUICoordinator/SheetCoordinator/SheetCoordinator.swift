@@ -163,34 +163,22 @@ final public class SheetCoordinator<T>: ObservableObject {
     @MainActor func remove(at index: String) async {
         guard let index = Int(index),
               (await itemManager.isValid(index: index))
-        else { return }
+        else {
+            return await updateItems()
+        }
         
         if let id = backUpItems[index] {
             await onRemoveItem?(id)
             backUpItems.removeValue(forKey: index)
         }
         
-        await itemManager.removeItem(at: index)
-        
-        let items = await itemManager.getAllItems()
-        
-        for i in (index)..<items.count {
-            if let item = items[i],
-                item.isCoordinator == true,
-                let element = getBackupItemIndex(by: item.id)
-            {
-                backUpItems.removeValue(forKey: element.key)
-                await onRemoveItem?(element.value)
-            }
+        guard (await itemManager.removeItem(at: index)) != nil else {
+            return await updateLastPresentationStyle()
         }
         
-        await itemManager.makeItemsNil(after: index - 1)
+        await handleRemove(index: index - 1)
         await updateLastPresentationStyle()
-    }
-    
-    
-    private func getBackupItemIndex(by value: String) -> Dictionary<Int, String>.Element? {
-        backUpItems.first(where: { $0.value == value})
+        await updateItems()
     }
     
     /// Cleans up the sheet coordinator, optionally animating the cleanup process.
@@ -240,11 +228,15 @@ final public class SheetCoordinator<T>: ObservableObject {
         await itemManager.removeAllNilItems()
     }
     
+    /// Updates the `items` published property with the current state from the `itemManager`.
+    /// This function should be called on the main actor.
     @MainActor
     func updateItems() async {
         items = await itemManager.getAllItems()
     }
     
+    /// Updates the `lastPresentationStyle` property based on the last non-nil item in the `itemManager`.
+    /// This function should be called on the main actor.
     private func updateLastPresentationStyle() async {
         let presentationStyle = await itemManager.getAllItems().last(where: {
             $0?.presentationStyle != nil
@@ -253,5 +245,31 @@ final public class SheetCoordinator<T>: ObservableObject {
         guard presentationStyle != lastPresentationStyle else { return }
         
         lastPresentationStyle = presentationStyle
+    }
+    
+    /// Handles the removal of coordinator items from the backup and invokes `onRemoveItem` for each.
+    /// This function is called after an item is removed, to clean up associated coordinator data.
+    ///
+    /// - Parameter index: The index from which to start checking for coordinator items to remove.
+    private func handleRemove(index: Int) async {
+        guard (await itemManager.isValid(index: index)) else { return }
+        
+        let items = await itemManager.getAllItems()
+        let range = index..<items.count
+        
+        for i in range {
+            if let item = items[i],
+               item.isCoordinator == true,
+               let element = getBackupItemIndex(by: item.id)
+            {
+                backUpItems.removeValue(forKey: element.key)
+                await onRemoveItem?(element.value)
+            }
+        }
+    }
+    
+    
+    private func getBackupItemIndex(by value: String) -> Dictionary<Int, String>.Element? {
+        backUpItems.first(where: { $0.value == value})
     }
 }

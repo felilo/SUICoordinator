@@ -87,7 +87,6 @@ struct CustomTransitionView<Item: SheetItemType, Content: View>: View {
         }
         .animation(animation, value: showContent)
         .onViewDidLoad { Task { @MainActor in
-            onDidLoad?("")
             await start(with: item)
         }}
     }
@@ -100,6 +99,7 @@ struct CustomTransitionView<Item: SheetItemType, Content: View>: View {
     var contentItem: some View {
         if let item = item {
             content(item)
+                .onViewDidLoad { onDidLoad?("") }
                 .onReceive(item.willDismiss) { _ in
                     Task { await finish() }
                 }
@@ -120,7 +120,7 @@ struct CustomTransitionView<Item: SheetItemType, Content: View>: View {
     }
     
     private func finish() async {
-        let duration = 0.35
+        let duration = 0.3
         showContent = false
         iContent = nil
         
@@ -128,7 +128,9 @@ struct CustomTransitionView<Item: SheetItemType, Content: View>: View {
             try? await Task.sleep(for: .seconds(duration))
         }
         
-        guard !isFullScreen else { return (item = nil) }
+        guard !isFullScreen else {
+            return (item = nil)
+        }
         
         onDismiss?("")
     }

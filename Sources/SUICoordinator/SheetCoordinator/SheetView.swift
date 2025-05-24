@@ -208,7 +208,7 @@ struct SheetView<Content: View, T: SheetItemType>: View {
         defaultView
             .sheet(
                 item: item,
-                onDismiss: {onDismiss?(String(index))},
+                onDismiss: { onDismiss?(String(index)) },
                 content: { content($0) }
             )
             .onAppear(perform: { onDidLoad?(String(index)) })
