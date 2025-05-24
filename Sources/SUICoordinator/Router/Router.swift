@@ -72,7 +72,7 @@ public class Router<Route: RouteType>: ObservableObject, RouterType {
     ///   - presentationStyle: The transition presentation style for the navigation.
     ///   - animated: A boolean value indicating whether to animate the navigation.
     @MainActor public func navigate(
-        to route: Route,
+        toRoute route: Route,
         presentationStyle: TransitionPresentationStyle? = nil,
         animated: Bool = true
     ) async -> Void {
@@ -98,7 +98,7 @@ public class Router<Route: RouteType>: ObservableObject, RouterType {
         
         if (presentationStyle ?? view.presentationStyle) == .push {
             return await navigate(
-                to: view,
+                toRoute: view,
                 presentationStyle: presentationStyle,
                 animated: animated)
         }

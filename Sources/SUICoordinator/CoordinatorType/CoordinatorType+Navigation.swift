@@ -54,7 +54,6 @@ public extension CoordinatorType {
         let item = buildSheetItemForCoordinator(coordinator, presentationStyle: presentationStyle, animated: animated)
         
         await swipedAway(coordinator: coordinator)
-        
         await router.presentSheet(item: item)
     }
     
