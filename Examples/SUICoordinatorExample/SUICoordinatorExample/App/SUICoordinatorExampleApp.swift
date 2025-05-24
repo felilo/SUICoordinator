@@ -36,7 +36,7 @@ struct SUICoordinatorExampleApp: App {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
                     Task { [weak mainCoordinator] in
                         // Create and present the CustomTabbarCoordinator in a sheet presentation style
-                        let coordinator = CustomTabbarCoordinator()
+                        let coordinator = CustomTabCoordinator()
                         try? await coordinator.forcePresentation(
                             presentationStyle: .sheet,
                             mainCoordinator: mainCoordinator

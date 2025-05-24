@@ -25,7 +25,7 @@
 import Foundation
 import SUICoordinator
 
-public class CustomTabbarCoordinator: TabCoordinator<MyTabbarPage> {
+public class CustomTabCoordinator: TabCoordinator<MyTabbarPage> {
     
     // ---------------------------------------------------------------------
     // MARK: Init
@@ -37,7 +37,7 @@ public class CustomTabbarCoordinator: TabCoordinator<MyTabbarPage> {
             currentPage: currentPage
         )
         
-        customView = { CustomTabbarView(viewModel: self) }
+        customView = { CustomTabView(viewModel: self) }
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
             self?.setBadge.send(( "2", .first ))

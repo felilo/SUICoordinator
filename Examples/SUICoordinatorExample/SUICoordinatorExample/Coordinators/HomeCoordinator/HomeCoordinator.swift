@@ -70,9 +70,8 @@ class HomeCoordinator: Coordinator<HomeRoute> {
     }
     
     func presentTabbarCoordinator() async {
-//        let coordinator = CustomTabbarCoordinator()
-        let coordinator = TabbarFlowCoordinator()
-        await navigate(to: coordinator, presentationStyle: .push, animated: animated)
+        let coordinator = CustomTabCoordinator()
+        await navigate(to: coordinator, presentationStyle: .sheet, animated: animated)
     }
     
     func close() async {

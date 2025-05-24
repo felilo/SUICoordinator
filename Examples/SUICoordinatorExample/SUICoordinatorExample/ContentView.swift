@@ -26,7 +26,7 @@ import SwiftUI
 
 struct ContentView: View {
     
-    let mainCoordinator = CustomTabbarCoordinator()
+    let mainCoordinator = CustomTabCoordinator()
     
     var body: some View {
         mainCoordinator.getView()
