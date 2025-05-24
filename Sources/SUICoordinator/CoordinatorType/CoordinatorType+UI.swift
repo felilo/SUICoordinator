@@ -24,8 +24,48 @@
 
 import SwiftUI
 
+/// Extension providing UI-related functionality for coordinator types.
+///
+/// This extension bridges the gap between coordinators and SwiftUI by providing
+/// methods to convert coordinators into SwiftUI views that can be integrated
+/// into the view hierarchy.
 public extension CoordinatorType {
     
+    /// Creates and returns a SwiftUI view representation of the coordinator.
+    ///
+    /// This method wraps the coordinator in a `CoordinatorView`, which handles
+    /// the integration between the coordinator's navigation logic and SwiftUI's
+    /// view system.
+    ///
+    /// The returned view automatically manages:
+    /// - Navigation stack presentation
+    /// - Modal sheet presentations
+    /// - Router state synchronization
+    /// - Proper lifecycle management
+    ///
+    /// - Returns: A SwiftUI view that represents this coordinator's interface.
+    ///
+    /// ## Example Usage
+    /// ```swift
+    /// struct ContentView: View {
+    ///     @StateObject var mainCoordinator = MainCoordinator()
+    ///
+    ///     var body: some View {
+    ///         mainCoordinator.getView()
+    ///             .onAppear {
+    ///                 Task {
+    ///                     await mainCoordinator.start()
+    ///                 }
+    ///             }
+    ///     }
+    /// }
+    /// ```
+    ///
+    /// ## Integration Notes
+    /// - The view automatically handles router state changes
+    /// - Navigation operations are properly reflected in the UI
+    /// - Modal presentations are managed transparently
+    /// - The coordinator remains the source of truth for navigation state
     @ViewBuilder
     func getView() -> some View {
         CoordinatorView(dataSource: self)

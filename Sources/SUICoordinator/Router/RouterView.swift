@@ -59,7 +59,7 @@ struct RouterView<Router: RouterType>: View {
     
     @ViewBuilder
     private func buildBody() -> some View {
-        if viewModel.isTabbarCoordinable {
+        if viewModel.isTabCoordinable {
             addSheetTo(view: mainView)
         } else {
             let view = NavigationStack(path: $viewModel.items) {

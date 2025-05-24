@@ -124,7 +124,7 @@ open class TabCoordinator<Page: TabPage>: TabCoordinatable {
         self.customView = customView
         self.pages = pages
         
-        router.isTabbarCoordinable = true
+        router.isTabCoordinable = true
     }
     
     // ---------------------------------------------------------
