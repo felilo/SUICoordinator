@@ -64,7 +64,7 @@ class HomeCoordinator: Coordinator<HomeRoute> {
     }
     
     func presentViewWithCustomPresentation() async {
-        let title = "Custom, presentation view!"
+        let title = "Custom presentation view!"
         let viewModel = PushViewModel(coordinator: self, title: title)
         await router.navigate(toRoute: .viewCustomTransition(viewModel: viewModel), animated: animated)
     }

@@ -123,8 +123,9 @@ final public class SheetCoordinator<T>: ObservableObject {
         guard !(await areEmptyItems) else { return await updateItems() }
         
         self.animated = animated
-        
         let totalItems = await totalItems
+        
+        await updateLastPresentationStyle()
         
         if lastPresentationStyle?.isCustom == true {
             await itemManager.getItem(at: totalItems)?.willDismiss.send()
@@ -133,7 +134,6 @@ final public class SheetCoordinator<T>: ObservableObject {
         }
         
         await updateItems()
-        await updateLastPresentationStyle()
     }
     
     /// Removes the first presented sheet.
@@ -147,9 +147,9 @@ final public class SheetCoordinator<T>: ObservableObject {
     func removeSheet(at index: [Int], animated: Bool) async -> Void {
         self.animated = animated
         
+        await updateLastPresentationStyle()
         await itemManager.makeItemsNil(at: index)
         await updateItems()
-        await updateLastPresentationStyle()
     }
     
     func removeSheet(at index: Int..., animated: Bool) async -> Void {

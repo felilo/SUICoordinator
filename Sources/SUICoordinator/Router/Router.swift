@@ -207,7 +207,13 @@ public class Router<Route: RouteType>: ObservableObject, RouterType {
         if sheetCoordinator.items.isEmpty {
             await popToRoot(animated: animated)
         } else {
-            await popToRoot(animated: false)
+            if #available(iOS 17.0, *) {
+                await popToRoot(animated: false)
+            } else {
+                async let  _ =  await popToRoot(animated: true)
+                try? await Task.sleep(for: .seconds(0.2))
+            }
+            
             await sheetCoordinator.clean(animated: animated)
             self.animated = animated
             

@@ -28,19 +28,10 @@ extension RouterType {
     // MARK: Helper funcs
     // --------------------------------------------------------------------
     
-    /// Removes all `nil` items from the sheet coordinator.
-    ///
-    /// This method ensures that the sheet coordinator does not contain invalid or nil values.
-    @MainActor func removeNilItemsFromSheetCoordinator() async -> Void {
-        await sheetCoordinator.removeAllNilItems()
-        await sheetCoordinator.updateItems()
-    }
-    
     /// Removes a specific item at the given index from the sheet coordinator.
     ///
     /// - Parameter index: The index of the item to remove.
     @MainActor func removeItemFromSheetCoordinator(at index: String) async -> Void {
         await sheetCoordinator.remove(at: index)
-        await sheetCoordinator.updateItems()
     }
 }

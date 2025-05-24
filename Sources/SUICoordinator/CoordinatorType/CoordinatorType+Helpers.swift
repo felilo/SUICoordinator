@@ -201,7 +201,7 @@ extension CoordinatorType {
         if effectivePresentationStyle == .push {
             effectivePresentationStyle = .custom(
                 transition: .move(edge: .trailing),
-                animation: .easeOut,
+                animation: .easeOut(duration: 0.22),
                 fullScreen: false
             )
         }
