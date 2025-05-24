@@ -37,7 +37,7 @@ struct PushView: View {
     var body: some View {
         ZStack {
             VStack {
-                Text("Hello, PushView!")
+                Text("Hello, PushView! \(viewModel.index)")
                     .font(.largeTitle)
                 Text("Time: \(counter)")
                 
@@ -69,5 +69,5 @@ struct PushView: View {
 }
 
 #Preview {
-    PushView(viewModel: .init(coordinator: .init()))
+    PushView(viewModel: .init(coordinator: .init(), index: 1))
 }

@@ -44,12 +44,10 @@ struct TabbarActionListView: View {
             }
         }
         .toolbar {
-            if isPresented {
-                Button {
-                    Task { await viewModel.finsh() }
-                } label: {
-                    Text("Finish flow")
-                }
+            Button {
+                Task { await viewModel.finsh() }
+            } label: {
+                Text("Finish flow")
             }
         }
         .navigationTitle("Navigation List")

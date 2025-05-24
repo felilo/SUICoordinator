@@ -60,6 +60,10 @@ struct SheetView: View {
                         Task { await viewModel.close() }
                     }.buttonStyle(.borderedProminent)
                     
+                    Button("present view with custom presentation") {
+                        Task { await viewModel.presentViewWithCustomPresentation() }
+                    }.buttonStyle(.borderedProminent)
+                    
                     Button("Restart coordinator") {
                         Task { await viewModel.restart() }
                     }.buttonStyle(.borderedProminent)

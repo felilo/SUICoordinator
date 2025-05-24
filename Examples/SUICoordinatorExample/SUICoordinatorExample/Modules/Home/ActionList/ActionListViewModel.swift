@@ -33,7 +33,7 @@ class ActionListViewModel: ObservableObject {
     }
     
     @MainActor func navigateToFirstView() async {
-        await coordinator.navigateToPushView()
+        await coordinator.navigateToPushView(index: 1)
     }
     
     @MainActor func presentSheet() async {

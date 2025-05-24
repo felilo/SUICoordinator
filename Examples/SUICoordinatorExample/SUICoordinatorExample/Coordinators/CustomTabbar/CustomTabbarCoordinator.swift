@@ -31,10 +31,7 @@ public class CustomTabbarCoordinator: TabbarCoordinator<MyTabbarPage> {
     // MARK: Init
     // ---------------------------------------------------------------------
     
-    public init(
-        currentPage: MyTabbarPage = .first,
-        presentationStyle: TransitionPresentationStyle = .sheet
-    ) {
+    public init( currentPage: MyTabbarPage = .first ) {
         super.init(
             pages: Page.allCases,
             currentPage: currentPage

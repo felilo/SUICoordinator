@@ -42,24 +42,24 @@ class HomeCoordinator: Coordinator<HomeRoute> {
     // MARK: Aditional flows
     // ---------------------------------------------------------------------
     
-    func navigateToPushView() async {
-        let viewModel = PushViewModel(coordinator: self)
-        await router.navigate(to: .push(viewModel: viewModel), animated: animated)
+    func navigateToPushView(index: Int) async {
+        let viewModel = PushViewModel(coordinator: self, index: index)
+        await router.navigate(toRoute: .push(viewModel: viewModel), animated: animated)
     }
     
     func presentSheet() async {
         let viewModel = SheetViewModel(coordinator: self)
-        await router.navigate(to: .sheet(viewModel: viewModel), animated: animated)
+        await router.navigate(toRoute: .sheet(viewModel: viewModel), animated: animated)
     }
     
     func presentFullscreen() async {
         let viewModel = FullscreenViewModel(coordinator: self)
-        await router.navigate(to: .fullscreen(viewModel: viewModel), animated: animated)
+        await router.navigate(toRoute: .fullscreen(viewModel: viewModel), animated: animated)
     }
     
     func presentDetents() async {
         let viewModel = DetentsViewModel(coordinator: self)
-        await router.navigate(to: .detents(viewModel: viewModel), animated: animated)
+        await router.navigate(toRoute: .detents(viewModel: viewModel), animated: animated)
     }
     
     func presentTabbarCoordinator() async {

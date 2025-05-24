@@ -34,7 +34,7 @@ class SheetViewModel: ObservableObject {
     
     
     @MainActor func navigateToPushView() async {
-        await coordinator.navigateToPushView()
+        await coordinator.navigateToPushView(index: 0)
     }
     
     @MainActor func navigateToNextView() async {
@@ -55,5 +55,9 @@ class SheetViewModel: ObservableObject {
     
     @MainActor func restart() async {
         await coordinator.restart()
+    }
+    
+    @MainActor func presentViewWithCustomPresentation() async {
+        await coordinator.presentTabbarCoordinator()
     }
 }
