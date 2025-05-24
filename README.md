@@ -119,7 +119,7 @@ class ActionListViewModel: ObservableObject {
         self.coordinator = coordinator
     }
     
-    @MainActor func navigateToFirstView() async {
+    @MainActor func navigateToPushView() async {
         await coordinator.navigateToPushView()
     }
     

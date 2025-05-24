@@ -36,8 +36,11 @@ struct PushView: View {
     
     var body: some View {
         ZStack {
+            
+            Color.cyan.ignoresSafeArea()
+            
             VStack {
-                Text("Hello, PushView! \(viewModel.index)")
+                Text(viewModel.title)
                     .font(.largeTitle)
                 Text("Time: \(counter)")
                 
@@ -69,5 +72,5 @@ struct PushView: View {
 }
 
 #Preview {
-    PushView(viewModel: .init(coordinator: .init(), index: 1))
+    PushView(viewModel: .init(coordinator: .init(), title: "1"))
 }

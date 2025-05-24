@@ -27,11 +27,11 @@ import Foundation
 class PushViewModel: ObservableObject {
     
     var coordinator: HomeCoordinator
-    var index: Int
+    var title: String
     
-    init(coordinator: HomeCoordinator, index: Int) {
+    init(coordinator: HomeCoordinator, title: String) {
         self.coordinator = coordinator
-        self.index = index
+        self.title = title
     }
     
     @MainActor func navigateToNextView() async {
@@ -47,7 +47,7 @@ class PushViewModel: ObservableObject {
     }
     
     @MainActor func navigateToPushView() async {
-        await coordinator.navigateToPushView(index: index + 1)
+        await coordinator.navigateToPushView()
     }
     
     @MainActor func close() async {

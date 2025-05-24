@@ -42,8 +42,9 @@ class HomeCoordinator: Coordinator<HomeRoute> {
     // MARK: Aditional flows
     // ---------------------------------------------------------------------
     
-    func navigateToPushView(index: Int) async {
-        let viewModel = PushViewModel(coordinator: self, index: index)
+    func navigateToPushView() async {
+        let title = "Hello, PushView! \(router.items.count + 1)"
+        let viewModel = PushViewModel(coordinator: self, title: title)
         await router.navigate(toRoute: .push(viewModel: viewModel), animated: animated)
     }
     
@@ -60,6 +61,12 @@ class HomeCoordinator: Coordinator<HomeRoute> {
     func presentDetents() async {
         let viewModel = DetentsViewModel(coordinator: self)
         await router.navigate(toRoute: .detents(viewModel: viewModel), animated: animated)
+    }
+    
+    func presentViewWithCustomPresentation() async {
+        let title = "Custom, presentation view!"
+        let viewModel = PushViewModel(coordinator: self, title: title)
+        await router.navigate(toRoute: .viewCustomTransition(viewModel: viewModel), animated: animated)
     }
     
     func presentTabbarCoordinator() async {
