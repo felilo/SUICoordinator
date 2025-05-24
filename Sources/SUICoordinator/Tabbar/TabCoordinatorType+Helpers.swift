@@ -24,20 +24,29 @@
 
 extension TabCoordinatorType {
     
-    /// Sets the current page for the tabbar coordinator.
+    /// Sets the current page for the tab coordinator based on a child coordinator.
+    ///
+    /// This method finds the page that corresponds to the provided coordinator by matching
+    /// the coordinator's `tagId` with the page's position, then sets it as the current page.
     ///
     /// - Parameters:
-    ///   - coordinator: The coordinator.
+    ///   - coordinator: The child coordinator whose corresponding page should be set as current.
+    ///                  The coordinator's `tagId` should match the string representation of a page's position.
     @MainActor func setCurrentPage(with coordinator: any CoordinatorType) {
         let page = pages.first(where: { "\($0.position)" == coordinator.tagId })
         
         setCurrentPage(page)
     }
     
-    /// Sets the current page for the tabbar coordinator.
+    /// Sets the current page for the tab coordinator.
+    ///
+    /// This method updates the currently selected tab to the specified page. It performs validation
+    /// to ensure the page exists in the coordinator's pages array and is different from the current page
+    /// before making the change.
     ///
     /// - Parameters:
-    ///   - value: The optional current page to set.
+    ///   - value: The optional page to set as current. If `nil`, no change will be made.
+    ///            The page must exist in the `pages` array and be different from the current page.
     @MainActor public func setCurrentPage(_ value: (any TabPage)?) {
         guard let value, value.position != currentPage.position,
               let item = pages.first(where: { $0.position == value.position })
@@ -46,6 +55,13 @@ extension TabCoordinatorType {
         currentPage = item
     }
     
+    /// Pops all view controllers to the root of the currently selected tab's navigation stack.
+    ///
+    /// This is a convenience method that calls `popToRoot` on the router of the currently selected
+    /// tab coordinator. It's useful for resetting the navigation state of the active tab.
+    ///
+    /// - Note: This method will attempt to get the currently selected coordinator and pop to its root.
+    ///         If the selected coordinator cannot be determined, the operation will fail silently.
     @MainActor public func popToRoot() async {
         try? await getCoordinatorSelected().root.popToRoot(animated: true)
     }

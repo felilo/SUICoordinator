@@ -25,20 +25,56 @@
 import SwiftUI
 import Foundation
 
+/// A SwiftUI view that provides the default tab interface for tab coordinators.
+///
+/// `TabViewCoordinator` is the default implementation of a tab interface that works with
+/// tab coordinators. It creates a native SwiftUI `TabView` and manages the coordination
+/// between the tab interface and the underlying tab coordinator.
+///
+/// This view handles:
+/// - Displaying tabs with their associated content views
+/// - Managing tab selection and synchronization with the coordinator
+/// - Badge management for individual tabs
+/// - Automatic updates when pages or current page changes
+///
+/// - Note: This is an internal view used by `TabCoordinator` when no custom view is provided.
 struct TabViewCoordinator<DataSource: TabCoordinatorType>: View {
     
+    /// Type alias for the page type used by the data source.
     typealias Page = DataSource.Page
+    
+    /// Type alias for badge items used by the data source.
     typealias BadgeItem = DataSource.BadgeItem
     
     // ---------------------------------------------------------------------
     // MARK: Properties
     // ---------------------------------------------------------------------
     
+    /// The data source that provides tab coordinator functionality.
+    ///
+    /// This object manages the pages, current page selection, and badge updates.
     @StateObject var dataSource: DataSource
+    
+    /// The current badge states for all tabs.
+    ///
+    /// This array maintains the badge values for each tab, synchronized with the pages array.
     @State var badges = [BadgeItem]()
+    
+    /// The current array of pages to display as tabs.
+    ///
+    /// This array is synchronized with the data source's pages and updates when pages change.
     @State var pages = [Page]()
+    
+    /// The currently selected page.
+    ///
+    /// This value is bound to the TabView's selection and synchronized with the data source.
     @State var currentPage: Page
     
+    /// Initializes a new tab view coordinator.
+    ///
+    /// - Parameters:
+    ///   - dataSource: The tab coordinator that provides the data and coordination logic.
+    ///   - currentPage: The initial page to select. Should match the data source's current page.
     init(dataSource: DataSource, currentPage: Page) {
         self._dataSource = .init(wrappedValue: dataSource)
         self.currentPage = dataSource.currentPage
@@ -48,6 +84,10 @@ struct TabViewCoordinator<DataSource: TabCoordinatorType>: View {
     // MARK: View
     // ---------------------------------------------------------------------
     
+    /// The main view body that creates the tab interface.
+    ///
+    /// This view creates a SwiftUI `TabView` with tabs generated from the pages array.
+    /// It handles automatic updates when pages change and manages badge synchronization.
     public var body: some View {
         TabView(selection: $currentPage){
             ForEach(pages, id: \.id, content: tabBarItem)
@@ -73,6 +113,13 @@ struct TabViewCoordinator<DataSource: TabCoordinatorType>: View {
     // MARK: Helper funcs
     // ---------------------------------------------------------------------
     
+    /// Creates a tab bar item for a specific page.
+    ///
+    /// This method creates a complete tab item including the content view, tab item label,
+    /// badge (if applicable), and proper tagging for selection management.
+    ///
+    /// - Parameter page: The page to create a tab item for.
+    /// - Returns: A SwiftUI view representing the complete tab item.
     @ViewBuilder
     func tabBarItem(with page: Page) -> some View {
         if let item = dataSource.getCoordinator(with: page.position) {
@@ -87,6 +134,10 @@ struct TabViewCoordinator<DataSource: TabCoordinatorType>: View {
         }
     }
     
+    /// Retrieves the badge information for a specific page.
+    ///
+    /// - Parameter page: The page to get badge information for.
+    /// - Returns: The badge item for the page, or `nil` if no badge is set or the page is not found.
     private func badge(of page: Page) -> BadgeItem? {
         guard let index = getBadgeIndex(page: page) else {
             return nil
@@ -94,6 +145,10 @@ struct TabViewCoordinator<DataSource: TabCoordinatorType>: View {
         return badges[index]
     }
     
+    /// Gets the index of a page in the badges array.
+    ///
+    /// - Parameter page: The page to find the index for.
+    /// - Returns: The index of the page in the badges array, or `nil` if not found.
     private func getBadgeIndex(page: Page) -> Int? {
         badges.firstIndex(where: { $0.1 == page })
     }

@@ -25,9 +25,10 @@
 import Foundation
 import Combine
 
-/// A protocol representing a type for managing and coordinating a tabbar-based navigation.
+/// A protocol representing a type for managing and coordinating tab-based navigation.
 ///
-/// Tabbar coordinator types define the interface for handling the selected page and badge updates.
+/// Tab coordinator types define the interface for handling the selected page, badge updates,
+/// and retrieving associated coordinators.
 @MainActor
 public protocol TabCoordinatorType: ObservableObject {
     
@@ -35,9 +36,9 @@ public protocol TabCoordinatorType: ObservableObject {
     // MARK: Associated Type
     // ---------------------------------------------------------
     
-    /// The associated type representing the page associated with the tabbar coordinator.
+    /// The associated type representing the page associated with the tab coordinator.
     ///
-    /// This must conform to the `TabbarPage` protocol to ensure the page has the necessary properties and behavior.
+    /// This must conform to the `TabPage` protocol to ensure the page has the necessary properties and behavior.
     associatedtype Page: TabPage
     
     /// A typealias representing a badge item.
@@ -50,9 +51,9 @@ public protocol TabCoordinatorType: ObservableObject {
     // MARK: Properties
     // ---------------------------------------------------------
     
-    /// The currently selected page in the tabbar coordinator.
+    /// The currently selected page in the tab coordinator.
     ///
-    /// This property keeps track of the active page in the tab bar interface.
+    /// This property keeps track of the active page in the tab interface.
     var currentPage: Page { get set }
     
     /// A subject used for setting badge values on specific pages.
@@ -61,13 +62,13 @@ public protocol TabCoordinatorType: ObservableObject {
     /// the badge value and the associated page.
     var setBadge: PassthroughSubject<(String?, Page), Never> { get set }
     
-    /// An array representing all the pages managed by the tabbar coordinator.
+    /// An array representing all the pages managed by the tab coordinator.
     ///
     /// This property contains the complete list of pages, which typically corresponds to the tabs
-    /// displayed in the tab bar.
+    /// displayed in the tab interface.
     var pages: [Page] { get set }
     
-    /// A custom view associated with the tabbar coordinator.
+    /// A custom view associated with the tab coordinator.
     ///
     /// This closure provides a SwiftUI view for customization, which can be associated with a specific
     /// `Page`. The view is optional and can be left `nil` if no custom view is needed.
@@ -77,20 +78,22 @@ public protocol TabCoordinatorType: ObservableObject {
     // MARK: Functions
     // ---------------------------------------------------------
     
-    /// Retrieves the coordinator at a specified position in the tabbar.
+    /// Retrieves the coordinator at a specified position in the tab coordinator.
     ///
     /// - Parameter position: The index of the coordinator to retrieve.
     /// - Returns: The coordinator at the specified position, or `nil` if no coordinator exists at that index.
     func getCoordinator(with position: Int) -> (any CoordinatorType)?
     
-    /// Retrieves the currently selected coordinator within the tabbar.
+    /// Retrieves the currently selected coordinator within the tab coordinator.
     ///
     /// - Returns: The coordinator that corresponds to the selected tab.
     /// - Throws: An error if the selected coordinator cannot be determined.
     func getCoordinatorSelected() throws -> (any CoordinatorType)
     
+    /// Performs cleanup operations for the coordinator.
+    /// This method should be called to release resources or reset state when the coordinator is no longer needed.
     @MainActor func clean() async
 }
 
-/// A type alias representing a coordinator that conforms to both `CoordinatorType` and `TabbarCoordinatorType`.
+/// A type alias representing a coordinator that conforms to both `CoordinatorType` and `TabCoordinatorType`.
 public typealias TabCoordinatable = CoordinatorType & TabCoordinatorType
