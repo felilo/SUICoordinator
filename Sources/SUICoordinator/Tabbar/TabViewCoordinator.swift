@@ -37,14 +37,17 @@ import Foundation
 /// - Badge management for individual tabs
 /// - Automatic updates when pages or current page changes
 ///
-/// - Note: This is an internal view used by `TabCoordinator` when no custom view is provided.
-struct TabViewCoordinator<DataSource: TabCoordinatorType>: View {
+/// The view automatically synchronizes with the data source's published properties and
+/// responds to badge update events through the `setBadge` publisher.
+///
+/// - Note: This is the default view used by `TabCoordinator` when a custom `viewContainer` is not provided.
+public struct TabViewCoordinator<DataSource: TabCoordinatorType>: View {
     
     /// Type alias for the page type used by the data source.
-    typealias Page = DataSource.Page
+    public typealias Page = DataSource.Page
     
     /// Type alias for badge items used by the data source.
-    typealias BadgeItem = DataSource.BadgeItem
+    public typealias BadgeItem = DataSource.BadgeItem
     
     // ---------------------------------------------------------------------
     // MARK: Properties
@@ -75,7 +78,7 @@ struct TabViewCoordinator<DataSource: TabCoordinatorType>: View {
     /// - Parameters:
     ///   - dataSource: The tab coordinator that provides the data and coordination logic.
     ///   - currentPage: The initial page to select. Should match the data source's current page.
-    init(dataSource: DataSource, currentPage: Page) {
+    public init(dataSource: DataSource, currentPage: Page) {
         self._dataSource = .init(wrappedValue: dataSource)
         self.currentPage = dataSource.currentPage
     }

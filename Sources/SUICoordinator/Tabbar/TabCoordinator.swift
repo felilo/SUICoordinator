@@ -25,14 +25,58 @@
 import Foundation
 import Combine
 
-/// An open class representing a coordinator for managing tab-based navigation.
+/// A coordinator class for managing tab-based navigation in SwiftUI applications.
 ///
-/// `TabCoordinator` handles the navigation and coordination of pages within a tab interface.
-/// It manages child coordinators for each tab, handles page transitions, and provides
-/// badge management functionality.
+/// `TabCoordinator` provides a complete implementation of tab-based navigation that manages
+/// multiple child coordinators, each representing a separate navigation flow within a tab.
+/// It handles page transitions, badge management, and coordination between the tab interface
+/// and individual tab content.
 ///
-/// Each tab is represented by a `TabPage` and has an associated child coordinator that
-/// manages the navigation flow for that specific tab.
+/// ## Key Features
+/// - **Multi-tab Navigation**: Manages multiple independent navigation flows
+/// - **Badge Support**: Provides badge notifications for individual tabs
+/// - **Custom Views**: Supports custom tab interface implementations via `viewContainer`
+/// - **Child Coordinator Management**: Automatically manages lifecycle of child coordinators
+/// - **SwiftUI Integration**: Seamlessly integrates with SwiftUI's navigation system
+///
+/// ## Usage
+///
+/// Create a tab coordinator by defining your pages and providing a view container:
+///
+/// ```swift
+/// let tabCoordinator = TabCoordinator(
+///     pages: [.home, .profile, .settings],
+///     currentPage: .home,
+///     viewContainer: { coordinator in
+///         TabViewCoordinator(dataSource: coordinator, currentPage: coordinator.currentPage)
+///     }
+/// )
+/// ```
+///
+/// Each page should conform to `TabPage` and provide its own coordinator:
+///
+/// ```swift
+/// enum MyPage: TabPage {
+///     case home, profile, settings
+///     
+///     func coordinator() -> any CoordinatorType {
+///         switch self {
+///         case .home: return HomeCoordinator()
+///         case .profile: return ProfileCoordinator()
+///         case .settings: return SettingsCoordinator()
+///         }
+///     }
+/// }
+/// ```
+///
+/// ## Badge Management
+///
+/// Set badges on tabs using the `setBadge` publisher:
+///
+/// ```swift
+/// tabCoordinator.setBadge.send(("3", .profile)) // Show badge with "3"
+/// tabCoordinator.setBadge.send((nil, .profile)) // Remove badge
+/// ```
 open class TabCoordinator<Page: TabPage>: TabCoordinatable {
     
     // --------------------------------------------------------------------
@@ -47,11 +91,13 @@ open class TabCoordinator<Page: TabPage>: TabCoordinatable {
     /// The array of published pages associated with the tab coordinator.
     ///
     /// This array contains all the available tabs that can be displayed in the tab interface.
+    /// Changes to this array will automatically update the tab interface.
     @Published public var pages: [Page] = []
     
     /// The published current page associated with the tab coordinator.
     ///
-    /// This property tracks which tab is currently selected and active.
+    /// This property tracks which tab is currently selected and active. Updates to this
+    /// property will trigger tab selection changes in the interface.
     @Published public var currentPage: Page
     
     // --------------------------------------------------------------------
@@ -69,7 +115,7 @@ open class TabCoordinator<Page: TabPage>: TabCoordinatable {
     /// The array of children coordinators associated with the coordinator.
     ///
     /// Each child coordinator corresponds to a tab and manages the navigation flow for that tab.
-    /// The `tagId` of each child coordinator should match the position of its corresponding page.
+    /// The `tagId` of each child coordinator matches the position of its corresponding page.
     public var children: [(any CoordinatorType)] = []
     
     /// The tag identifier associated with the coordinator.
@@ -81,9 +127,10 @@ open class TabCoordinator<Page: TabPage>: TabCoordinatable {
     // MARK: TabCoordinatorType properties
     // --------------------------------------------------------------------
     
-    /// The presentation style for transitioning between pages.
+    /// The presentation style for the tab coordinator itself.
     ///
-    /// This defines how the tab coordinator itself is presented (e.g., as a sheet, full screen cover, etc.).
+    /// This defines how the tab coordinator is presented when started (e.g., as a sheet,
+    /// full screen cover, etc.). This is different from the navigation within individual tabs.
     private var presentationStyle: TransitionPresentationStyle
     
     /// A subject for setting badge values on specific tabs.
@@ -92,11 +139,13 @@ open class TabCoordinator<Page: TabPage>: TabCoordinatable {
     /// Send a tuple containing the badge value (or nil to remove) and the target page.
     public var setBadge: PassthroughSubject<(String?, Page), Never> = .init()
     
-    /// A custom view associated with the tab coordinator.
+    /// A closure that provides the custom view container for the tab interface.
     ///
-    /// If provided, this custom view will be used instead of the default `TabViewCoordinator`.
-    /// This allows for complete customization of the tab interface appearance and behavior.
-    public var customView: (() -> (Page.View?))?
+    /// This closure receives the `TabCoordinator` instance and returns a view that implements
+    /// the tab interface. If you want to use the default tab view, provide `TabViewCoordinator`.
+    /// For custom tab interfaces, implement your own view that conforms to the expected interface.
+    public var viewContainer: (TabCoordinator<Page>) -> (Page.View)
+    
     
     // ---------------------------------------------------------
     // MARK: Constructor
@@ -105,23 +154,31 @@ open class TabCoordinator<Page: TabPage>: TabCoordinatable {
     /// Initializes a new instance of `TabCoordinator`.
     ///
     /// - Parameters:
-    ///   - pages: The array of pages associated with the tab coordinator. Each page represents a tab.
-    ///   - currentPage: The initial current page for the tab coordinator. This tab will be selected by default.
-    ///   - presentationStyle: The presentation style for transitioning between pages. Defaults to `.sheet`.
-    ///   - customView: A custom view associated with the tab coordinator. If nil, uses the default tab view.
+    ///   - pages: The array of pages for the tab coordinator. Each page represents a tab and
+    ///           should provide its own coordinator through the `coordinator()` method.
+    ///   - currentPage: The initial current page for the tab coordinator. This tab will be
+    ///                 selected by default when the coordinator starts.
+    ///   - presentationStyle: The presentation style for the tab coordinator itself.
+    ///                       Defaults to `.sheet`. This controls how the entire tab interface
+    ///                       is presented, not the navigation within individual tabs.
+    ///   - viewContainer: A closure that provides the view container for the tab interface.
+    ///                   This closure receives the coordinator instance and should return
+    ///                   a view that implements the tab interface.
     ///
-    /// - Note: Make sure to set the `tagId` of each child coordinator to match the position of its corresponding page.
+    /// - Note: Make sure each page's `coordinator()` method returns a properly configured
+    ///         coordinator. The `tagId` of each child coordinator will be automatically set
+    ///         to match the position of its corresponding page.
     public init(
         pages: [Page],
         currentPage: Page,
         presentationStyle: TransitionPresentationStyle = .sheet,
-        customView: (() -> Page.View?)? = nil
+        viewContainer: @escaping (TabCoordinator<Page>) -> Page.View
     ) {
         self.router = .init()
         self.uuid = "\(NSStringFromClass(type(of: self))) - \(UUID().uuidString)"
         self.presentationStyle = presentationStyle
         self.currentPage = currentPage
-        self.customView = customView
+        self.viewContainer = viewContainer
         self.pages = pages
         
         router.isTabCoordinable = true
@@ -131,20 +188,24 @@ open class TabCoordinator<Page: TabPage>: TabCoordinatable {
     // MARK: Coordinator
     // --------------------------------------------------------
     
-    /// Starts the tab coordinator.
+    /// Starts the tab coordinator and presents the tab interface.
     ///
-    /// This method sets up the tab pages and their associated coordinators, then presents
-    /// the tab interface using either a custom view or the default `TabViewCoordinator`.
+    /// This method initializes all child coordinators for the provided pages, sets up
+    /// the tab interface, and presents it using the specified presentation style.
+    /// Each page's coordinator is created and properly configured with the correct `tagId`.
     ///
     /// - Parameters:
-    ///   - animated: A boolean value indicating whether to animate the start process. Defaults to `true`.
+    ///   - animated: A boolean value indicating whether to animate the presentation.
+    ///              Defaults to `true`.
     open func start(animated: Bool = true) async {
         setupPages(pages, currentPage: currentPage)
-        
-        let cView = customView?() ?? TabViewCoordinator(dataSource: self, currentPage: currentPage)
+        let cView = viewContainer
         
         await startFlow(
-            route: DefaultRoute(presentationStyle: presentationStyle) { cView },
+            route: .init(
+                presentationStyle: presentationStyle,
+                content: { cView(self) }
+            ),
             transitionStyle: presentationStyle,
             animated: animated)
     }
@@ -156,21 +217,25 @@ open class TabCoordinator<Page: TabPage>: TabCoordinatable {
     /// Retrieves the coordinator at a specific position within the tab coordinator.
     ///
     /// This method searches through the child coordinators to find one with a `tagId`
-    /// that matches the specified position.
+    /// that matches the specified position converted to a string.
     ///
     /// - Parameters:
-    ///   - position: The position of the coordinator to retrieve.
-    /// - Returns: The coordinator at the specified position, or `nil` if no coordinator is found.
+    ///   - position: The zero-based position of the coordinator to retrieve.
+    /// - Returns: The coordinator at the specified position, or `nil` if no coordinator
+    ///           is found at that position.
     public func getCoordinator(with position: Int) -> (any CoordinatorType)? {
         children.first { $0.tagId == "\(position)" }
     }
     
     /// Retrieves the currently selected coordinator within the tab coordinator.
     ///
-    /// This method finds the child coordinator that corresponds to the currently active tab.
+    /// This method finds the child coordinator that corresponds to the currently active tab
+    /// by matching the current page's position with the coordinator's `tagId`.
     ///
     /// - Returns: The coordinator that corresponds to the currently selected tab.
-    /// - Throws: `TabCoordinatorError.coordinatorSelected` if the selected coordinator cannot be found.
+    /// - Throws: `TabCoordinatorError.coordinatorSelected` if the selected coordinator
+    ///          cannot be found. This can happen if the current page's position doesn't
+    ///          match any child coordinator's `tagId`.
     open func getCoordinatorSelected() throws -> (any CoordinatorType) {
         guard let index = children.firstIndex(where: { $0.tagId == "\(currentPage.position)" })
         else { throw TabCoordinatorError.coordinatorSelected }
@@ -179,11 +244,16 @@ open class TabCoordinator<Page: TabPage>: TabCoordinatable {
     
     /// Performs cleanup operations for the tab coordinator.
     ///
-    /// This method clears all pages, cleans up the router, and releases the custom view.
-    /// It should be called when the tab coordinator is no longer needed to free up resources.
+    /// This method clears all pages, cleans up the router, and releases resources.
+    /// It should be called when the tab coordinator is no longer needed to prevent
+    /// memory leaks and ensure proper cleanup of all child coordinators.
+    ///
+    /// The cleanup process:
+    /// 1. Clears all pages and resets the current page
+    /// 2. Cleans up the router and dismisses any presented views
+    /// 3. Releases references to child coordinators
     @MainActor public func clean() async {
         await setPages([], currentPage: nil)
         await router.clean(animated: false)
-        customView = nil
     }
 }

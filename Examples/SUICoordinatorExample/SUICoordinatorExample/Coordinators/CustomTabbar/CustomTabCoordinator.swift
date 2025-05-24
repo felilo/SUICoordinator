@@ -34,10 +34,9 @@ public class CustomTabCoordinator: TabCoordinator<MyTabbarPage> {
     public init( currentPage: MyTabbarPage = .first ) {
         super.init(
             pages: Page.allCases,
-            currentPage: currentPage
+            currentPage: currentPage,
+            viewContainer: { CustomTabView(viewModel: $0) }
         )
-        
-        customView = { CustomTabView(viewModel: self) }
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
             self?.setBadge.send(( "2", .first ))
