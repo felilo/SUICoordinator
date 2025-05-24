@@ -200,8 +200,8 @@ extension CoordinatorType {
         
         if effectivePresentationStyle == .push {
             effectivePresentationStyle = .custom(
-                transition: .opacity.combined(with: .move(edge: .trailing)),
-                animation: .default,
+                transition: .move(edge: .trailing),
+                animation: .easeOut,
                 fullScreen: false
             )
         }
