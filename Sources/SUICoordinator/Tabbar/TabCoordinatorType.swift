@@ -38,7 +38,7 @@ public protocol TabCoordinatorType: ObservableObject {
     /// The associated type representing the page associated with the tabbar coordinator.
     ///
     /// This must conform to the `TabbarPage` protocol to ensure the page has the necessary properties and behavior.
-    associatedtype Page: TabbarPage
+    associatedtype Page: TabPage
     
     /// A typealias representing a badge item.
     ///

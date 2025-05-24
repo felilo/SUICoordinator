@@ -25,7 +25,7 @@
 import Foundation
 
 /// A protocol representing a type for managing and providing a coordinator for tabbar navigation.
-public protocol TabbarNavigationRouter: Sendable {
+public protocol TabNavigationRouter: Sendable {
     
     // ---------------------------------------------------------
     // MARK: Functions

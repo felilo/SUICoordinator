@@ -27,8 +27,8 @@ import Combine
 
 /// An open class representing a coordinator for managing a tabbar-based navigation.
 ///
-/// Tabbar coordinators handle the navigation and coordination of pages within a tabbar.
-open class TabbarCoordinator<Page: TabbarPage>: TabCoordinatable {
+/// Tab coordinators handle the navigation and coordination of pages within a tabbar.
+open class TabCoordinator<Page: TabPage>: TabCoordinatable {
     
     // --------------------------------------------------------------------
     // MARK: Wrapper properties
@@ -136,7 +136,7 @@ open class TabbarCoordinator<Page: TabbarPage>: TabCoordinatable {
     /// - Returns: The selected coordinator.
     open func getCoordinatorSelected() throws -> (any CoordinatorType) {
         guard let index = children.firstIndex(where: { $0.tagId == "\(currentPage.position)" })
-        else { throw TabbarCoordinatorError.coordinatorSelected }
+        else { throw TabCoordinatorError.coordinatorSelected }
         return children[index]
     }
     

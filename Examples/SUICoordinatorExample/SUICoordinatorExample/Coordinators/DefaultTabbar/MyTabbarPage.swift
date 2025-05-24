@@ -26,7 +26,7 @@ import SUICoordinator
 import SwiftUI
 
 
-public enum MyTabbarPage: TabbarPage, CaseIterable {
+public enum MyTabbarPage: TabPage, CaseIterable {
     
     case first
     case second

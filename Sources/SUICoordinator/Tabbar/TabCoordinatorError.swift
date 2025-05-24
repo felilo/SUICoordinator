@@ -25,7 +25,7 @@
 import Foundation
 
 /// An enumeration representing errors specific to `TabbarCoordinator`.
-public enum TabbarCoordinatorError: LocalizedError {
+public enum TabCoordinatorError: LocalizedError {
     
     /// An error case indicating that no coordinator is selected.
     case coordinatorSelected

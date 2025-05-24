@@ -38,7 +38,7 @@ extension TabCoordinatorType {
     ///
     /// - Parameters:
     ///   - value: The optional current page to set.
-    @MainActor public func setCurrentPage(_ value: (any TabbarPage)?) {
+    @MainActor public func setCurrentPage(_ value: (any TabPage)?) {
         guard let value, value.position != currentPage.position,
               let item = pages.first(where: { $0.position == value.position })
         else { return  }

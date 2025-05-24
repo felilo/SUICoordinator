@@ -25,7 +25,7 @@
 import Foundation
 import SUICoordinator
 
-class DefaultTabbarCoordinator: TabbarCoordinator<MyTabbarPage> {
+class DefaultTabbarCoordinator: TabCoordinator<MyTabbarPage> {
     
     // ---------------------------------------------------------------------
     // MARK: Init
