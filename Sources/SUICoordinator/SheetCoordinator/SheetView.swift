@@ -124,6 +124,7 @@ struct SheetView<Content: View, T: SheetItemType>: View {
                 transition: transition,
                 animation: animation,
                 animated: animated,
+                isFullScreen: isFullScreen,
                 onDismiss: { _ in onDismiss?("\(index)") },
                 onDidLoad: onDidLoad,
                 content: { content(index, $0) }

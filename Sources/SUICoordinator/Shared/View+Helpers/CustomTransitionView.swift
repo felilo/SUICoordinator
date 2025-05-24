@@ -44,6 +44,7 @@ struct CustomTransitionView<Item: SheetItemType, Content: View>: View {
     var transition: AnyTransition
     var animation: Animation?
     let animated: Bool
+    let isFullScreen: Bool
     
     // ---------------------------------------------------------
     // MARK: Constructor
@@ -54,6 +55,7 @@ struct CustomTransitionView<Item: SheetItemType, Content: View>: View {
         transition: AnyTransition,
         animation: Animation?,
         animated: Bool,
+        isFullScreen: Bool,
         onDismiss: ActionClosure? = nil,
         onDidLoad: ActionClosure? = nil,
         @ViewBuilder content: @escaping (Item) -> Content
@@ -65,6 +67,7 @@ struct CustomTransitionView<Item: SheetItemType, Content: View>: View {
         self.animated = animated
         self.onDismiss = onDismiss
         self.onDidLoad = onDidLoad
+        self.isFullScreen = isFullScreen
     }
     
     // ---------------------------------------------------------
@@ -124,6 +127,9 @@ struct CustomTransitionView<Item: SheetItemType, Content: View>: View {
         if animated {
             try? await Task.sleep(for: .seconds(duration))
         }
+        
+        guard !isFullScreen else { return (item = nil) }
+        
         onDismiss?("")
     }
 }

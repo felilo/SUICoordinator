@@ -165,8 +165,6 @@ final public class SheetCoordinator<T>: ObservableObject {
               (await itemManager.isValid(index: index))
         else { return }
         
-        
-        
         if let id = backUpItems[index] {
             await onRemoveItem?(id)
             backUpItems.removeValue(forKey: index)
