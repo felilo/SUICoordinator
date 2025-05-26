@@ -31,7 +31,7 @@ struct RouterView<Router: RouterType>: View {
     // MARK: Properties
     // --------------------------------------------------------------------
     
-    @StateObject var viewModel: Router
+    @ObservedObject var viewModel: Router
     @State private var mainView: AnyView?
     
     // --------------------------------------------------------------------
