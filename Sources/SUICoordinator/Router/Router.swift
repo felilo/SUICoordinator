@@ -380,4 +380,28 @@ public class Router<Route: RouteType>: ObservableObject, RouterType {
     func updateItems() async {
         items = await itemManager.getAllItems()
     }
+    
+    /// Synchronizes the router's items array with the internal item manager state.
+    ///
+    /// This method ensures consistency between the published items array and the internal
+    /// navigation stack state. It's particularly useful for resolving state discrepancies
+    /// that might occur during complex navigation operations or when the navigation stack
+    /// gets out of sync with the UI representation.
+    ///
+    /// The synchronization process compares the count of items in the published array
+    /// with the internal item manager's count. If there are fewer items in the published
+    /// array, it removes the excess items from the manager and updates the published state.
+    ///
+    /// This method is typically called automatically by the router's internal mechanisms
+    /// and should rarely need to be called directly by client code.
+    public func syncItems() async {
+        let counterManagerItems = await itemManager.getAllItems().count
+        let counterItems = items.count
+        
+        if counterItems < counterManagerItems {
+            let range = counterItems..<counterManagerItems
+            await itemManager.removeItemsIn(range: range)
+            await updateItems()
+        }
+    }
 }

@@ -53,7 +53,7 @@ struct RouterView<Router: RouterType>: View {
     }
     
     // --------------------------------------------------------------------
-    // MARK: Helper funcs
+    // MARK: View helper functions
     // --------------------------------------------------------------------
     
     
@@ -63,10 +63,10 @@ struct RouterView<Router: RouterType>: View {
             addSheetTo(view: mainView)
         } else {
             let view = NavigationStack(path: $viewModel.items) {
-                mainView.navigationDestination(for: Router.Route.self) {
-                    AnyView($0.view)
-                }
-            }.transaction { $0.disablesAnimations = !viewModel.animated }
+                mainView.navigationDestination(for: Router.Route.self) { AnyView($0.view) }
+            }
+                .transaction { $0.disablesAnimations = !viewModel.animated }
+                .onChange(of: viewModel.items, perform: onChangeItems)
             
             addSheetTo(view: view)
         }
@@ -76,13 +76,17 @@ struct RouterView<Router: RouterType>: View {
     private func addSheetTo(view: (some View)?) -> some View {
         view
             .sheetCoordinator(
-            coordinator: viewModel.sheetCoordinator,
-            onDissmis: { index in Task(priority: .high) { @MainActor [weak viewModel] in
-                await viewModel?.removeItemFromSheetCoordinator(at: index)
-            }},
-            onDidLoad: nil
-        )
+                coordinator: viewModel.sheetCoordinator,
+                onDissmis: { index in Task(priority: .high) { @MainActor [weak viewModel] in
+                    await viewModel?.removeItemFromSheetCoordinator(at: index)
+                }},
+                onDidLoad: nil
+            )
     }
+    
+    // --------------------------------------------------------------------
+    // MARK: Helper functions
+    // --------------------------------------------------------------------
     
     private func onChangeFirstView(_ value: Router.Route?) {
         guard let view = value?.view else {
@@ -90,5 +94,9 @@ struct RouterView<Router: RouterType>: View {
         }
         
         mainView = AnyView(view)
+    }
+    
+    private func onChangeItems(_ value: [Router.Route]) {
+        Task { await viewModel.syncItems() }
     }
 }
