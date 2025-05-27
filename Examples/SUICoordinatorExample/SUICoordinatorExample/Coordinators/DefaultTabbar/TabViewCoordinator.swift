@@ -23,7 +23,7 @@
 //
 
 import SwiftUI
-import Foundation
+import SUICoordinator
 
 /// A SwiftUI view that provides the default tab interface for tab coordinators.
 ///
@@ -41,7 +41,7 @@ import Foundation
 /// responds to badge update events through the `setBadge` publisher.
 ///
 /// - Note: This is the default view used by `TabCoordinator` when a custom `viewContainer` is not provided.
-public struct TabViewCoordinator<DataSource: TabCoordinatorType>: View {
+public struct TabViewCoordinator<DataSource: TabCoordinatorType>: View where DataSource.DataSourcePage == MyTabPageDataSource {
     
     /// Type alias for the page type used by the data source.
     public typealias Page = DataSource.Page
@@ -129,8 +129,8 @@ public struct TabViewCoordinator<DataSource: TabCoordinatorType>: View {
             AnyView( item.getView() )
                 .tabItem {
                     Label(
-                        title: { AnyView(page.title) },
-                        icon: { AnyView(page.icon) } )
+                        title: { page.dataSource.title },
+                        icon: { page.dataSource.icon } )
                 }
                 .badge(badge(of: page)?.value)
                 .tag(page)

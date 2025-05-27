@@ -25,7 +25,7 @@
 import SwiftUI
 import SUICoordinator
 
-struct CustomTabView<DataSource: TabCoordinatorType>: View {
+struct CustomTabView<DataSource: TabCoordinatorType>: View where DataSource.DataSourcePage == MyTabPageDataSource {
     
     // ---------------------------------------------------------------------
     // MARK: Typealias
@@ -108,7 +108,7 @@ struct CustomTabView<DataSource: TabCoordinatorType>: View {
     @ViewBuilder
     func tabBarItem(page: Page) -> some View {
         if let item = viewModel.getCoordinator(with: page.position) {
-            AnyView( item.getView() )
+            AnyView(item.getView())
                 .toolbar(.hidden)
                 .tag(page)
         }
@@ -121,8 +121,8 @@ struct CustomTabView<DataSource: TabCoordinatorType>: View {
         } label: {
             ZStack(alignment: .bottom) {
                 VStack(alignment: .center , spacing: 2) {
-                    AnyView(page.icon)
-                    AnyView(page.title)
+                    page.dataSource.icon
+                    page.dataSource.title
                 }.foregroundColor(currentPage == page ? .blue : .black)
             }
         }

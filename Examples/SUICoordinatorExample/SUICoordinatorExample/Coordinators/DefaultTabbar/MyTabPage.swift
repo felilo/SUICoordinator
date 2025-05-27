@@ -23,8 +23,6 @@
 //
 
 import SUICoordinator
-import SwiftUI
-
 
 public enum MyTabPage: TabPage, CaseIterable {
     
@@ -34,22 +32,6 @@ public enum MyTabPage: TabPage, CaseIterable {
     // ---------------------------------------------------------
     // MARK: TabbarPage
     // ---------------------------------------------------------
-    
-    @ViewBuilder
-    public var icon: (any View) {
-        switch self {
-            case .first: Image.init(systemName: "homekit")
-            case .second: Image.init(systemName: "gear")
-        }
-    }
-    
-    @ViewBuilder
-    public var title: (any View) {
-        switch self {
-            case .first: Text("first")
-            case .second: Text("second")
-        }
-    }
     
     public var position: Int {
         switch self {
@@ -65,5 +47,9 @@ public enum MyTabPage: TabPage, CaseIterable {
             case .second:
                 return TabFlowCoordinator()
         }
+    }
+    
+    public var dataSource: MyTabPageDataSource {
+        .init(page: self)
     }
 }
