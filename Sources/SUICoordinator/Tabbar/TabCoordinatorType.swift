@@ -68,6 +68,13 @@ public protocol TabCoordinatorType: ObservableObject {
     /// The value can be `nil` to indicate no badge should be displayed.
     typealias BadgeItem = (value: String?, page: Page)
     
+    /// A typealias representing the data source page type.
+    ///
+    /// This provides a convenient reference to the data source associated with the page type,
+    /// which contains the visual representation and configuration data for tabs.
+    typealias DataSourcePage = Page.DataSource
+    
+    
     // ---------------------------------------------------------
     // MARK: Properties
     // ---------------------------------------------------------
@@ -118,9 +125,19 @@ public protocol TabCoordinatorType: ObservableObject {
     
     /// Retrieves the coordinator at a specified position in the tab coordinator.
     ///
+    /// This method allows you to access child coordinators by their position in the tab bar,
+    /// which is useful for programmatic navigation or coordinator interaction.
+    ///
     /// - Parameter position: The zero-based index of the coordinator to retrieve.
     /// - Returns: The coordinator at the specified position, or `nil` if no coordinator
     ///           exists at that index or the position is out of bounds.
+    ///
+    /// ## Example Usage
+    /// ```swift
+    /// if let firstCoordinator = tabCoordinator.getCoordinator(with: 0) {
+    ///     // Interact with the first tab's coordinator
+    /// }
+    /// ```
     func getCoordinator(with position: Int) -> (any CoordinatorType)?
     
     /// Retrieves the currently selected coordinator within the tab coordinator.
@@ -130,13 +147,34 @@ public protocol TabCoordinatorType: ObservableObject {
     ///
     /// - Returns: The coordinator that corresponds to the currently selected tab.
     /// - Throws: An error if the selected coordinator cannot be determined or found.
+    ///
+    /// ## Example Usage
+    /// ```swift
+    /// do {
+    ///     let activeCoordinator = try tabCoordinator.getCoordinatorSelected()
+    ///     // Work with the active coordinator
+    /// } catch {
+    ///     print("Failed to get selected coordinator: \(error)")
+    /// }
+    /// ```
     func getCoordinatorSelected() throws -> (any CoordinatorType)
     
     /// Performs cleanup operations for the coordinator.
     ///
     /// This method should be called to release resources, clear state, and properly
     /// dispose of child coordinators when the tab coordinator is no longer needed.
-    /// It's important to call this method to prevent memory leaks.
+    /// It's essential to call this method to prevent memory leaks.
+    ///
+    /// The cleanup process typically includes:
+    /// - Releasing child coordinators
+    /// - Clearing cached data
+    /// - Canceling active subscriptions
+    /// - Resetting internal state
+    ///
+    /// ## Example Usage
+    /// ```swift
+    /// await tabCoordinator.clean()
+    /// ```
     @MainActor func clean() async
 }
 
