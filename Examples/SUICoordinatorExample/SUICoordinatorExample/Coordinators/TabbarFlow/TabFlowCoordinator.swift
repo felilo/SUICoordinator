@@ -1,5 +1,5 @@
 //
-//  TabbarFlowCoordinator.swift
+//  TabFlowCoordinator.swift
 //
 //  Copyright (c) Andres F. Lozano
 //
@@ -25,7 +25,7 @@
 import Foundation
 import SUICoordinator
 
-class TabbarFlowCoordinator: Coordinator<DefaultRoute> {
+class TabFlowCoordinator: Coordinator<DefaultRoute> {
     
     // ---------------------------------------------------------------------
     // MARK: Coordinator

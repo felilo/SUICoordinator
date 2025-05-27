@@ -26,9 +26,9 @@ import Foundation
 
 class TabbarActionListViewModel: ObservableObject {
     
-    let coordinator: TabbarFlowCoordinator
+    let coordinator: TabFlowCoordinator
     
-    init(coordinator: TabbarFlowCoordinator) {
+    init(coordinator: TabFlowCoordinator) {
         self.coordinator = coordinator
     }
     

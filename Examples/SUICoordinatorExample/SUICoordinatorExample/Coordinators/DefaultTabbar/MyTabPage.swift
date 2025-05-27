@@ -26,7 +26,7 @@ import SUICoordinator
 import SwiftUI
 
 
-public enum MyTabbarPage: TabPage, CaseIterable {
+public enum MyTabPage: TabPage, CaseIterable {
     
     case first
     case second
@@ -63,7 +63,7 @@ public enum MyTabbarPage: TabPage, CaseIterable {
             case .first:
                 return HomeCoordinator()
             case .second:
-                return TabbarFlowCoordinator()
+                return TabFlowCoordinator()
         }
     }
 }
