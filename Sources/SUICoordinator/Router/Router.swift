@@ -268,7 +268,7 @@ public class Router<Route: RouteType>: ObservableObject, RouterType {
     @MainActor public func close(animated: Bool = true, finishFlow: Bool = false) async -> Void {
         if !(await sheetCoordinator.areEmptyItems) {
             await dismiss(animated: animated)
-            try? await Task.sleep(for: .seconds(animated ? 0.2 : 1))
+            try? await Task.sleep(for: .seconds(animated ? 0.2 : 0.1))
         } else if !(await itemManager.areItemsEmpty()) {
             await pop(animated: animated)
         }

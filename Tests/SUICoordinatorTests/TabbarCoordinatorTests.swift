@@ -33,7 +33,7 @@ final class TabbarCoordinatorTests: XCTestCase {
     
     @MainActor func test_setPages() async throws {
         let sut = makeSUT()
-        let pages = [AnyEnumTabbarRoute.tab2]
+        let pages = [AnyEnumTabRoute.tab2]
         
         await sut.start(animated: animated)
         await sut.setPages(pages)
@@ -61,7 +61,7 @@ final class TabbarCoordinatorTests: XCTestCase {
         await sut.setPages([])
         
         XCTAssertThrowsError(try sut.getCoordinatorSelected(), "Expected error xxx got success") { error in
-            XCTAssertEqual(error.localizedDescription, TabbarCoordinatorError.coordinatorSelected.localizedDescription)
+            XCTAssertEqual(error.localizedDescription, TabCoordinatorError.coordinatorSelected.localizedDescription)
         }
         await finishFlow(sut: sut)
     }
@@ -84,8 +84,8 @@ final class TabbarCoordinatorTests: XCTestCase {
         
         let coordinatorSelected = try sut.getCoordinatorSelected() as? AnyCoordinator
         
-        await coordinatorSelected?.router.navigate(to: .pushStep2)
-        await coordinatorSelected?.router.navigate(to: .pushStep3)
+        await coordinatorSelected?.router.navigate(toRoute: .pushStep2)
+        await coordinatorSelected?.router.navigate(toRoute: .pushStep3)
         XCTAssertEqual(coordinatorSelected?.router.items.count, 2)
         
         await sut.popToRoot()
@@ -130,12 +130,12 @@ final class TabbarCoordinatorTests: XCTestCase {
     
     @MainActor func test_get_coordinator_at_position() async throws {
         let sut = makeSUT()
-        let pages = [AnyEnumTabbarRoute.tab2, .tab1]
+        let pages = [AnyEnumTabRoute.tab2, .tab1]
         
         await sut.start(animated: animated)
         await sut.setPages(pages)
         
-        let coordinator = sut.getCoordinator(with: AnyEnumTabbarRoute.tab2.position)
+        let coordinator = sut.getCoordinator(with: AnyEnumTabRoute.tab2.position)
         XCTAssertNotNil(coordinator)
         
         let coordinatorNil = sut.getCoordinator(with: 500)
@@ -146,26 +146,26 @@ final class TabbarCoordinatorTests: XCTestCase {
     
     @MainActor func test_start_coordinator() async throws {
         let sut = makeSUT()
-        let pages = [AnyEnumTabbarRoute.tab2, .tab1]
+        let pages = [AnyEnumTabRoute.tab2, .tab1]
         
         await sut.start(animated: animated)
         await sut.setPages(pages)
         
         let view = try XCTUnwrap(sut.router.mainView?.view)
         
-        XCTAssertEqual(self.getNameOf(object: view), self.getNameOf(object: TabbarCoordinatorView<TabbarCoordinator<AnyEnumTabbarRoute>>.self))
+        XCTAssertEqual(self.getNameOf(object: view), self.getNameOf(object: AnyTabView<TabCoordinator<AnyEnumTabRoute>>.self))
         
         await finishFlow(sut: sut)
     }
     
     @MainActor func test_finishCoordinator_from_child() async throws {
         let sut = makeSUT()
-        let pages = [AnyEnumTabbarRoute.tab2, .tab1]
+        let pages = [AnyEnumTabRoute.tab2, .tab1]
         
         await sut.start(animated: animated)
         await sut.setPages(pages)
         
-        let coordinator = sut.getCoordinator(with: AnyEnumTabbarRoute.tab2.position)
+        let coordinator = sut.getCoordinator(with: AnyEnumTabRoute.tab2.position)
         
         await coordinator?.finishFlow(animated: animated)
         
@@ -178,11 +178,11 @@ final class TabbarCoordinatorTests: XCTestCase {
     // --------------------------------------------------------------------
     
     @MainActor private func makeSUT(
-        currentPage: AnyEnumTabbarRoute = AnyEnumTabbarRoute.tab1,
+        currentPage: AnyEnumTabRoute = AnyEnumTabRoute.tab1,
         file: StaticString = #filePath,
         line: UInt = #line
-    ) -> AnyTabbarCoordinator {
-        let coordinator = AnyTabbarCoordinator(currentPage: currentPage)
+    ) -> AnyTabCoordinator {
+        let coordinator = AnyTabCoordinator(currentPage: currentPage)
         trackForMemoryLeaks(coordinator, file: file, line: line)
         return coordinator
     }

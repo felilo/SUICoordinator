@@ -26,33 +26,23 @@ import SwiftUI
 @testable import SUICoordinator
 
 
-class AnyTabbarCoordinator: TabbarCoordinator<AnyEnumTabbarRoute> {
-    init(currentPage: AnyEnumTabbarRoute = .tab1) {
-        super.init(pages: Page.sortedByPosition(), currentPage: currentPage)
+class AnyTabCoordinator: TabCoordinator<AnyEnumTabRoute> {
+    init(currentPage: AnyEnumTabRoute = .tab1) {
+        super.init(
+            pages: Page.sortedByPosition(),
+            currentPage: currentPage,
+            viewContainer: { AnyTabView(dataSource: $0) }
+        )
     }
 }
 
 
-enum AnyEnumTabbarRoute: TabbarPage, CaseIterable {
+enum AnyEnumTabRoute: TabPage, CaseIterable {
     case tab1
     case tab2
     
     
-    @ViewBuilder
-    public var icon: (any View) {
-        switch self {
-            case .tab1: Image.init(systemName: "homekit")
-            case .tab2: Image.init(systemName: "gear")
-        }
-    }
-    
-    @ViewBuilder
-    public var title: (any View) {
-        switch self {
-            case .tab1: Text("Tab1")
-            case .tab2: Text("Tab2")
-        }
-    }
+    var dataSource: AnyTabDataSource { .init()  }
     
     public var position: Int {
         switch self {
@@ -70,3 +60,13 @@ enum AnyEnumTabbarRoute: TabbarPage, CaseIterable {
         }
     }
 }
+
+struct AnyTabDataSource { }
+
+struct AnyTabView<DataSource: TabCoordinatorType>: View where DataSource.DataSourcePage == AnyTabDataSource {
+    let dataSource: DataSource
+    
+    var body: some View { EmptyView() }
+}
+
+

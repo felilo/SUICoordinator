@@ -168,7 +168,6 @@ final public class SheetCoordinator<T>: ObservableObject {
     @MainActor public func presentSheet(_ sheet: Item) async -> Void {
         animated = sheet.animated
         lastPresentationStyle = sheet.presentationStyle
-        let id = sheet.id
         
         await itemManager.addItem(sheet)
         await backUpItems[totalItems] = sheet.id
@@ -259,12 +258,13 @@ final public class SheetCoordinator<T>: ObservableObject {
         }
         
         guard (await itemManager.removeItem(at: index)) != nil else {
-            return await updateLastPresentationStyle()
+            await updateLastPresentationStyle()
+            return await updateItems()
         }
         
         await handleRemove(index: index - 1)
         await updateLastPresentationStyle()
-        await updateItems()
+        await removeAllNilItems()
     }
     
     /// Cleans up the sheet coordinator, optionally animating the cleanup process.
@@ -321,8 +321,9 @@ final public class SheetCoordinator<T>: ObservableObject {
     ///
     /// This cleanup method ensures the items array doesn't accumulate nil values,
     /// maintaining a clean state for the sheet stack.
-    @MainActor func removeAllNilItems() async {
+    func removeAllNilItems() async {
         await itemManager.removeAllNilItems()
+        await updateItems()
     }
     
     /// Updates the `items` published property with the current state from the `itemManager`.
