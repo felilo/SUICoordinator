@@ -223,7 +223,7 @@ open class TabCoordinator<Page: TabPage>: TabCoordinatable {
     ///   - position: The zero-based position of the coordinator to retrieve.
     /// - Returns: The coordinator at the specified position, or `nil` if no coordinator
     ///           is found at that position.
-    public func getCoordinator(with position: Int) -> (any CoordinatorType)? {
+    public func getCoordinator(with position: Int) -> AnyCoordinatorType? {
         children.first { $0.tagId == "\(position)" }
     }
     

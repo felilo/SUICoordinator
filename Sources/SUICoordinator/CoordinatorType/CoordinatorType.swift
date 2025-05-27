@@ -34,13 +34,6 @@ import Foundation
 public protocol CoordinatorType: SCHashable, ObservableObject {
     
     // ---------------------------------------------------------
-    // MARK: Type Aliases
-    // ---------------------------------------------------------
-    
-    /// A type alias representing any coordinator conforming to CoordinatorType.
-    typealias TCoordinatorType = (any CoordinatorType)
-    
-    // ---------------------------------------------------------
     // MARK: Associated Type
     // ---------------------------------------------------------
     
@@ -58,10 +51,10 @@ public protocol CoordinatorType: SCHashable, ObservableObject {
     var tagId: String? { get set }
     
     /// The parent coordinator, if any, to which this coordinator is a child.
-    var parent: TCoordinatorType! { get set }
+    var parent: AnyCoordinatorType! { get set }
     
     /// An array of child coordinators associated with this coordinator.
-    var children: [TCoordinatorType] { get set }
+    var children: [AnyCoordinatorType] { get set }
     
     /// The router responsible for navigation within the coordinator.
     var router: Router<Route> { get set }

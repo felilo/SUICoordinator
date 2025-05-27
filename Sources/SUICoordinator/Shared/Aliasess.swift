@@ -6,3 +6,4 @@
 //
 
 public typealias ActionClosure = (String) -> Void
+public typealias AnyCoordinatorType = (any CoordinatorType)

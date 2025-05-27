@@ -45,7 +45,7 @@ public extension CoordinatorType {
     ///     await topCoordinator.navigate(to: newCoordinator, presentationStyle: .sheet)
     /// }
     /// ```
-    func topCoordinator(pCoodinator: TCoordinatorType? = nil) throws -> TCoordinatorType? {
+    func topCoordinator(pCoodinator: AnyCoordinatorType? = nil) throws -> AnyCoordinatorType? {
         guard children.last != nil else { return self }
         var auxCoordinator = pCoodinator ?? self.children.last
         return try getDeepCoordinator(from: &auxCoordinator)
@@ -73,7 +73,7 @@ public extension CoordinatorType {
     /// )
     /// ```
     func navigate(
-        to coordinator: TCoordinatorType,
+        to coordinator: AnyCoordinatorType,
         presentationStyle: TransitionPresentationStyle,
         animated: Bool = true
     ) async -> Void {
