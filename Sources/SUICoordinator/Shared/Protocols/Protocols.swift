@@ -48,7 +48,9 @@ public extension SCEquatable {
 /// Conforming types automatically get an identifier based on their type name.
 /// - Important: The identifier is based on the type name using `String(describing: self.self)`.
 /// - SeeAlso: `Identifiable`
-public protocol SCIdentifiable: Identifiable {}
+public protocol SCIdentifiable: Identifiable {
+    var id: String { get }
+}
 
 extension SCIdentifiable {
     /// The default identifier based on the type's name.

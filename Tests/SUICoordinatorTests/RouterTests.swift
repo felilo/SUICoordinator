@@ -32,7 +32,7 @@ final class RouterTests: XCTestCase {
         let sut = makeSUT()
         let route = AnyEnumRoute.pushStep
         
-        await sut.navigate(to: route, animated: false)
+        await sut.navigate(toRoute: route, animated: false)
         
         XCTAssertEqual(sut.items.last?.id, route.id)
     }
@@ -40,7 +40,7 @@ final class RouterTests: XCTestCase {
     @MainActor func test_navigationStack_pop() async throws {
         let sut = makeSUT()
         
-        await sut.navigate(to: .pushStep, animated: false)
+        await sut.navigate(toRoute: .pushStep, animated: false)
         await sut.pop(animated: false)
         
         XCTAssertNil(sut.items.last ?? nil)
@@ -49,9 +49,9 @@ final class RouterTests: XCTestCase {
     @MainActor func test_navigationStack_popToRoot() async throws {
         let sut = makeSUT()
         
-        await sut.navigate(to: .pushStep, animated: false)
-        await sut.navigate(to: .pushStep2, animated: false)
-        await sut.navigate(to: .pushStep3, animated: false)
+        await sut.navigate(toRoute: .pushStep, animated: false)
+        await sut.navigate(toRoute: .pushStep2, animated: false)
+        await sut.navigate(toRoute: .pushStep3, animated: false)
         await sut.popToRoot(animated: false)
         
         XCTAssertEqual(sut.items.count, 0)
@@ -61,23 +61,23 @@ final class RouterTests: XCTestCase {
     @MainActor func test_closeRoute() async throws {
         let sut = makeSUT()
         
-        await sut.navigate(to: .pushStep, animated: false)
+        await sut.navigate(toRoute: .pushStep, animated: false)
         await sut.close(animated: false)
         XCTAssertEqual(sut.items.count, 0)
         
-        await sut.navigate(to: .sheetStep, animated: false)
+        await sut.navigate(toRoute: .sheetStep, animated: false)
         await sut.close(animated: false)
-        sut.sheetCoordinator.removeAllNilItems()
+        await sut.sheetCoordinator.removeAllNilItems()
         XCTAssertEqual(sut.sheetCoordinator.items.count, 0)
     }
     
     @MainActor func test_cleanRouter() async throws {
         let sut = makeSUT()
         
-        await sut.navigate(to: .pushStep, animated: false)
-        await sut.navigate(to: .pushStep2, animated: false)
-        await sut.navigate(to: .sheetStep, animated: false)
-        await sut.navigate(to: .fullScreenStep, animated: false)
+        await sut.navigate(toRoute: .pushStep, animated: false)
+        await sut.navigate(toRoute: .pushStep2, animated: false)
+        await sut.navigate(toRoute: .sheetStep, animated: false)
+        await sut.navigate(toRoute: .fullScreenStep, animated: false)
         await sut.clean(animated: false)
         await sut.restart(animated: false)
         
@@ -88,9 +88,9 @@ final class RouterTests: XCTestCase {
     @MainActor func test_restartRouter() async throws {
         let sut = makeSUT()
         
-        await sut.navigate(to: .pushStep, animated: false)
-        await sut.navigate(to: .pushStep2, animated: false)
-        await sut.navigate(to: .sheetStep, animated: false)
+        await sut.navigate(toRoute: .pushStep, animated: false)
+        await sut.navigate(toRoute: .pushStep2, animated: false)
+        await sut.navigate(toRoute: .sheetStep, animated: false)
         await sut.present(.fullScreenStep)
         await sut.restart(animated: false)
         
@@ -121,9 +121,9 @@ final class RouterTests: XCTestCase {
         let sut = makeSUT()
         let view = PushStepView.self
         
-        await sut.navigate(to: .pushStep, animated: false)
-        await sut.navigate(to: .pushStep2, animated: false)
-        await sut.navigate(to: .pushStep3, animated: false)
+        await sut.navigate(toRoute: .pushStep, animated: false)
+        await sut.navigate(toRoute: .pushStep2, animated: false)
+        await sut.navigate(toRoute: .pushStep3, animated: false)
         
         let result = await sut.popToView(view, animated: false)
         XCTAssertTrue(result)
@@ -141,10 +141,10 @@ final class RouterTests: XCTestCase {
         let view = PushStepView.self
         sut.mainView = DefaultRoute(presentationStyle: .push, content: { PushStepView() })
         
-        await sut.navigate(to: .init(presentationStyle: .push, content: { PushStepView() } ), animated: false)
-        await sut.navigate(to: .init(presentationStyle: .push, content: { PushStep2View() } ), animated: false)
-        await sut.navigate(to: .init(presentationStyle: .push, content: { PushStep3View() } ), animated: false)
-        await sut.navigate(to: .init(presentationStyle: .push, content: { FullScreenStepView() } ), animated: false)
+        await sut.navigate(toRoute: .init(presentationStyle: .push, content: { PushStepView() } ), animated: false)
+        await sut.navigate(toRoute: .init(presentationStyle: .push, content: { PushStep2View() } ), animated: false)
+        await sut.navigate(toRoute: .init(presentationStyle: .push, content: { PushStep3View() } ), animated: false)
+        await sut.navigate(toRoute: .init(presentationStyle: .push, content: { FullScreenStepView() } ), animated: false)
         
         let result = await sut.popToView(view, animated: false)
         
@@ -163,9 +163,9 @@ final class RouterTests: XCTestCase {
         let sut = makeSUT()
         let route = AnyEnumRoute.fullScreenStep
         
-        await sut.navigate(to: .pushStep, animated: false)
-        await sut.navigate(to: .pushStep2, animated: false)
-        await sut.navigate(to: .pushStep3, animated: false)
+        await sut.navigate(toRoute: .pushStep, animated: false)
+        await sut.navigate(toRoute: .pushStep2, animated: false)
+        await sut.navigate(toRoute: .pushStep3, animated: false)
         
         let result = await sut.popToView(route, animated: false)
         XCTAssertFalse(result)
@@ -177,12 +177,12 @@ final class RouterTests: XCTestCase {
         let sut = makeSUT()
         let index = 0
         
-        await sut.navigate(to: .pushStep, presentationStyle: .sheet, animated: false)
+        await sut.navigate(toRoute: .pushStep, presentationStyle: .sheet, animated: false)
         
         XCTAssertEqual(sut.sheetCoordinator.items.count, 1)
         
-        sut.removeNilItemsFromSheetCoordinator()
-        sut.removeItemFromSheetCoordinator(at: index)
+        
+        await sut.removeItemFromSheetCoordinator(at: "\(index)")
         
         XCTAssertEqual(sut.sheetCoordinator.items.count, 0)
     }

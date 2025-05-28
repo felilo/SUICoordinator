@@ -31,7 +31,7 @@ final class SheetCoordinatorTests: XCTestCase {
         let sut = makeSUT()
         let item = makeSheetItem("Custom Item")
         
-        sut.presentSheet(item)
+        await sut.presentSheet(item)
         
         XCTAssertFalse(sut.items.isEmpty)
         XCTAssertEqual(item.getPresentationStyle(), .sheet)
@@ -58,7 +58,7 @@ final class SheetCoordinatorTests: XCTestCase {
         XCTAssertEqual(sut.items.count, 1)
         
         await sut.removeLastSheet(animated: false)
-        sut.removeAllNilItems()
+        await sut.removeAllNilItems()
         
         XCTAssertEqual(sut.items.count, 0)
     }
@@ -69,8 +69,7 @@ final class SheetCoordinatorTests: XCTestCase {
         await presentSheet(makeSheetItem("First Item"), with: sut)
         await presentSheet(makeSheetItem("Second Item"), with: sut)
         await presentSheet(makeSheetItem("Third Item"), with: sut)
-        
-        sut.remove(at: 1)
+        await sut.remove(at: "\(1)")
         
         XCTAssertEqual(sut.items.count, 2)
         XCTAssertEqual(sut.items.last??.view(), "Third Item")
@@ -122,7 +121,6 @@ final class SheetCoordinatorTests: XCTestCase {
     }
     
     @MainActor private func presentSheet( _ item: SheetItem<String>, with sut: SheetCoordinator<String>) async {
-        sut.presentSheet(item)
-        sut.removeAllNilItems()
+        await sut.presentSheet(item)
     }
 }

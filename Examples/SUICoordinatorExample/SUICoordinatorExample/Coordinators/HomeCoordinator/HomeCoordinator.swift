@@ -43,27 +43,34 @@ class HomeCoordinator: Coordinator<HomeRoute> {
     // ---------------------------------------------------------------------
     
     func navigateToPushView() async {
-        let viewModel = PushViewModel(coordinator: self)
-        await router.navigate(to: .push(viewModel: viewModel), animated: animated)
+        let title = "Hello, PushView! \(router.items.count + 1)"
+        let viewModel = PushViewModel(coordinator: self, title: title)
+        await router.navigate(toRoute: .push(viewModel: viewModel), animated: animated)
     }
     
     func presentSheet() async {
         let viewModel = SheetViewModel(coordinator: self)
-        await router.navigate(to: .sheet(viewModel: viewModel), animated: animated)
+        await router.navigate(toRoute: .sheet(viewModel: viewModel), animated: animated)
     }
     
     func presentFullscreen() async {
         let viewModel = FullscreenViewModel(coordinator: self)
-        await router.navigate(to: .fullscreen(viewModel: viewModel), animated: animated)
+        await router.navigate(toRoute: .fullscreen(viewModel: viewModel), animated: animated)
     }
     
     func presentDetents() async {
         let viewModel = DetentsViewModel(coordinator: self)
-        await router.navigate(to: .detents(viewModel: viewModel), animated: animated)
+        await router.navigate(toRoute: .detents(viewModel: viewModel), animated: animated)
+    }
+    
+    func presentViewWithCustomPresentation() async {
+        let title = "Custom presentation view!"
+        let viewModel = PushViewModel(coordinator: self, title: title)
+        await router.navigate(toRoute: .viewCustomTransition(viewModel: viewModel), animated: animated)
     }
     
     func presentTabbarCoordinator() async {
-        let coordinator = CustomTabbarCoordinator()
+        let coordinator = CustomTabCoordinator()
         await navigate(to: coordinator, presentationStyle: .sheet, animated: animated)
     }
     

@@ -1,5 +1,5 @@
 //
-//  AppDelegate.swift
+//  MyTabbarPage.swift
 //
 //  Copyright (c) Andres F. Lozano
 //
@@ -22,31 +22,34 @@
 //  THE SOFTWARE.
 //
 
-import SwiftUI
 import SUICoordinator
 
-class AppDelegate: NSObject, UIApplicationDelegate {
+public enum MyTabPage: TabPage, CaseIterable {
     
-    var mainCoodinator: HomeCoordinator?
+    case first
+    case second
     
-    func application(
-        _ application: UIApplication,
-        didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil
-    ) -> Bool {
-        mainCoodinator = HomeCoordinator()
-        
-        // Simulate the receipt of a notification or external trigger to present the some coordinator
-        DispatchQueue.main.asyncAfter(deadline: .now() + 10) {
-            Task { [weak self] in
-                // Create and present the CustomTabbarCoordinator in a sheet presentation style
-                let coordinator = CustomTabbarCoordinator()
-                try? await coordinator.forcePresentation(
-                    presentationStyle: .sheet,
-                    mainCoordinator: self?.mainCoodinator
-                )
-            }
+    // ---------------------------------------------------------
+    // MARK: TabbarPage
+    // ---------------------------------------------------------
+    
+    public var position: Int {
+        switch self {
+            case .first: return 0
+            case .second: return 1
         }
-        
-        return true
+    }
+    
+    public func coordinator() -> (any CoordinatorType) {
+        switch self {
+            case .first:
+                return HomeCoordinator()
+            case .second:
+                return TabFlowCoordinator()
+        }
+    }
+    
+    public var dataSource: MyTabPageDataSource {
+        .init(page: self)
     }
 }

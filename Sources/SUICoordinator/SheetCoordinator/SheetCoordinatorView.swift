@@ -31,7 +31,7 @@ struct SheetCoordinatorView: ViewModifier {
     // MARK: typealias
     // ---------------------------------------------------------
     
-    typealias Action = ((Int) -> Void)
+    typealias Action = ((String) -> Void)
     typealias Value = (any View)
     
     // ---------------------------------------------------------
@@ -46,8 +46,8 @@ struct SheetCoordinatorView: ViewModifier {
     // ---------------------------------------------------------
     
     public var isLast: Bool
-    public var onDissmis: Action?
-    public var onDidLoad: Action?
+    public var onDissmis: ActionClosure?
+    public var onDidLoad: ActionClosure?
     
     // ---------------------------------------------------------
     // MARK: ViewModifier
@@ -56,14 +56,14 @@ struct SheetCoordinatorView: ViewModifier {
     @ViewBuilder
     func body(content: Content) -> some View {
         content
-            .background {
+            .overlay {
                 VStack {
                     SheetView(
                         index: index,
                         items: $coordinator.items,
-                        content: buildContent,
                         transitionStyle: coordinator.lastPresentationStyle,
                         animated: coordinator.animated ?? true,
+                        content: buildContent,
                         onDismiss: onDissmis,
                         onDidLoad: onDidLoad
                     )

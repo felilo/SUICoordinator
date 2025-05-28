@@ -33,7 +33,7 @@ extension CoordinatorType {
     
     /// A boolean value indicating whether the coordinator is tabbar-coordinable.
     var isTabbarCoordinable: Bool {
-        self is (any TabbarCoordinatable)
+        self is (any TabCoordinatable)
     }
     
     /// A boolean value indicating whether the coordinator is empty.
@@ -50,7 +50,7 @@ extension CoordinatorType {
     ///   - animated: A boolean value indicating whether to animate the cleaning process.
     ///   - withMainView: A boolean value indicating whether to clean the main view.
     func cleanView(animated: Bool = false, withMainView: Bool = true) async {
-        if let coordinator = self as? (any TabbarCoordinatable) {
+        if let coordinator = self as? (any TabCoordinatable) {
             await coordinator.clean()
         } else {
             await router.clean(animated: animated, withMainView: withMainView)
@@ -65,7 +65,7 @@ extension CoordinatorType {
     ///   - value: An inout parameter containing the coordinator value.
     /// - Returns: An optional deep coordinator of type TCoordinatorType.
     /// - Throws: An error if the deep coordinator retrieval fails.
-    func getDeepCoordinator(from value: inout TCoordinatorType?) throws -> TCoordinatorType? {
+    func getDeepCoordinator(from value: inout AnyCoordinatorType?) throws -> AnyCoordinatorType? {
         if value?.children.last == nil {
             return value
         } else if let value = value, let tabCoordinator = getTabbarCoordinable(value) {
@@ -80,7 +80,7 @@ extension CoordinatorType {
     ///
     /// - Parameters:
     ///   - coordinator: The child coordinator to be removed.
-    func removeChild(coordinator : TCoordinatorType) async {
+    func removeChild(coordinator : AnyCoordinatorType) async {
         guard let index = children.firstIndex(where: {$0.uuid == coordinator.uuid}) else {
             return
         }
@@ -95,7 +95,7 @@ extension CoordinatorType {
     func removeChildren(animated: Bool = false) async {
         guard let first = children.first else { return }
         
-        if let parent = first.parent as? (any TabbarCoordinatable) {
+        if let parent = first.parent as? (any TabCoordinatable) {
             parent.setCurrentPage(with: first)
         }
         
@@ -107,16 +107,16 @@ extension CoordinatorType {
     ///
     /// - Parameters:
     ///   - coordinator: The coordinator for which to retrieve the tabbar-coordinable object.
-    /// - Returns: An optional tabbar-coordinable object conforming to any TabbarCoordinatable.
-    func getTabbarCoordinable(_ coordinator: TCoordinatorType) ->  (any TabbarCoordinatable)? {
-        coordinator as? (any TabbarCoordinatable)
+    /// - Returns: An optional tabbar-coordinable object conforming to any TabCoordinatable.
+    func getTabbarCoordinable(_ coordinator: AnyCoordinatorType) ->  (any TabCoordinatable)? {
+        coordinator as? (any TabCoordinatable)
     }
     
     /// Starts a child coordinator.
     ///
     /// - Parameters:
     ///   - coordinator: The child coordinator to be started.
-    func startChildCoordinator(_ coordinator: TCoordinatorType) {
+    func startChildCoordinator(_ coordinator: AnyCoordinatorType) {
         children.append(coordinator)
         coordinator.parent = self
     }
@@ -156,7 +156,7 @@ extension CoordinatorType {
             return await emptyCoordinator(animated: animated)
         }
         
-        if parent is (any TabbarCoordinatable) {
+        if parent is (any TabCoordinatable) {
             await parent.parent?.closeLastSheet(animated: animated)
             return await parent.emptyCoordinator(animated: animated)
         }
@@ -166,16 +166,52 @@ extension CoordinatorType {
     }
     
     /// Cleans up the coordinator.
-    func swipedAway(coordinator: TCoordinatorType) {
+    func swipedAway(coordinator: AnyCoordinatorType) async {
         let sheetCoordinator = router.sheetCoordinator
+        let uuid = coordinator.uuid
         
-        sheetCoordinator.onRemoveItem = { [weak coordinator] id in
-            if let uuid = coordinator?.uuid, id.contains(uuid) {
-                Task(priority: .utility) { [weak coordinator] in
-                    await coordinator?.finish(animated: false, withDismiss: false)
-                    sheetCoordinator.onRemoveItem = nil
-                }
+        await sheetCoordinator.onRemoveItem = { [weak sheetCoordinator, weak coordinator] id in
+            if id.contains(uuid) {
+                await coordinator?.finish(animated: false, withDismiss: false)
+                sheetCoordinator?.onRemoveItem = nil
             }
         }
+    }
+
+    /// Prepares a `SheetItem` for navigating to another coordinator.
+    ///
+    /// This function configures a `SheetItem` which is used by the `SheetCoordinator`
+    /// to present the view of the target coordinator. It handles the presentation style,
+    /// particularly adjusting `.push` transitions to a custom animation suitable for
+    /// coordinator navigation.
+    ///
+    /// - Parameters:
+    ///   - coordinator: The coordinator to navigate to. Its view will be embedded in the `SheetItem`.
+    ///   - presentationStyle: The desired presentation style for the navigation.
+    ///     If `.push` is provided, it's converted to a custom transition (`.opacity.combined(with: .move(edge: .trailing))`).
+    ///   - animated: A Boolean value indicating whether the transition should be animated.
+    /// - Returns: A `SheetItem` configured to present the target coordinator's view.
+    func buildSheetItemForCoordinator(
+        _ coordinator: AnyCoordinatorType,
+        presentationStyle: TransitionPresentationStyle,
+        animated: Bool
+    ) -> SheetItem<RouteType.Body> {
+        var effectivePresentationStyle = presentationStyle
+        
+        if effectivePresentationStyle == .push {
+            effectivePresentationStyle = .custom(
+                transition: .move(edge: .trailing),
+                animation: .easeOut(duration: 0.22),
+                fullScreen: false
+            )
+        }
+        
+        return SheetItem(
+            id: "\(coordinator.uuid) - \(effectivePresentationStyle.id)",
+            animated: animated,
+            presentationStyle: effectivePresentationStyle,
+            isCoordinator: true,
+            view: { [weak coordinator] in coordinator?.getView() }
+        )
     }
 }

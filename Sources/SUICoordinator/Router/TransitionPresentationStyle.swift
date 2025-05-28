@@ -39,4 +39,16 @@ public enum TransitionPresentationStyle: SCEquatable, Sendable {
     case fullScreenCover
     /// A style allowing for presenting views with specific detents.
     case detents(Set<PresentationDetent>)
+    /// A custom presentation style.
+    case custom(transition: AnyTransition, animation: Animation?, fullScreen: Bool = false)
+    
+    
+    var isCustom: Bool {
+        switch self {
+        case .custom:
+            return true
+        default:
+            return false
+        }
+    }
 }

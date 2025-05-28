@@ -34,7 +34,7 @@ struct NavigationActionListView: View {
     var body: some View {
         List {
             Button("Push NavigationView") {
-                Task { await viewModel.navigateToFirstView() }
+                Task { await viewModel.navigateToPushView() }
             }
             
             Button("Presents SheetView") {
@@ -47,6 +47,10 @@ struct NavigationActionListView: View {
             
             Button("Presents DetentsView") {
                 Task { await viewModel.presentDetents() }
+            }
+            
+            Button("present view with custom presentation") {
+                Task { await viewModel.presentViewWithCustomPresentation() }
             }
             
             Button("Presents Tabbar Coordinator") {

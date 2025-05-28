@@ -56,4 +56,8 @@ class SheetViewModel: ObservableObject {
     @MainActor func restart() async {
         await coordinator.restart()
     }
+    
+    @MainActor func presentViewWithCustomPresentation() async {
+        await coordinator.presentViewWithCustomPresentation()
+    }
 }

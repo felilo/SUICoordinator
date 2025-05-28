@@ -31,7 +31,7 @@ struct RouterView<Router: RouterType>: View {
     // MARK: Properties
     // --------------------------------------------------------------------
     
-    @StateObject var viewModel: Router
+    @ObservedObject var viewModel: Router
     @State private var mainView: AnyView?
     
     // --------------------------------------------------------------------
@@ -48,25 +48,26 @@ struct RouterView<Router: RouterType>: View {
     
     var body: some View {
         ZStack { buildBody() }
-        .onChange(of: viewModel.mainView, perform: onChangeFirstView)
-        .onViewDidLoad { onChangeFirstView(viewModel.mainView) }
+            .onChange(of: viewModel.mainView, perform: onChangeFirstView)
+            .onViewDidLoad { onChangeFirstView(viewModel.mainView) }
     }
     
     // --------------------------------------------------------------------
-    // MARK: Helper funcs
+    // MARK: View helper functions
     // --------------------------------------------------------------------
     
     
     @ViewBuilder
     private func buildBody() -> some View {
-        if viewModel.isTabbarCoordinable {
+        if viewModel.isTabCoordinable {
             addSheetTo(view: mainView)
         } else {
             let view = NavigationStack(path: $viewModel.items) {
-                mainView.navigationDestination(for: Router.Route.self) {
-                    AnyView($0.view)
-                }
+                mainView.navigationDestination(for: Router.Route.self) { AnyView($0.view) }
             }
+                .transaction { $0.disablesAnimations = !viewModel.animated }
+                .onChange(of: viewModel.items, perform: onChangeItems)
+            
             addSheetTo(view: view)
         }
     }
@@ -76,17 +77,16 @@ struct RouterView<Router: RouterType>: View {
         view
             .sheetCoordinator(
                 coordinator: viewModel.sheetCoordinator,
-                onDissmis: { index in
-                    Task(priority: .high) { @MainActor [weak viewModel] in
-                        viewModel?.removeItemFromSheetCoordinator(at: index)
-                        viewModel?.removeNilItemsFromSheetCoordinator()
-                    }
-                },
-                onDidLoad: { _ in
-                    viewModel.removeNilItemsFromSheetCoordinator()
-                }
+                onDissmis: { index in Task(priority: .high) { @MainActor [weak viewModel] in
+                    await viewModel?.removeItemFromSheetCoordinator(at: index)
+                }},
+                onDidLoad: nil
             )
     }
+    
+    // --------------------------------------------------------------------
+    // MARK: Helper functions
+    // --------------------------------------------------------------------
     
     private func onChangeFirstView(_ value: Router.Route?) {
         guard let view = value?.view else {
@@ -94,5 +94,9 @@ struct RouterView<Router: RouterType>: View {
         }
         
         mainView = AnyView(view)
+    }
+    
+    private func onChangeItems(_ value: [Router.Route]) {
+        Task { await viewModel.syncItems() }
     }
 }
