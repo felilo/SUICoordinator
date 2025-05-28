@@ -170,7 +170,7 @@ extension CoordinatorType {
         let sheetCoordinator = router.sheetCoordinator
         let uuid = coordinator.uuid
         
-        await sheetCoordinator.onRemoveItem = { [weak sheetCoordinator, weak coordinator] id in
+        sheetCoordinator.onRemoveItem = { [weak sheetCoordinator, weak coordinator] id in
             if id.contains(uuid) {
                 await coordinator?.finish(animated: false, withDismiss: false)
                 sheetCoordinator?.onRemoveItem = nil

@@ -46,8 +46,8 @@ class TabFlowCoordinator: Coordinator<DefaultRoute> {
     // MARK: Adiotional flows
     // ---------------------------------------------------------------------
     
-    func presentDefaultTabbarCoordinator() async {
-        let coordinator = DefaultTabbarCoordinator()
+    func presentDefaultTabCoordinator() async {
+        let coordinator = DefaultTabCoordinator()
         await navigate(to: coordinator, presentationStyle: .fullScreenCover)
     }
     

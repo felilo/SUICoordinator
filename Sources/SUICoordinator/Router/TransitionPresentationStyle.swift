@@ -29,7 +29,7 @@ import SwiftUI
  
  TransitionPresentationStyle enumerates the different styles used for transitioning between views or presenting views within an application.
  */
-public enum TransitionPresentationStyle: SCEquatable, Sendable {
+public enum TransitionPresentationStyle: @unchecked Sendable, SCEquatable {
     
     /// A push transition style, commonly used in navigation controllers.
     case push

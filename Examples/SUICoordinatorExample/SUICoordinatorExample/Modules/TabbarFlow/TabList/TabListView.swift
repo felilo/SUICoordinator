@@ -36,7 +36,7 @@ struct TabListView: View {
         List {
             
             Button("Presents Default Tabbar") {
-                Task { await viewModel.presentDefaultTabbarCoordinator() }
+                Task { await viewModel.presentDefaultTabCoordinator() }
             }
             
             Button("Presents Custom Tabbar") {
