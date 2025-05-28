@@ -26,11 +26,24 @@ import SwiftUI
 
 @main
 struct SUICoordinatorExampleApp: App {
-    @UIApplicationDelegateAdaptor private var appDelegate: AppDelegate
+    
+    var mainCoordinator = HomeCoordinator()
     
     var body: some Scene {
         WindowGroup {
-            appDelegate.mainCoodinator?.getView()
+            mainCoordinator.getView().onAppear {
+                // Simulate the receipt of a notification or external trigger to present the some coordinator
+                DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+                    Task { [weak mainCoordinator] in
+                        // Create and present the CustomTabbarCoordinator in a sheet presentation style
+                        let coordinator = CustomTabCoordinator()
+                        try? await coordinator.forcePresentation(
+                            presentationStyle: .sheet,
+                            mainCoordinator: mainCoordinator
+                        )
+                    }
+                }
+            }
         }
     }
 }

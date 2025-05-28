@@ -1,5 +1,5 @@
 //
-//  TabbarCoordinatorError.swift
+//  MyTabPageDataSource.swift
 //
 //  Copyright (c) Andres F. Lozano
 //
@@ -22,23 +22,25 @@
 //  THE SOFTWARE.
 //
 
-import Foundation
+import SwiftUI
 
-/// An enumeration representing errors specific to `TabbarCoordinator`.
-public enum TabbarCoordinatorError: LocalizedError {
+public struct MyTabPageDataSource {
+
+    let page: MyTabPage
     
-    /// An error case indicating that no coordinator is selected.
-    case coordinatorSelected
+    @ViewBuilder
+    public var icon: some View {
+        switch page {
+            case .first: Image.init(systemName: "homekit")
+            case .second: Image.init(systemName: "gear")
+        }
+    }
     
-    // ---------------------------------------------------------
-    // MARK: LocalizedError
-    // ---------------------------------------------------------
-    
-    /// A computed property providing a localized description for the error.
-    public var errorDescription: String? {
-        switch self {
-            case .coordinatorSelected:
-                return "There is no coordinator selected."
+    @ViewBuilder
+    public var title: some View {
+        switch page {
+            case .first: Text("first")
+            case .second: Text("second")
         }
     }
 }

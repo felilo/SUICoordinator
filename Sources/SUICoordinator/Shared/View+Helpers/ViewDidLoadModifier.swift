@@ -30,8 +30,8 @@ public extension View {
         coordinator: SheetCoordinator<(any View)>,
         index: Int = 0,
         isLast: Bool = false,
-        onDissmis: ((Int) -> Void)? = nil,
-        onDidLoad: ((Int) -> Void)? = nil
+        onDissmis: ActionClosure? = nil,
+        onDidLoad: ActionClosure? = nil
     ) -> some View {
         modifier(
             SheetCoordinatorView(

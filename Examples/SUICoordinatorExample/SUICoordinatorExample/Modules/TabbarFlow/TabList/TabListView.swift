@@ -1,5 +1,5 @@
 //
-//  CustomTabbarCoordinator.swift
+//  TabbarActionListView.swift
 //
 //  Copyright (c) Andres F. Lozano
 //
@@ -22,28 +22,38 @@
 //  THE SOFTWARE.
 //
 
-import Foundation
-import SUICoordinator
+import SwiftUI
 
-public class CustomTabbarCoordinator: TabbarCoordinator<MyTabbarPage> {
+struct TabListView: View {
     
-    // ---------------------------------------------------------------------
-    // MARK: Init
-    // ---------------------------------------------------------------------
+    typealias ViewModel = TabListViewModel
     
-    public init(
-        currentPage: MyTabbarPage = .first,
-        presentationStyle: TransitionPresentationStyle = .sheet
-    ) {
-        super.init(
-            pages: Page.allCases,
-            currentPage: currentPage
-        )
-        
-        customView = { CustomTabbarView(viewModel: self) }
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
-            self?.setBadge.send(( "2", .first ))
+    
+    @Environment(\.isPresented) private var isPresented
+    @StateObject var viewModel: ViewModel
+    
+    var body: some View {
+        List {
+            
+            Button("Presents Default Tabbar") {
+                Task { await viewModel.presentDefaultTabbarCoordinator() }
+            }
+            
+            Button("Presents Custom Tabbar") {
+                Task { await viewModel.presentCustomTabbarCoordinator() }
+            }
         }
+        .toolbar {
+            Button {
+                Task { await viewModel.finsh() }
+            } label: {
+                Text("Finish flow")
+            }
+        }
+        .navigationTitle("Navigation List")
     }
+}
+
+#Preview {
+    NavigationActionListView(viewModel: .init(coordinator: .init()))
 }

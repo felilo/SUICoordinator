@@ -1,5 +1,5 @@
 //
-//  TabbarActionListView.swift
+//  TabFlowCoordinator.swift
 //
 //  Copyright (c) Andres F. Lozano
 //
@@ -22,40 +22,37 @@
 //  THE SOFTWARE.
 //
 
-import SwiftUI
+import Foundation
+import SUICoordinator
 
-struct TabbarActionListView: View {
+class TabFlowCoordinator: Coordinator<DefaultRoute> {
     
-    typealias ViewModel = TabbarActionListViewModel
+    // ---------------------------------------------------------------------
+    // MARK: Coordinator
+    // ---------------------------------------------------------------------
     
-    
-    @Environment(\.isPresented) private var isPresented
-    @StateObject var viewModel: ViewModel
-    
-    var body: some View {
-        List {
-            
-            Button("Presents Default Tabbar") {
-                Task { await viewModel.presentDefaultTabbarCoordinator() }
-            }
-            
-            Button("Presents Custom Tabbar") {
-                Task { await viewModel.presentCustomTabbarCoordinator() }
-            }
-        }
-        .toolbar {
-            if isPresented {
-                Button {
-                    Task { await viewModel.finsh() }
-                } label: {
-                    Text("Finish flow")
-                }
-            }
-        }
-        .navigationTitle("Navigation List")
+    override func start(animated: Bool = true) async {
+        let viewModel = TabListViewModel(coordinator: self)
+        
+        let route = DefaultRoute(
+            presentationStyle: .push,
+            content: { TabListView(viewModel: viewModel) }
+        )
+        
+        await startFlow(route: route )
     }
-}
-
-#Preview {
-    NavigationActionListView(viewModel: .init(coordinator: .init()))
+    
+    // ---------------------------------------------------------------------
+    // MARK: Adiotional flows
+    // ---------------------------------------------------------------------
+    
+    func presentDefaultTabbarCoordinator() async {
+        let coordinator = DefaultTabbarCoordinator()
+        await navigate(to: coordinator, presentationStyle: .fullScreenCover)
+    }
+    
+    func presentCustomTabbarCoordinator() async {
+        let coordinator = CustomTabCoordinator()
+        await navigate(to: coordinator, presentationStyle: .sheet)
+    }
 }

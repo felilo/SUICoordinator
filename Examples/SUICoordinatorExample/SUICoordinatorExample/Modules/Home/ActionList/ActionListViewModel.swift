@@ -32,7 +32,7 @@ class ActionListViewModel: ObservableObject {
         self.coordinator = coordinator
     }
     
-    @MainActor func navigateToFirstView() async {
+    @MainActor func navigateToPushView() async {
         await coordinator.navigateToPushView()
     }
     
@@ -46,6 +46,10 @@ class ActionListViewModel: ObservableObject {
     
     @MainActor func presentDetents() async {
         await coordinator.presentDetents()
+    }
+    
+    @MainActor func presentViewWithCustomPresentation() async {
+        await coordinator.presentViewWithCustomPresentation()
     }
     
     @MainActor func presentTabbarCoordinator() async {

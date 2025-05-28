@@ -26,10 +26,12 @@ import Foundation
 
 class PushViewModel: ObservableObject {
     
-    unowned var coordinator: HomeCoordinator
+    var coordinator: HomeCoordinator
+    var title: String
     
-    init(coordinator: HomeCoordinator) {
+    init(coordinator: HomeCoordinator, title: String) {
         self.coordinator = coordinator
+        self.title = title
     }
     
     @MainActor func navigateToNextView() async {

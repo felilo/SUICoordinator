@@ -40,8 +40,8 @@ struct SheetView<Content: View, T: SheetItemType>: View {
     
     let index: Int
     let content: ( (Int, (Item)) -> Content)
-    let onDismiss: ((Int) -> Void)?
-    let onDidLoad: ((Int) -> Void)?
+    let onDismiss: ActionClosure?
+    let onDidLoad: ActionClosure?
     let transitionStyle: TransitionPresentationStyle?
     let animated: Bool
     
@@ -52,11 +52,11 @@ struct SheetView<Content: View, T: SheetItemType>: View {
     init(
         index: Int,
         items: Binding<[Item?]>,
-        @ViewBuilder content: @escaping (Int, (Item)) -> Content,
         transitionStyle: TransitionPresentationStyle?,
         animated: Bool,
-        onDismiss: ((Int) -> Void)? = nil,
-        onDidLoad: ((Int) -> Void)?
+        @ViewBuilder content: @escaping (Int, (Item)) -> Content,
+        onDismiss: ActionClosure? = nil,
+        onDidLoad: ActionClosure?
     ) {
         self.index = index
         self._items = items
@@ -78,15 +78,30 @@ struct SheetView<Content: View, T: SheetItemType>: View {
                 
                 switch getTransitionStyle(from: index) {
                 case .fullScreenCover:
-                    fullScreenView(item: item, index: index)
+                    fullScreenView(
+                        item: item,
+                        index: index,
+                        onDismiss: onDismiss
+                    )
                 case .sheet, .detents:
-                    sheetView(item: item, index: index)
-                default:
-                    EmptyView()
+                    sheetView(
+                        item: item,
+                        index: index,
+                        onDismiss: onDismiss
+                    )
+                case .custom(let transition, let animation, let fullScreen):
+                    customTransitionView(
+                        item: item,
+                        index: index,
+                        transition: transition,
+                        animation: animation,
+                        isFullScreen: fullScreen,
+                        onDismiss: onDismiss
+                    )
+                default: EmptyView()
                 }
             }
         }
-        .transaction { $0.disablesAnimations = !(animated) }
     }
     
     // ---------------------------------------------------------
@@ -94,25 +109,110 @@ struct SheetView<Content: View, T: SheetItemType>: View {
     // ---------------------------------------------------------
     
     @ViewBuilder
-    private func sheetView(item: Binding<Item?>, index: Int) -> some View {
-        defaultView
-            .sheet(
+    private func customTransitionView(
+        item: Binding<Item?>,
+        index: Int,
+        transition: AnyTransition,
+        animation: Animation?,
+        isFullScreen: Bool = false,
+        onDismiss: ActionClosure?
+    ) -> some View {
+        if items.indices.contains(index)  {
+            
+            let view = CustomTransitionView(
                 item: item,
-                onDismiss: { onDismiss?(index) },
+                transition: transition,
+                animation: animation,
+                animated: animated,
+                isFullScreen: isFullScreen,
+                onDismiss: { _ in onDismiss?("\(index)") },
+                onDidLoad: onDidLoad,
                 content: { content(index, $0) }
             )
-            .onViewDidLoad { onDidLoad?(index) }
+            .clearModalBackground()
+            
+            if isFullScreen {
+                fullScreenContainer(
+                    item: item,
+                    animated: false,
+                    index: index,
+                    onDismiss: onDismiss,
+                    content: { _ in view }
+                )
+            } else {
+                view
+            }
+        }
     }
     
     @ViewBuilder
-    private func fullScreenView(item: Binding<Item?>, index: Int) -> some View {
+    private func sheetView(
+        item: Binding<Item?>,
+        index: Int,
+        onDismiss: ActionClosure?
+    ) -> some View {
+        sheetContainer(
+            item: item,
+            animated: animated,
+            index: index,
+            onDismiss: onDismiss,
+            content: { content(index, $0) }
+        )
+    }
+    
+    @ViewBuilder
+    private func fullScreenView(
+        item: Binding<Item?>,
+        index: Int,
+        onDismiss: ActionClosure?
+    ) -> some View {
+        fullScreenContainer(
+            item: item,
+            animated: animated,
+            index: index,
+            onDismiss: onDismiss,
+            content: { content(index, $0) }
+        )
+    }
+    
+    // ---------------------------------------------------------
+    // MARK: View containers
+    // ---------------------------------------------------------
+    
+    @ViewBuilder
+    private func fullScreenContainer(
+        item: Binding<Item?>,
+        animated: Bool,
+        index: Int,
+        onDismiss: ActionClosure? = nil,
+        @ViewBuilder content: @escaping (Item) -> some View
+    ) -> some View {
         defaultView
             .fullScreenCover(
                 item: item,
-                onDismiss: { onDismiss?(index) },
-                content: { content(index, $0) }
+                onDismiss: {onDismiss?(String(index))},
+                content: { content($0) }
             )
-            .onViewDidLoad { onDidLoad?(index) }
+            .onAppear(perform: { onDidLoad?(String(index)) })
+            .transaction { $0.disablesAnimations = !(animated) }
+    }
+    
+    @ViewBuilder
+    private func sheetContainer(
+        item: Binding<Item?>,
+        animated: Bool,
+        index: Int,
+        onDismiss: ActionClosure? = nil,
+        @ViewBuilder content: @escaping (Item) -> some View
+    ) -> some View {
+        defaultView
+            .sheet(
+                item: item,
+                onDismiss: { onDismiss?(String(index)) },
+                content: { content($0) }
+            )
+            .onAppear(perform: { onDidLoad?(String(index)) })
+            .transaction { $0.disablesAnimations = !(animated) }
     }
     
     private var defaultView: some View {

@@ -1,5 +1,5 @@
 //
-//  TabbarCoordinatorType+TabbarCoordinatable.swift
+//  TabbarActionListViewModel.swift
 //
 //  Copyright (c) Andres F. Lozano
 //
@@ -22,30 +22,25 @@
 //  THE SOFTWARE.
 //
 
-extension TabbarCoordinatorType where Self : TabbarCoordinatable {
+import Foundation
+
+class TabListViewModel: ObservableObject {
     
-    /// Sets the array of pages for the tabbar coordinator.
-    ///
-    /// - Parameters:
-    ///   - values: The array of pages to set.
-    ///   - currentPage: The optional current page to set.
-    public func setPages(_ values: [Page], currentPage: Page? = nil) async {
-        await removeChildren()
-        setupPages(values, currentPage: currentPage)
+    let coordinator: TabFlowCoordinator
+    
+    init(coordinator: TabFlowCoordinator) {
+        self.coordinator = coordinator
     }
     
-    /// Sets up the pages for the tabbar coordinator.
-    ///
-    /// - Parameters:
-    ///   - value: The array of pages to set up.
-    func setupPages(_ value: [Page], currentPage: Page? = nil) {
-        for page in value {
-            let item = page.coordinator()
-            startChildCoordinator(item)
-            item.tagId = "\(page.position)"
-        }
-        
-        pages = value
-        setCurrentPage(currentPage)
+    @MainActor func presentDefaultTabbarCoordinator() async {
+        await coordinator.presentDefaultTabbarCoordinator()
+    }
+    
+    @MainActor func presentCustomTabbarCoordinator() async {
+        await coordinator.presentCustomTabbarCoordinator()
+    }
+    
+    @MainActor func finsh() async {
+        await coordinator.finishFlow()
     }
 }

@@ -32,6 +32,7 @@ enum HomeRoute: RouteType {
     case fullscreen(viewModel: FullscreenViewModel)
     case detents(viewModel: DetentsViewModel)
     case actionListView(viewModel: ActionListViewModel)
+    case viewCustomTransition(viewModel: PushViewModel)
     
     // ---------------------------------------------------------------------
     // MARK: RouteType
@@ -49,13 +50,18 @@ enum HomeRoute: RouteType {
                 return .detents([.medium])
             case .actionListView:
                 return .push
+        case .viewCustomTransition:
+            return .custom(
+                transition: .move(edge: .leading),
+                animation: .bouncy,
+            )
         }
     }
     
     
     var view: Body {
         switch self {
-            case .push(let viewModel):
+        case .push(let viewModel), .viewCustomTransition(let viewModel):
                 PushView(viewModel: viewModel)
             case .sheet(let viewModel):
                 SheetView(viewModel: viewModel)

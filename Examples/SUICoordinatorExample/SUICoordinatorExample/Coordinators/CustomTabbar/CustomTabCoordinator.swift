@@ -1,5 +1,5 @@
 //
-//  TabbarCoordinatorType+Helpers.swift
+//  CustomTabbarCoordinator.swift
 //
 //  Copyright (c) Andres F. Lozano
 //
@@ -22,31 +22,24 @@
 //  THE SOFTWARE.
 //
 
-extension TabbarCoordinatorType {
+import Foundation
+import SUICoordinator
+
+public class CustomTabCoordinator: TabCoordinator<MyTabPage> {
     
-    /// Sets the current page for the tabbar coordinator.
-    ///
-    /// - Parameters:
-    ///   - coordinator: The coordinator.
-    @MainActor func setCurrentPage(with coordinator: any CoordinatorType) {
-        let page = pages.first(where: { "\($0.position)" == coordinator.tagId })
+    // ---------------------------------------------------------------------
+    // MARK: Init
+    // ---------------------------------------------------------------------
+    
+    public init( currentPage: MyTabPage = .first ) {
+        super.init(
+            pages: Page.allCases,
+            currentPage: currentPage,
+            viewContainer: { CustomTabView(viewModel: $0) }
+        )
         
-        setCurrentPage(page)
-    }
-    
-    /// Sets the current page for the tabbar coordinator.
-    ///
-    /// - Parameters:
-    ///   - value: The optional current page to set.
-    @MainActor public func setCurrentPage(_ value: (any TabbarPage)?) {
-        guard let value, value.position != currentPage.position,
-              let item = pages.first(where: { $0.position == value.position })
-        else { return  }
-        
-        currentPage = item
-    }
-    
-    @MainActor public func popToRoot() async {
-        try? await getCoordinatorSelected().root.popToRoot(animated: true)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
+            self?.setBadge.send(( "2", .first ))
+        }
     }
 }

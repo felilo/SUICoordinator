@@ -1,5 +1,5 @@
 //
-//  TabbarActionListViewModel.swift
+//  ClearBackgroundViewModifier.swift
 //
 //  Copyright (c) Andres F. Lozano
 //
@@ -22,25 +22,34 @@
 //  THE SOFTWARE.
 //
 
-import Foundation
+import SwiftUI
 
-class TabbarActionListViewModel: ObservableObject {
-    
-    let coordinator: TabbarFlowCoordinator
-    
-    init(coordinator: TabbarFlowCoordinator) {
-        self.coordinator = coordinator
+struct ClearBackgroundView: UIViewRepresentable {
+    func makeUIView(context: Context) -> some UIView {
+        let view = UIView()
+        DispatchQueue.main.async {
+            view.superview?.superview?.backgroundColor = .clear
+        }
+        return view
     }
+    func updateUIView(_ uiView: UIViewType, context: Context) { }
+}
+
+struct ClearBackgroundViewModifier: ViewModifier {
     
-    @MainActor func presentDefaultTabbarCoordinator() async {
-        await coordinator.presentDefaultTabbarCoordinator()
+    func body(content: Content) -> some View {
+        if #available(iOS 16.4, *) {
+            content
+                .presentationBackground(.clear)
+        } else {
+            content
+                .background(ClearBackgroundView())
+        }
     }
-    
-    @MainActor func presentCustomTabbarCoordinator() async {
-        await coordinator.presentCustomTabbarCoordinator()
-    }
-    
-    @MainActor func finsh() async {
-        await coordinator.finishFlow()
+}
+
+extension View {
+    func clearModalBackground()->some View {
+        self.modifier(ClearBackgroundViewModifier())
     }
 }

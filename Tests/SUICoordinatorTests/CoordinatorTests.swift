@@ -33,8 +33,8 @@ final class CoordinatorTests: XCTestCase {
     @MainActor func test_finshFlow() async throws {
         let sut = makeSUT()
         
-        await sut.router.navigate(to: .pushStep2, animated: animated )
-        await sut.router.navigate(to: .sheetStep, animated: animated )
+        await sut.router.navigate(toRoute: .pushStep2, animated: animated )
+        await sut.router.navigate(toRoute: .sheetStep, animated: animated )
         
         await finishFlow(sut: sut)
         XCTAssertEqual(sut.router.items.count, 0)
@@ -47,8 +47,8 @@ final class CoordinatorTests: XCTestCase {
         
         await sut.navigate(to: anyCoordinator, presentationStyle: .sheet)
         
-        sut.router.sheetCoordinator.remove(at: 0)
-        sut.swipedAway(coordinator: anyCoordinator)
+        await sut.router.sheetCoordinator.remove(at: "\(0)")
+        await sut.swipedAway(coordinator: anyCoordinator)
         
         try await Task.sleep(for: .seconds(0.5))
         
@@ -61,7 +61,7 @@ final class CoordinatorTests: XCTestCase {
         let coordinator = OtherCoordinator()
         
         await sut.start(animated: animated)
-        await sut.router.navigate(to: .pushStep2, animated: animated )
+        await sut.router.navigate(toRoute: .pushStep2, animated: animated )
         await navigateToCoordinator(coordinator, in: sut)
         
         await finishFlow(sut: sut)
@@ -92,8 +92,6 @@ final class CoordinatorTests: XCTestCase {
         
         XCTAssertEqual(mainView, route)
         XCTAssertEqual(self.getNameOf(object: mainView.view), self.getNameOf(object: FullScreenStepView.self))
-        
-        await finishFlow(sut: sut)
     }
     
     @MainActor func test_parentCoordinator_not_nil() async throws {
@@ -149,7 +147,7 @@ final class CoordinatorTests: XCTestCase {
         let sut = makeSUT()
         let coordinator1 = OtherCoordinator()
         let coordinator2 = AnyCoordinator()
-        let coordinator3 = AnyTabbarCoordinator()
+        let coordinator3 = AnyTabCoordinator()
         
         await navigateToCoordinator(coordinator1, in: sut)
         await navigateToCoordinator(coordinator2, in: coordinator1)
@@ -166,7 +164,7 @@ final class CoordinatorTests: XCTestCase {
     @MainActor func test_restartCoordinator() async throws {
         let sut = makeSUT()
         
-        await sut.router.navigate(to: .pushStep2, animated: animated )
+        await sut.router.navigate(toRoute: .pushStep2, animated: animated )
         await sut.router.present(.fullScreenStep)
         await sut.restart()
         
