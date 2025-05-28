@@ -305,7 +305,9 @@ func showMainApplicationTabs() async {
 
 For a comprehensive understanding and more advanced use cases, including `TabCoordinator` examples (both default SwiftUI `TabView` and custom tab views), please explore the example project located in the [Examples folder](https://github.com/felilo/SUICoordinator/tree/main/Examples/SUICoordinatorExample).
 
-https://github.com/felilo/SUICoordinator/assets/10853689/90e8564e-6fa5-458b-b2a3-23d10f5aebb4
+
+![coordinator-ezgif com-resize](https://github.com/user-attachments/assets/98a90863-3e35-48b3-9a9f-cf8757d5e0d6)
+
 
 _____
 
@@ -649,7 +651,7 @@ Assume:
 ```swift
 // In your App struct or AppDelegate, where you handle incoming notifications:
 import SUICoordinator
-import SwiftUI // For @MainActor
+import SwiftUI
 
 @MainActor
 func handlePushNotificationDeepLink(
