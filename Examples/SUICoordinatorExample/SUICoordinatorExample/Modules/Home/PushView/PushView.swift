@@ -30,6 +30,8 @@ struct PushView: View {
     
     @StateObject var viewModel: ViewModel
     @State private var counter = 0
+    @State var bgColor: Color = Self.randomColor()
+    
     
     let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
     
@@ -37,7 +39,7 @@ struct PushView: View {
     var body: some View {
         ZStack {
             
-            Color.cyan.ignoresSafeArea()
+            bgColor.ignoresSafeArea()
             
             VStack {
                 Text(viewModel.title)
@@ -68,6 +70,13 @@ struct PushView: View {
             }
         }
         .onReceive(timer) { _ in counter += 1 }
+    }
+
+    private static func randomColor() -> Color {
+        let red = Double.random(in: 0...1)
+        let green = Double.random(in: 0...1)
+        let blue = Double.random(in: 0...1)
+        return Color(red: red, green: green, blue: blue)
     }
 }
 
