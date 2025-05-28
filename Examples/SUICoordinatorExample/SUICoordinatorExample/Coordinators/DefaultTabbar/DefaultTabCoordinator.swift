@@ -1,5 +1,5 @@
 //
-//  DefaultTabbarCoordinator.swift
+//  DefaultTabCoordinator.swift
 //
 //  Copyright (c) Andres F. Lozano
 //
@@ -25,7 +25,7 @@
 import Foundation
 import SUICoordinator
 
-class DefaultTabbarCoordinator: TabCoordinator<MyTabPage> {
+class DefaultTabCoordinator: TabCoordinator<MyTabPage> {
     
     // ---------------------------------------------------------------------
     // MARK: Init
@@ -34,7 +34,7 @@ class DefaultTabbarCoordinator: TabCoordinator<MyTabPage> {
     init() {
         super.init(
             pages: Page.allCases,
-            currentPage: .second,
+            currentPage: .first,
             viewContainer: { TabViewCoordinator(dataSource: $0, currentPage: .first) }
         )
         

@@ -23,27 +23,53 @@
 //
 
 import SwiftUI
+import SUICoordinator
 
 @main
 struct SUICoordinatorExampleApp: App {
     
-    var mainCoordinator = HomeCoordinator()
+    var mainCoordinator = DefaultTabCoordinator()
     
     var body: some Scene {
         WindowGroup {
             mainCoordinator.getView().onAppear {
-                // Simulate the receipt of a notification or external trigger to present the some coordinator
+                
                 DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-                    Task { [weak mainCoordinator] in
-                        // Create and present the CustomTabbarCoordinator in a sheet presentation style
-                        let coordinator = CustomTabCoordinator()
-                        try? await coordinator.forcePresentation(
-                            presentationStyle: .sheet,
-                            mainCoordinator: mainCoordinator
-                        )
+                    Task {
+                        do {
+                            try await handlePushNotificationDeepLink(path: .settings, rootCoordinator: mainCoordinator)
+                        } catch {
+                            print("Some error")
+                        }
                     }
                 }
             }
+        }
+    }
+    
+    enum DeepLinkPaths: String {
+        case settings = "/tabs/settings"
+        case profile = "/profile"
+    }
+    
+    
+    func handlePushNotificationDeepLink(
+        path: DeepLinkPaths,
+        rootCoordinator: AnyCoordinatorType
+    ) async throws {
+        switch path {
+        case .settings:
+            if let tabCoordinator = try rootCoordinator.topCoordinator()?.parent as? DefaultTabCoordinator {
+                if let coordinatorSelected = try tabCoordinator.getCoordinatorSelected() as? HomeCoordinator {
+                    await coordinatorSelected.presentDetents()
+                }
+            }
+        case .profile:
+            let coordinator = CustomTabCoordinator()
+            try? await coordinator.forcePresentation(
+                presentationStyle: .sheet,
+                mainCoordinator: mainCoordinator
+            )
         }
     }
 }
