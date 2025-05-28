@@ -24,7 +24,7 @@
 
 import Foundation
 
-class TabbarActionListViewModel: ObservableObject {
+class TabListViewModel: ObservableObject {
     
     let coordinator: TabFlowCoordinator
     

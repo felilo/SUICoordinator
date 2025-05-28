@@ -24,9 +24,9 @@
 
 import SwiftUI
 
-struct TabbarActionListView: View {
+struct TabListView: View {
     
-    typealias ViewModel = TabbarActionListViewModel
+    typealias ViewModel = TabListViewModel
     
     
     @Environment(\.isPresented) private var isPresented

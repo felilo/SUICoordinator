@@ -32,11 +32,11 @@ class TabFlowCoordinator: Coordinator<DefaultRoute> {
     // ---------------------------------------------------------------------
     
     override func start(animated: Bool = true) async {
-        let viewModel = TabbarActionListViewModel(coordinator: self)
+        let viewModel = TabListViewModel(coordinator: self)
         
         let route = DefaultRoute(
             presentationStyle: .push,
-            content: { TabbarActionListView(viewModel: viewModel) }
+            content: { TabListView(viewModel: viewModel) }
         )
         
         await startFlow(route: route )

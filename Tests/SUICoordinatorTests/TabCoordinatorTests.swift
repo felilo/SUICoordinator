@@ -27,7 +27,7 @@ import SwiftUI
 @testable import SUICoordinator
 
 
-final class TabbarCoordinatorTests: XCTestCase {
+final class TabCoordinatorTests: XCTestCase {
     
     private let animated: Bool = false
     
