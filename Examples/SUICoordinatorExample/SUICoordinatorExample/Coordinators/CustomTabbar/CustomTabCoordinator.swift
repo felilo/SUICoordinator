@@ -31,7 +31,7 @@ public class CustomTabCoordinator: TabCoordinator<MyTabPage> {
     // MARK: Init
     // ---------------------------------------------------------------------
     
-    public init( currentPage: MyTabPage = .first ) {
+    public init(currentPage: MyTabPage = .first ) {
         super.init(
             pages: Page.allCases,
             currentPage: currentPage,

@@ -58,23 +58,14 @@ struct SUICoordinatorExampleApp: App {
                     }
                 }
                 .onOpenURL { incomingURL in
-                    guard let path = DeepLinkPath(rawValue: incomingURL.absoluteString) else { return }
+                    guard let host = URLComponents(url: incomingURL, resolvingAgainstBaseURL: true)?.host,
+                          let path = DeepLinkPath(rawValue: host)
+                    else { return }
                     
-                    Task {
+                    Task { @MainActor in
                         try? await handlePushNotificationDeepLink(path: path, rootCoordinator: mainCoordinator)
                     }
                 }
-                .onAppear {
-                    // This DispatchQueue.main.asyncAfter block simulates a delayed deep link trigger
-                    // that might occur after the app has fully launched, for example, processing
-                    // a launch option or a deferred event. Here, it navigates to the .home path
-                    // after 3 seconds.
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-                        Task {
-                            try? await handlePushNotificationDeepLink(path: .home, rootCoordinator: mainCoordinator)
-                        }
-                    }
-            }
         }
     }
     
@@ -84,7 +75,7 @@ struct SUICoordinatorExampleApp: App {
     /// - `tabCoordinator`: Represents a path to present a `CustomTabCoordinator` modally.
     enum DeepLinkPath: String {
         case home = "home" // Example: "yourapp://home" or a notification payload "home"
-        case tabCoordinator = "/tabs/coordinator" // Example: "yourapp://tabs/coordinator"
+        case tabCoordinator = "tabs-coordinator" // Example: "yourapp://tabs-coordinator"
     }
     
     
@@ -100,7 +91,7 @@ struct SUICoordinatorExampleApp: App {
     ///     used as a starting point to traverse and manipulate the coordinator tree.
     /// - Throws: Can throw errors from coordinator operations, such as `topCoordinator()` or `getCoordinatorSelected()`,
     ///           if the navigation path is invalid or a coordinator is not in the expected state.
-    func handlePushNotificationDeepLink(
+    @MainActor func handlePushNotificationDeepLink(
         path: DeepLinkPath,
         rootCoordinator: AnyCoordinatorType
     ) async throws {
@@ -130,7 +121,7 @@ struct SUICoordinatorExampleApp: App {
             // It creates a new `HomeCoordinator` instance and uses `forcePresentation`
             // to display it as a sheet over the current context, managed by the `mainCoordinator`.
             let coordinator = HomeCoordinator()
-            try? await coordinator.forcePresentation(
+            try await coordinator.forcePresentation(
                 presentationStyle: .sheet,
                 mainCoordinator: mainCoordinator
             )
