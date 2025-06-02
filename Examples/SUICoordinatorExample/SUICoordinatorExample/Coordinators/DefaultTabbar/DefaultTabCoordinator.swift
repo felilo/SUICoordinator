@@ -44,6 +44,3 @@ class DefaultTabCoordinator: TabCoordinator<MyTabPage> {
         }
     }
 }
-
-
-

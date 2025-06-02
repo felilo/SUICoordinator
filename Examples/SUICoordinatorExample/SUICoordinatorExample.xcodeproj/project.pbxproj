@@ -10,6 +10,7 @@
 		D9107CFB2B6703D80039F40D /* NavigationActionListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9107CFA2B6703D80039F40D /* NavigationActionListView.swift */; };
 		D91AD1F42D0D0BDC00C0FEAA /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D91AD1F32D0D0BDC00C0FEAA /* LaunchScreen.storyboard */; };
 		D9204C0C2DE661EF004D632D /* MyTabPageDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9204C0B2DE661EC004D632D /* MyTabPageDataSource.swift */; };
+		D92B4E582DEDFC77000A8B3D /* DefaultTabCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = D92B4E572DEDFC77000A8B3D /* DefaultTabCoordinator.swift */; };
 		D95389212B643BAD000E3357 /* SUICoordinatorExampleApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = D95389202B643BAD000E3357 /* SUICoordinatorExampleApp.swift */; };
 		D95389232B643BAD000E3357 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D95389222B643BAD000E3357 /* ContentView.swift */; };
 		D95389252B643BAE000E3357 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D95389242B643BAE000E3357 /* Assets.xcassets */; };
@@ -32,7 +33,6 @@
 		D9B456062B643FBD004DD03A /* DetentsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9B455E02B643FBD004DD03A /* DetentsView.swift */; };
 		D9B456072B643FBD004DD03A /* DetentsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9B455E12B643FBD004DD03A /* DetentsViewModel.swift */; };
 		D9B4560C2B643FBD004DD03A /* SplashView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9B455EB2B643FBD004DD03A /* SplashView.swift */; };
-		D9B4560E2B643FBD004DD03A /* DefaultTabbarCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9B455EF2B643FBD004DD03A /* DefaultTabbarCoordinator.swift */; };
 		D9B456152B643FBD004DD03A /* HomeRoute.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9B455FA2B643FBD004DD03A /* HomeRoute.swift */; };
 		D9B456162B643FBD004DD03A /* HomeCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9B455FB2B643FBD004DD03A /* HomeCoordinator.swift */; };
 /* End PBXBuildFile section */
@@ -42,6 +42,7 @@
 		D91AD1F32D0D0BDC00C0FEAA /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 		D91AD1F52D0D0E6200C0FEAA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		D9204C0B2DE661EC004D632D /* MyTabPageDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyTabPageDataSource.swift; sourceTree = "<group>"; };
+		D92B4E572DEDFC77000A8B3D /* DefaultTabCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultTabCoordinator.swift; sourceTree = "<group>"; };
 		D953891D2B643BAD000E3357 /* SUICoordinatorExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SUICoordinatorExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D95389202B643BAD000E3357 /* SUICoordinatorExampleApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SUICoordinatorExampleApp.swift; sourceTree = "<group>"; };
 		D95389222B643BAD000E3357 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -64,7 +65,6 @@
 		D9B455E02B643FBD004DD03A /* DetentsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DetentsView.swift; sourceTree = "<group>"; };
 		D9B455E12B643FBD004DD03A /* DetentsViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DetentsViewModel.swift; sourceTree = "<group>"; };
 		D9B455EB2B643FBD004DD03A /* SplashView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SplashView.swift; sourceTree = "<group>"; };
-		D9B455EF2B643FBD004DD03A /* DefaultTabbarCoordinator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DefaultTabbarCoordinator.swift; sourceTree = "<group>"; };
 		D9B455FA2B643FBD004DD03A /* HomeRoute.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HomeRoute.swift; sourceTree = "<group>"; };
 		D9B455FB2B643FBD004DD03A /* HomeCoordinator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HomeCoordinator.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -253,7 +253,7 @@
 				D9204C0B2DE661EC004D632D /* MyTabPageDataSource.swift */,
 				D9A4D2172DE65AF600FBAF4E /* MyTabPage.swift */,
 				D9A4D2192DE65F4700FBAF4E /* TabViewCoordinator.swift */,
-				D9B455EF2B643FBD004DD03A /* DefaultTabbarCoordinator.swift */,
+				D92B4E572DEDFC77000A8B3D /* DefaultTabCoordinator.swift */,
 			);
 			path = DefaultTabbar;
 			sourceTree = "<group>";
@@ -365,8 +365,8 @@
 				D9B456162B643FBD004DD03A /* HomeCoordinator.swift in Sources */,
 				D9630FFF2DE6B73800796C0C /* TabListView.swift in Sources */,
 				D9107CFB2B6703D80039F40D /* NavigationActionListView.swift in Sources */,
-				D9B4560E2B643FBD004DD03A /* DefaultTabbarCoordinator.swift in Sources */,
 				D9B455FE2B643FBD004DD03A /* PushView.swift in Sources */,
+				D92B4E582DEDFC77000A8B3D /* DefaultTabCoordinator.swift in Sources */,
 				D9B456022B643FBD004DD03A /* FullscreenViewModel.swift in Sources */,
 				D961EB862DE23FAE00FDEAA5 /* CustomTabCoordinator.swift in Sources */,
 				D9B456072B643FBD004DD03A /* DetentsViewModel.swift in Sources */,

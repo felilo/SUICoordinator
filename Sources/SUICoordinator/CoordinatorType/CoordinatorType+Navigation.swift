@@ -45,9 +45,15 @@ public extension CoordinatorType {
     ///     await topCoordinator.navigate(to: newCoordinator, presentationStyle: .sheet)
     /// }
     /// ```
-    func topCoordinator(pCoodinator: AnyCoordinatorType? = nil) throws -> AnyCoordinatorType? {
+    func topCoordinator(pCoordinator: AnyCoordinatorType? = nil) throws -> AnyCoordinatorType? {
+        if let tabCoordinator = getTabbarCoordinable(self) {
+            var auxCoordinator = try tabCoordinator.getCoordinatorSelected() ?? self.children.last
+            return try tabCoordinator.getCoordinatorSelected()
+        }
+        
+        
         guard children.last != nil else { return self }
-        var auxCoordinator = pCoodinator ?? self.children.last
+        var auxCoordinator = pCoordinator ?? self.children.last
         return try getDeepCoordinator(from: &auxCoordinator)
     }
     

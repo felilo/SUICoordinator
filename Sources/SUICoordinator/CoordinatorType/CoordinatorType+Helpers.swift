@@ -69,7 +69,7 @@ extension CoordinatorType {
         if value?.children.last == nil {
             return value
         } else if let value = value, let tabCoordinator = getTabbarCoordinable(value) {
-            return try topCoordinator(pCoodinator: try tabCoordinator.getCoordinatorSelected())
+            return try topCoordinator(pCoordinator: try tabCoordinator.getCoordinatorSelected())
         } else {
             var last = value?.children.last
             return try getDeepCoordinator(from: &last)
