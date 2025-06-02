@@ -73,7 +73,7 @@ enum HomeRoute: RouteType {
 }
 ```
 
-For a deeper dive into route, take a look at [RouteType](https://github.com/felilo/SUICoordinator/blob/main/Examples/SUICoordinatorExample/SUICoordinatorExample/Coordinators/DefaultTabbar/TabViewCoordinator.swift)
+For a deeper dive into route protocol, take a look at [RouteType](https://github.com/felilo/SUICoordinator?tab=readme-ov-file#routetype)
 
 ### 2. Create Your Coordinator
 Subclass `Coordinator<YourRouteType>` and implement the mandatory `start()` method. This method defines the initial view or flow for the coordinator.
