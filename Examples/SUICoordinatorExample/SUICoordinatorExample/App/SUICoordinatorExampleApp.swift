@@ -54,14 +54,14 @@ struct SUICoordinatorExampleApp: App {
                     guard let urlString = object.object as? String,
                           let path = DeepLinkPath(rawValue: urlString) else { return }
                     Task {
-                        await try? handlePushNotificationDeepLink(path: path, rootCoordinator: mainCoordinator)
+                        try? await handlePushNotificationDeepLink(path: path, rootCoordinator: mainCoordinator)
                     }
                 }
                 .onOpenURL { incomingURL in
                     guard let path = DeepLinkPath(rawValue: incomingURL.absoluteString) else { return }
                     
                     Task {
-                        await try? handlePushNotificationDeepLink(path: path, rootCoordinator: mainCoordinator)
+                        try? await handlePushNotificationDeepLink(path: path, rootCoordinator: mainCoordinator)
                     }
                 }
                 .onAppear {
@@ -71,7 +71,7 @@ struct SUICoordinatorExampleApp: App {
                     // after 3 seconds.
                     DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
                         Task {
-                            await try? handlePushNotificationDeepLink(path: .home, rootCoordinator: mainCoordinator)
+                            try? await handlePushNotificationDeepLink(path: .home, rootCoordinator: mainCoordinator)
                         }
                     }
             }
