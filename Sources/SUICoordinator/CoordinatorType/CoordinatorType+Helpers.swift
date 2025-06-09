@@ -26,6 +26,15 @@ import Foundation
 
 extension CoordinatorType {
     
+    /// A Boolean value indicating whether the coordinator has been started and has a main view.
+    ///
+    /// This property checks if the `router`'s `mainView` is non-nil, which typically
+    /// signifies that the coordinator's `start()` method has been called and has set up
+    /// its initial view.
+    var isRunning: Bool {
+        router.mainView != nil
+    }
+    
     /// The root router associated with the coordinator.
     var root: (any RouterType) {
         return router
