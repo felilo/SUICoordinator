@@ -378,7 +378,9 @@ public class Router<Route: RouteType>: ObservableObject, RouterType {
     /// item manager state, triggering UI updates when the navigation stack changes.
     @MainActor
     func updateItems() async {
-        items = await itemManager.getAllItems()
+        try? await Task.sleep(for: .milliseconds(20))
+        
+        self.items = await self.itemManager.getAllItems()
     }
     
     /// Synchronizes the router's items array with the internal item manager state.
@@ -394,13 +396,13 @@ public class Router<Route: RouteType>: ObservableObject, RouterType {
     ///
     /// This method is typically called automatically by the router's internal mechanisms
     /// and should rarely need to be called directly by client code.
+    @MainActor
     public func syncItems() async {
         let counterManagerItems = await itemManager.getAllItems().count
         let counterItems = items.count
         
-        if counterItems < counterManagerItems {
-            let range = counterItems..<counterManagerItems
-            await itemManager.removeItemsIn(range: range)
+        if counterItems != counterManagerItems {
+            await itemManager.setItems(items)
             await updateItems()
         }
     }
