@@ -1,5 +1,5 @@
 //
-//  ViewModifier.swift
+//  View+Helpers.swift
 //
 //  Copyright (c) Andres F. Lozano
 //
@@ -24,16 +24,15 @@
 
 import SwiftUI
 
-struct ViewDidLoadModifier: ViewModifier {
-    @State private var viewDidLoad = false
-    public let action: (() -> Void)?
-    
-    public func body(content: Content) -> some View {
-        content.onAppear {
-            if !viewDidLoad {
-                viewDidLoad.toggle()
-                action?()
-            }
-        }
+public extension View {
+    /// Wraps the view in an `AnyView` type eraser.
+    ///
+    /// This is useful when you need to store or return a view of an
+    /// unknown concrete type, for example, in collections or when
+    /// implementing generic view-building functions.
+    ///
+    /// - Returns: An `AnyView` wrapping this view.
+    func asAnyView() -> AnyView {
+        AnyView(self)
     }
 }

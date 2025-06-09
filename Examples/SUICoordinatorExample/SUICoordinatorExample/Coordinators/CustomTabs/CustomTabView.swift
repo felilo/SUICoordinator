@@ -73,7 +73,7 @@ struct CustomTabView<DataSource: TabCoordinatorType>: View where DataSource.Data
             
             VStack() {
                 Spacer()
-                customTabbar()
+                customTabView()
             }.background(
                 .gray.opacity(0.5),
                 in: RoundedRectangle(cornerRadius: 0, style: .continuous)
@@ -108,8 +108,8 @@ struct CustomTabView<DataSource: TabCoordinatorType>: View where DataSource.Data
     @ViewBuilder
     func tabBarItem(page: Page) -> some View {
         if let item = viewModel.getCoordinator(with: page.position) {
-            AnyView(item.getView())
-                .toolbar(.hidden)
+            item.getView().asAnyView()
+                .toolbar(.hidden, for: .tabBar)
                 .tag(page)
         }
     }
@@ -150,7 +150,7 @@ struct CustomTabView<DataSource: TabCoordinatorType>: View where DataSource.Data
     
     
     @ViewBuilder
-    func customTabbar() -> some View {
+    func customTabView() -> some View {
         GeometryReader { proxy in
             HStack(spacing: 0) {
                 ForEach(pages, id: \.id) {
