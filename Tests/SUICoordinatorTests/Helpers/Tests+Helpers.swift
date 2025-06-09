@@ -37,11 +37,12 @@ extension XCTestCase {
     @MainActor func navigateToCoordinator(
         _ nextCoordinator: (any CoordinatorType),
         in coordinator: (any CoordinatorType),
+        presentationStyle: TransitionPresentationStyle = .fullScreenCover,
         animated: Bool = false
     ) async {
         await coordinator.navigate(
             to: nextCoordinator,
-            presentationStyle: .fullScreenCover,
+            presentationStyle: presentationStyle,
             animated: animated)
         
         await nextCoordinator.start(animated: animated)
@@ -51,7 +52,18 @@ extension XCTestCase {
         await sut.finishFlow(animated: animated)
     }
     
-    func getNameOf<T>(object: T) -> String {
-        Router<AnyEnumRoute>.removingParenthesesContent(String(describing: object.self))
+    func asyncStream<T, E: Error>(_ stream: any Publisher<T, E> )  -> AsyncStream<T> {
+        AsyncStream { continuation in
+            
+            let cancellable = stream.sink { completion in
+                continuation.finish()
+            } receiveValue: { value in
+                continuation.yield(value)
+            }
+            
+            continuation.onTermination = { continuation in
+                cancellable.cancel()
+            }
+        }
     }
 }

@@ -40,8 +40,8 @@ extension CoordinatorType {
         return router
     }
     
-    /// A boolean value indicating whether the coordinator is tabbar-coordinable.
-    var isTabbarCoordinable: Bool {
+    /// A boolean value indicating whether the coordinator is tab-coordinable.
+    var isTabCoordinable: Bool {
         self is (any TabCoordinatable)
     }
     
@@ -77,7 +77,7 @@ extension CoordinatorType {
     func getDeepCoordinator(from value: inout AnyCoordinatorType?) throws -> AnyCoordinatorType? {
         if value?.children.last == nil {
             return value
-        } else if let value = value, let tabCoordinator = getTabbarCoordinable(value) {
+        } else if let value = value, let tabCoordinator = getTabCoordinable(value) {
             return try topCoordinator(pCoordinator: try tabCoordinator.getCoordinatorSelected())
         } else {
             var last = value?.children.last
@@ -112,12 +112,12 @@ extension CoordinatorType {
         await removeChildren()
     }
     
-    /// Retrieves the tabbar-coordinable object associated with the provided coordinator.
+    /// Retrieves the tab-coordinable object associated with the provided coordinator.
     ///
     /// - Parameters:
-    ///   - coordinator: The coordinator for which to retrieve the tabbar-coordinable object.
-    /// - Returns: An optional tabbar-coordinable object conforming to any TabCoordinatable.
-    func getTabbarCoordinable(_ coordinator: AnyCoordinatorType) ->  (any TabCoordinatable)? {
+    ///   - coordinator: The coordinator for which to retrieve the tab-coordinable object.
+    /// - Returns: An optional tab-coordinable object conforming to any TabCoordinatable.
+    func getTabCoordinable(_ coordinator: AnyCoordinatorType) ->  (any TabCoordinatable)? {
         coordinator as? (any TabCoordinatable)
     }
     
@@ -181,6 +181,7 @@ extension CoordinatorType {
         
         sheetCoordinator.onRemoveItem = { [weak sheetCoordinator, weak coordinator] id in
             if id.contains(uuid) {
+                try? await Task.sleep(for: .seconds(0.2))
                 await coordinator?.finish(animated: false, withDismiss: false)
                 sheetCoordinator?.onRemoveItem = nil
             }
@@ -204,7 +205,7 @@ extension CoordinatorType {
         _ coordinator: AnyCoordinatorType,
         presentationStyle: TransitionPresentationStyle,
         animated: Bool
-    ) -> SheetItem<RouteType.Body> {
+    ) -> SheetItem<AnyViewAlias> {
         var effectivePresentationStyle = presentationStyle
         
         if effectivePresentationStyle == .push {

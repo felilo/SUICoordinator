@@ -46,11 +46,9 @@ public extension CoordinatorType {
     /// }
     /// ```
     func topCoordinator(pCoordinator: AnyCoordinatorType? = nil) throws -> AnyCoordinatorType? {
-        if let tabCoordinator = getTabbarCoordinable(self) {
-            var auxCoordinator = try tabCoordinator.getCoordinatorSelected() ?? self.children.last
+        if let tabCoordinator = getTabCoordinable(self) {
             return try tabCoordinator.getCoordinatorSelected()
         }
-        
         
         guard children.last != nil else { return self }
         var auxCoordinator = pCoordinator ?? self.children.last

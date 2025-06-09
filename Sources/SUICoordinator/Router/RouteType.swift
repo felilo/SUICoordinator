@@ -24,102 +24,51 @@
 
 import SwiftUI
 
-/// Protocol defining the requirements for a route in the Coordinator pattern.
+/// `RouteType` is a typealias used for defining route representations in the Coordinator pattern.
 ///
-/// `RouteType` represents the different views or navigation actions that can be handled by a coordinator
-/// or router within an application. Routes encapsulate both the destination view and how it should be presented.
+/// It represents any value (typically an enum or struct) that both:
+/// - Conforms to `RoutePresentationType` (declares navigation presentation style and identity)
+/// - Implements SwiftUI's `View` protocol (provides destination UI)
 ///
-/// Routes are the fundamental building blocks of navigation in the coordinator pattern, providing a
-/// type-safe way to define navigation destinations and their presentation behavior.
+/// By conforming to `RouteType`, you enable your enum or struct to act as a navigation route within your coordinator–
+/// encapsulating both the "what to show" and "how to present" aspects in a type-safe, declarative way.
 ///
-/// ## Key Features
-/// - **Type Safety**: Each route defines its specific view type and presentation behavior
-/// - **Presentation Control**: Routes specify how they should be presented (push, sheet, etc.)
-/// - **View Builder Support**: Routes can return complex view hierarchies using `@ViewBuilder`
-/// - **Hashable Conformance**: Routes can be used in navigation stacks and collections
-///
-/// ## Example Implementation
+/// ## Example
 /// ```swift
 /// enum AppRoute: RouteType {
 ///     case home
-///     case profile(User)
-///     case settings
+///     case details(id: Int)
 ///
 ///     var presentationStyle: TransitionPresentationStyle {
 ///         switch self {
-///         case .home, .profile:
+///         case .home:
 ///             return .push
-///         case .settings:
+///         case .details:
 ///             return .sheet
 ///         }
 ///     }
 ///
-///     @ViewBuilder @MainActor
-///     var view: Body {
+///     var body: some View {
 ///         switch self {
-///         case .home:
-///             HomeView()
-///         case .profile(let user):
-///             ProfileView(user: user)
-///         case .settings:
-///             SettingsView()
+///         case .home: HomeView()
+///         case .details(let id): DetailsView(id: id)
 ///         }
 ///     }
 /// }
 /// ```
-public protocol RouteType: SCHashable {
-    
-    // ---------------------------------------------------------
-    // MARK: typealias
-    // ---------------------------------------------------------
-    
-    /// A type alias representing the body of the route, conforming to the View protocol.
-    ///
-    /// This represents any SwiftUI view that can be presented as the destination for this route.
-    typealias Body = (any View)
-    
-    // ---------------------------------------------------------
-    // MARK: Properties
-    // ---------------------------------------------------------
-    
+///
+/// Use `RouteType` when you want to describe stack-based or modal navigation with clear ownership of both view and presentation.
+///
+public typealias RouteType = RoutePresentationType & View
+
+/// Protocol that supplies presentation and identity requirements for `RouteType`.
+///
+/// - Requires a `presentationStyle` indicating navigation semantics (push, sheet, fullScreen, etc.)
+/// - Inherits from `SCHashable` for use in navigation stacks
+public protocol RoutePresentationType: SCHashable {
     /// The transition style for presenting the view.
     ///
     /// This property determines how the route's view should be presented when navigated to.
-    /// Common values include `.push` for navigation stack presentation, `.sheet` for modal presentation,
-    /// and `.fullScreenCover` for full-screen modal presentation.
-    var presentationStyle: TransitionPresentationStyle { get }
-    
-    /// The body of the route, conforming to the View protocol.
-    ///
-    /// This computed property returns the SwiftUI view that represents the destination for this route.
-    /// Use the `@ViewBuilder` attribute to enable view builder syntax for complex view hierarchies.
-    ///
-    /// - Important: This property is marked with `@MainActor` to ensure it runs on the main thread,
-    ///              which is required for SwiftUI view creation.
-    @ViewBuilder @MainActor var view: Body { get }
-}
-
-/// Extension providing utility methods for RouteType conforming types.
-extension RouteType {
-    
-    /// Creates a view from the provided content closure with proper error handling.
-    ///
-    /// This method safely creates a view from a content closure, providing a fallback
-    /// empty view if the content creation fails. It also ensures proper view identification
-    /// for SwiftUI's view diffing system.
-    ///
-    /// - Parameter content: A closure that returns an optional view body.
-    /// - Returns: A properly configured SwiftUI view, either from the content or an empty fallback.
-    ///
-    /// - Note: This method is used internally by the router system to safely create views
-    ///         from route definitions.
-    func getView(from content: () -> (Body?)) -> any View {
-        var view = AnyView(EmptyView()).id(UUID().uuidString)
-        
-        if let v = content() {
-            view = AnyView(v).id(String(describing: v.self))
-        }
-        
-        return view
-    }
+    /// Supported values include `.push` (navigation stack), `.sheet` (modal), `.fullScreenCover`, etc.
+    nonisolated var presentationStyle: TransitionPresentationStyle { get }
 }

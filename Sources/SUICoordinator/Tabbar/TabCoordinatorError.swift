@@ -1,5 +1,5 @@
 //
-//  TabbarCoordinatorError.swift
+//  TabCoordinatorError.swift
 //
 //  Copyright (c) Andres F. Lozano
 //

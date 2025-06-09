@@ -1,5 +1,5 @@
 //
-//  CustomTabbarCoordinator.swift
+//  CustomTabCoordinator.swift
 //
 //  Copyright (c) Andres F. Lozano
 //

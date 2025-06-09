@@ -50,13 +50,13 @@ public protocol RouterType: ObservableObject {
     var items: [Route] { get set }
     
     /// The sheet coordinator associated with the router.
-    var sheetCoordinator: SheetCoordinator<Route.Body> { get set }
+    var sheetCoordinator: SheetCoordinator<AnyViewAlias> { get }
     
     /// The main view associated with the router.
-    var mainView: Route? { get set }
+    var mainView: Route? { get  }
     
     /// The main view associated with the router.
-    var animated: Bool { get set }
+    var animated: Bool { get }
     
     // --------------------------------------------------------------------
     // MARK: Functions
@@ -89,14 +89,6 @@ public protocol RouterType: ObservableObject {
     /// - Parameters:
     ///   - animated: A boolean value indicating whether to animate the pop action.
     @MainActor func popToRoot(animated: Bool) async
-    
-    /// Pops to a specific view or coordinator in the navigation stack.
-    ///
-    /// - Parameters:
-    ///   - view: The target view or coordinator to pop to.
-    ///   - animated: A boolean value indicating whether to animate the pop action.
-    /// - Returns: A boolean value indicating whether the pop action was successful.
-    @MainActor func popToView<T>(_ view: T, animated: Bool) async -> Bool
     
     /// Dismisses the currently presented view or coordinator.
     ///

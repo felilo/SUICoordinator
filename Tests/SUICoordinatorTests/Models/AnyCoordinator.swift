@@ -27,13 +27,13 @@ import SwiftUI
 
 class AnyCoordinator: Coordinator<AnyEnumRoute> {
     override func start(animated: Bool = true) async {
-        await startFlow(route: .pushStep)
+        await startFlow(route: .pushStep(1))
     }
 }
 
 class OtherCoordinator: Coordinator<DefaultRoute> { 
     override func start(animated: Bool = true) async {
-        let page = AnyEnumRoute.pushStep
-        await startFlow(route: .init(presentationStyle: page.presentationStyle, content: { page.view }))
+        let page = AnyEnumRoute.pushStep(1)
+        await startFlow(route: .init(presentationStyle: page.presentationStyle, content: { page }))
     }
 }

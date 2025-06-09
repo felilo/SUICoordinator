@@ -1,5 +1,5 @@
 //
-//  TabbarCoordinatorTests.swift
+//  TabCoordinatorTests.swift
 //
 //  Copyright (c) Andres F. Lozano
 //
@@ -93,9 +93,9 @@ final class TabCoordinatorTests: XCTestCase {
         await finishFlow(sut: sut)
     }
     
-    @MainActor func test_siTabbarCoordinator() async throws {
+    @MainActor func test_siTabCoordinator() async throws {
         let sut = makeSUT(currentPage: .tab1)
-        XCTAssertTrue(sut.isTabbarCoordinable)
+        XCTAssertTrue(sut.isTabCoordinable)
         await finishFlow(sut: sut)
     }
     
@@ -151,9 +151,7 @@ final class TabCoordinatorTests: XCTestCase {
         await sut.start(animated: animated)
         await sut.setPages(pages)
         
-        let view = try XCTUnwrap(sut.router.mainView?.view)
-        
-        XCTAssertEqual(self.getNameOf(object: view), self.getNameOf(object: AnyTabView<TabCoordinator<AnyEnumTabRoute>>.self))
+        XCTAssertTrue(sut.isRunning)
         
         await finishFlow(sut: sut)
     }

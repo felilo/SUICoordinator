@@ -35,7 +35,7 @@ class HomeCoordinator: Coordinator<HomeRoute> {
     
     override func start(animated: Bool = true) async {
         let viewModel = ActionListViewModel(coordinator: self)
-        await startFlow(route: .actionListView(viewModel: viewModel), animated: animated)
+        await startFlow(route: .actionListView(viewModel: viewModel))
     }
     
     // ---------------------------------------------------------------------
@@ -69,7 +69,7 @@ class HomeCoordinator: Coordinator<HomeRoute> {
         await router.navigate(toRoute: .viewCustomTransition(viewModel: viewModel), animated: animated)
     }
     
-    func presentTabbarCoordinator() async {
+    func presentTabCoordinator() async {
         let coordinator = CustomTabCoordinator()
         await navigate(to: coordinator, presentationStyle: .sheet, animated: animated)
     }

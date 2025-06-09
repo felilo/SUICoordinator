@@ -52,8 +52,8 @@ class ActionListViewModel: ObservableObject {
         await coordinator.presentViewWithCustomPresentation()
     }
     
-    @MainActor func presentTabbarCoordinator() async {
-        await coordinator.presentTabbarCoordinator()
+    @MainActor func presentTabCoordinator() async {
+        await coordinator.presentTabCoordinator()
     }
     
     @MainActor func finish() async {

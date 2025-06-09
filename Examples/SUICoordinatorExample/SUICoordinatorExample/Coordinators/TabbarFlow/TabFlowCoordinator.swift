@@ -51,7 +51,7 @@ class TabFlowCoordinator: Coordinator<DefaultRoute> {
         await navigate(to: coordinator, presentationStyle: .fullScreenCover)
     }
     
-    func presentCustomTabbarCoordinator() async {
+    func presentCustomTabCoordinator() async {
         let coordinator = CustomTabCoordinator()
         await navigate(to: coordinator, presentationStyle: .sheet)
     }

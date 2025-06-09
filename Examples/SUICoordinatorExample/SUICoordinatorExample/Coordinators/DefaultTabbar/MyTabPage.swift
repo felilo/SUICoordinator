@@ -1,5 +1,5 @@
 //
-//  MyTabbarPage.swift
+//  MyTabPage.swift
 //
 //  Copyright (c) Andres F. Lozano
 //
@@ -30,7 +30,7 @@ public enum MyTabPage: TabPage, CaseIterable {
     case second
     
     // ---------------------------------------------------------
-    // MARK: TabbarPage
+    // MARK: TabPage
     // ---------------------------------------------------------
     
     public var position: Int {
@@ -40,7 +40,7 @@ public enum MyTabPage: TabPage, CaseIterable {
         }
     }
     
-    public func coordinator() -> (any CoordinatorType) {
+    public func coordinator() -> AnyCoordinatorType {
         switch self {
             case .first:
                 return HomeCoordinator()

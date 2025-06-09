@@ -79,7 +79,7 @@ public class Router<Route: RouteType>: ObservableObject, RouterType {
     ///
     /// This coordinator manages all modal presentations (sheets, full-screen covers, etc.)
     /// and provides a unified interface for modal navigation operations.
-    @Published public var sheetCoordinator: SheetCoordinator<Route.Body> = .init()
+    @Published public var sheetCoordinator: SheetCoordinator<AnyViewAlias> = .init()
     
     /// Controls whether navigation operations should be animated.
     ///
@@ -172,7 +172,7 @@ public class Router<Route: RouteType>: ObservableObject, RouterType {
             id: "\(view.id) - \(UUID())",
             animated: animated,
             presentationStyle: presentationStyle ?? view.presentationStyle,
-            view: { view.view }
+            view: { view as AnyViewAlias }
         )
         
         await presentSheet(item: item)
@@ -206,43 +206,7 @@ public class Router<Route: RouteType>: ObservableObject, RouterType {
         await itemManager.removeAll()
         await updateItems()
     }
-    
-    /// Pops to a specific view type in the navigation stack.
-    ///
-    /// This method searches the navigation stack for a view of the specified type
-    /// and removes all views above it, effectively navigating back to that view.
-    ///
-    /// - Parameters:
-    ///   - view: The target view type to pop to.
-    ///   - animated: A boolean value indicating whether to animate the pop action.
-    ///
-    /// - Returns: `true` if the target view was found and navigation occurred,
-    ///            `false` if the view was not found in the stack.
-    @discardableResult
-    @MainActor public func popToView<T>(_ view: T, animated: Bool = true) async -> Bool {
-        let name: (Any) -> String = { String(describing: $0.self) }
-        
-        let isValidName = { (route: Route) in
-            Self.removingParenthesesContent(name(route.view)) == name(view)
-        }
-        
-        let items = await itemManager.getAllItems()
-        guard let index = items.firstIndex(where: isValidName) else {
-            return false
-        }
-        
-        let position = index + 1
-        let range = position..<items.count
-        if position >= items.count { return true }
-        
-        self.animated = animated
-        
-        await itemManager.removeItemsIn(range: range)
-        await updateItems()
-        
-        return true
-    }
-    
+
     /// Dismisses the currently presented view or coordinator.
     ///
     /// This method dismisses the topmost modal presentation, such as a sheet
@@ -322,44 +286,8 @@ public class Router<Route: RouteType>: ObservableObject, RouterType {
     ///
     /// - Parameters:
     ///   - item: The sheet item containing the view to present.
-    @MainActor func presentSheet(item: SheetItem<RouteType.Body>) async -> Void {
+    @MainActor func presentSheet(item: SheetItem<AnyViewAlias>) async -> Void {
         await sheetCoordinator.presentSheet(item)
-    }
-    
-    /// Removes all content inside parentheses, including nested parentheses, from the string.
-    ///
-    /// This utility method is used for view type comparison by cleaning up type names
-    /// and removing dynamic content like IDs that might be embedded in parentheses.
-    /// It's particularly useful for the `popToView` functionality.
-    ///
-    /// The method works recursively by finding the innermost parentheses and removing them,
-    /// repeating the process until no parentheses are left in the string.
-    /// It handles cases with multiple and nested parentheses.
-    ///
-    /// - Parameter content: The string to clean up.
-    /// - Returns: A new string with all parentheses and their contents removed.
-    static func removingParenthesesContent(_ content: String) -> String {
-        var content = content
-        let regexPattern = #"id: \"([^\"]+)\""#
-
-        if let regex = try? NSRegularExpression(pattern: regexPattern) {
-            let range = NSRange(content.startIndex..<content.endIndex, in: content)
-            if let match = regex.firstMatch(in: content, range: range) {
-                if let idRange = Range(match.range(at: 1), in: content) {
-                    let extractedID = String(content[idRange])
-                    content = extractedID
-                }
-            }
-        }
-        
-        var modifiedString = content
-        let regex = "\\([^()]*\\)"
-
-        while let range = modifiedString.range(of: regex, options: .regularExpression) {
-            modifiedString.removeSubrange(range)
-        }
-        
-        return modifiedString
     }
     
     /// Handles the pop action by updating the navigation stack.

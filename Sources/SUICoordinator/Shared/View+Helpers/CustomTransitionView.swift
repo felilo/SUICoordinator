@@ -32,7 +32,6 @@ struct CustomTransitionView<Item: SheetItemType, Content: View>: View {
     
     @Binding var item: Item?
     @State private var showContent: Bool = false
-    @State private var iContent: Content?
     
     // ---------------------------------------------------------
     // MARK: Properties
@@ -111,26 +110,20 @@ struct CustomTransitionView<Item: SheetItemType, Content: View>: View {
     // ---------------------------------------------------------
     
     private func start(with item: Item?) async {
-        guard let item = item, animated else {
+        guard item != nil, animated else {
             return await finish()
         }
         
-        iContent = content(item)
         showContent = true
     }
     
     private func finish() async {
         let duration = 0.3
         showContent = false
-        iContent = nil
         
-        if animated {
-            try? await Task.sleep(for: .seconds(duration))
-        }
+        if animated { try? await Task.sleep(for: .seconds(duration)) }
         
-        guard !isFullScreen else {
-            return (item = nil)
-        }
+        guard !isFullScreen else { return (item = nil) }
         
         onDismiss?("")
     }

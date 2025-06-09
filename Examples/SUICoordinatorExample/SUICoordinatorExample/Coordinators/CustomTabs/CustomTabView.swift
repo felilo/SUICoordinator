@@ -1,5 +1,5 @@
 //
-//  CustomTabbarView.swift
+//  CustomTabView.swift
 //
 //  Copyright (c) Andres F. Lozano
 //

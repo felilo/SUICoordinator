@@ -1,5 +1,5 @@
 //
-//  TabbarCoordinatorView.swift
+//  TabCoordinatorView.swift
 //
 //  Copyright (c) Andres F. Lozano
 //
@@ -126,7 +126,7 @@ public struct TabViewCoordinator<DataSource: TabCoordinatorType>: View where Dat
     @ViewBuilder
     func tabBarItem(with page: Page) -> some View {
         if let item = dataSource.getCoordinator(with: page.position) {
-            AnyView( item.getView() )
+            item.getView().asAnyView()
                 .tabItem {
                     Label(
                         title: { page.dataSource.title },

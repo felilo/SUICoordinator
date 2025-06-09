@@ -30,7 +30,18 @@ final class CoordinatorTests: XCTestCase {
     
     private let animated: Bool = false
     
-    @MainActor func test_finshFlow() async throws {
+    @MainActor func test_finishFlow() async throws {
+        let sut = makeSUT()
+        
+        await sut.router.navigate(toRoute: .pushStep2, animated: animated )
+        await sut.router.navigate(toRoute: .sheetStep, animated: animated )
+        
+        await finishFlow(sut: sut)
+        XCTAssertEqual(sut.router.items.count, 0)
+        XCTAssertEqual(sut.router.sheetCoordinator.items.count, 0)
+    }
+    
+    @MainActor func test_CleanCoordinator() async throws {
         let sut = makeSUT()
         
         await sut.router.navigate(toRoute: .pushStep2, animated: animated )
@@ -46,9 +57,7 @@ final class CoordinatorTests: XCTestCase {
         let anyCoordinator = AnyCoordinator()
         
         await sut.navigate(to: anyCoordinator, presentationStyle: .sheet)
-        
         await sut.router.sheetCoordinator.remove(at: "\(0)")
-        await sut.swipedAway(coordinator: anyCoordinator)
         
         try await Task.sleep(for: .seconds(0.5))
         
@@ -91,7 +100,7 @@ final class CoordinatorTests: XCTestCase {
         let mainView = try XCTUnwrap(sut.router.mainView)
         
         XCTAssertEqual(mainView, route)
-        XCTAssertEqual(self.getNameOf(object: mainView.view), self.getNameOf(object: FullScreenStepView.self))
+        XCTAssertTrue(sut.isRunning)
     }
     
     @MainActor func test_parentCoordinator_not_nil() async throws {
@@ -109,6 +118,17 @@ final class CoordinatorTests: XCTestCase {
         let coordinator = OtherCoordinator()
         
         await navigateToCoordinator(coordinator, in: sut)
+        
+        XCTAssertEqual(sut.children.last?.id, coordinator.id)
+        XCTAssertEqual(sut.uuid, coordinator.parent.uuid)
+        await finishFlow(sut: sut)
+    }
+    
+    @MainActor func test_navigateToCoordinator_with_customTransition() async throws {
+        let sut = makeSUT()
+        let coordinator = OtherCoordinator()
+        
+        await navigateToCoordinator(coordinator, in: sut, presentationStyle: .push)
         
         XCTAssertEqual(sut.children.last?.id, coordinator.id)
         XCTAssertEqual(sut.uuid, coordinator.parent.uuid)

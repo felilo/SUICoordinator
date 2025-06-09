@@ -29,36 +29,40 @@ import SwiftUI
 
 enum AnyEnumRoute: RouteType {
     
-    case pushStep
+    case pushStep(_ num: Int? = nil)
     case pushStep2
     case pushStep3
     case fullScreenStep
     case sheetStep
     case detentsStep
+    case customTransition(fullScreen: Bool = true)
     
     var presentationStyle: TransitionPresentationStyle {
         switch self {
-            case .pushStep, .pushStep2, .pushStep3: return .push
-            case .fullScreenStep: return .fullScreenCover
-            case .sheetStep: return .sheet
-            case .detentsStep: return .detents([.medium])
+        case .pushStep, .pushStep2, .pushStep3: return .push
+        case .fullScreenStep: return .fullScreenCover
+        case .sheetStep: return .sheet
+        case .detentsStep: return .detents([.medium])
+        case .customTransition(let fullScreen): return .custom(transition: .move(edge: .bottom), animation: nil, fullScreen: fullScreen)
         }
     }
     
-    var view: Body {
+    var body: some View {
         switch self {
-            case .pushStep:
-                return PushStepView()
-            case .pushStep2:
-                return PushStep2View()
-            case .pushStep3:
-                return PushStep3View()
-            case .fullScreenStep:
-                return FullScreenStepView()
-            case .sheetStep:
-                return Text("sheetStep")
-            case .detentsStep:
-                return Text("detentsStep")
+        case .pushStep:
+            PushStepView()
+        case .pushStep2:
+            PushStep2View()
+        case .pushStep3:
+            PushStep3View()
+        case .fullScreenStep:
+            FullScreenStepView()
+        case .sheetStep:
+            Text("sheetStep")
+        case .detentsStep:
+            Text("detentsStep")
+        case .customTransition(_):
+            CustomTransitionView()
         }
     }
 }
@@ -94,6 +98,12 @@ struct PushStep3View: View {
 }
 
 struct FullScreenStepView: View {
+    var body: some View {
+        Text("FullScreenStepView")
+    }
+}
+
+struct CustomTransitionView: View {
     var body: some View {
         Text("FullScreenStepView")
     }

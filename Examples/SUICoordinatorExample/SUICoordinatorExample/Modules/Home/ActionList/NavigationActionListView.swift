@@ -54,7 +54,7 @@ struct NavigationActionListView: View {
             }
             
             Button("Presents Tabbar Coordinator") {
-                Task { await viewModel.presentTabbarCoordinator() }
+                Task { await viewModel.presentTabCoordinator() }
             }
         }
         .toolbar {

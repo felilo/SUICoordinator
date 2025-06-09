@@ -35,12 +35,12 @@ struct TabListView: View {
     var body: some View {
         List {
             
-            Button("Presents Default Tabbar") {
+            Button("Presents Default Tab View") {
                 Task { await viewModel.presentDefaultTabCoordinator() }
             }
             
-            Button("Presents Custom Tabbar") {
-                Task { await viewModel.presentCustomTabbarCoordinator() }
+            Button("Presents Custom Tab View") {
+                Task { await viewModel.presentCustomTabCoordinator() }
             }
         }
         .toolbar {

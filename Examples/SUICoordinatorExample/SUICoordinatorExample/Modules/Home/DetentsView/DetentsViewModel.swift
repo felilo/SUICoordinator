@@ -33,7 +33,7 @@ class DetentsViewModel: ObservableObject {
     }
     
     @MainActor func navigateToNextView() async {
-        await coordinator.presentTabbarCoordinator()
+        await coordinator.presentTabCoordinator()
     }
     
     @MainActor func close() async {

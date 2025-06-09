@@ -16,8 +16,8 @@
 		D95389252B643BAE000E3357 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D95389242B643BAE000E3357 /* Assets.xcassets */; };
 		D95389282B643BAE000E3357 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D95389272B643BAE000E3357 /* Preview Assets.xcassets */; };
 		D95389792B643C70000E3357 /* SUICoordinator in Frameworks */ = {isa = PBXBuildFile; productRef = D95389782B643C70000E3357 /* SUICoordinator */; };
-		D961EB862DE23FAE00FDEAA5 /* CustomTabCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = D961EB852DE23FAE00FDEAA5 /* CustomTabCoordinator.swift */; };
-		D961EB882DE23FD000FDEAA5 /* CustomTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D961EB872DE23FD000FDEAA5 /* CustomTabView.swift */; };
+		D95959E72DF791CE00E8CE28 /* CustomTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D95959E52DF791CE00E8CE28 /* CustomTabView.swift */; };
+		D95959E82DF791CE00E8CE28 /* CustomTabCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = D95959E42DF791CE00E8CE28 /* CustomTabCoordinator.swift */; };
 		D9630FFD2DE6B6EB00796C0C /* TabListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9630FFC2DE6B6EB00796C0C /* TabListViewModel.swift */; };
 		D9630FFF2DE6B73800796C0C /* TabListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9630FFE2DE6B73800796C0C /* TabListView.swift */; };
 		D9A4D2162DE65AC900FBAF4E /* TabFlowCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9A4D2152DE65AC900FBAF4E /* TabFlowCoordinator.swift */; };
@@ -48,8 +48,8 @@
 		D95389222B643BAD000E3357 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		D95389242B643BAE000E3357 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		D95389272B643BAE000E3357 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
-		D961EB852DE23FAE00FDEAA5 /* CustomTabCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTabCoordinator.swift; sourceTree = "<group>"; };
-		D961EB872DE23FD000FDEAA5 /* CustomTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTabView.swift; sourceTree = "<group>"; };
+		D95959E42DF791CE00E8CE28 /* CustomTabCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTabCoordinator.swift; sourceTree = "<group>"; };
+		D95959E52DF791CE00E8CE28 /* CustomTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTabView.swift; sourceTree = "<group>"; };
 		D9630FFC2DE6B6EB00796C0C /* TabListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabListViewModel.swift; sourceTree = "<group>"; };
 		D9630FFE2DE6B73800796C0C /* TabListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabListView.swift; sourceTree = "<group>"; };
 		D9A4D2152DE65AC900FBAF4E /* TabFlowCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabFlowCoordinator.swift; sourceTree = "<group>"; };
@@ -126,6 +126,15 @@
 				D95389272B643BAE000E3357 /* Preview Assets.xcassets */,
 			);
 			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		D95959E62DF791CE00E8CE28 /* CustomTabs */ = {
+			isa = PBXGroup;
+			children = (
+				D95959E42DF791CE00E8CE28 /* CustomTabCoordinator.swift */,
+				D95959E52DF791CE00E8CE28 /* CustomTabView.swift */,
+			);
+			path = CustomTabs;
 			sourceTree = "<group>";
 		};
 		D9B455CE2B643FBD004DD03A /* App */ = {
@@ -239,9 +248,9 @@
 		D9B455EC2B643FBD004DD03A /* Coordinators */ = {
 			isa = PBXGroup;
 			children = (
+				D95959E62DF791CE00E8CE28 /* CustomTabs */,
 				D9B455ED2B643FBD004DD03A /* DefaultTabbar */,
 				D9B455F02B643FBD004DD03A /* TabbarFlow */,
-				D9B455F22B643FBD004DD03A /* CustomTabbar */,
 				D9B455F92B643FBD004DD03A /* HomeCoordinator */,
 			);
 			path = Coordinators;
@@ -264,15 +273,6 @@
 				D9A4D2152DE65AC900FBAF4E /* TabFlowCoordinator.swift */,
 			);
 			path = TabbarFlow;
-			sourceTree = "<group>";
-		};
-		D9B455F22B643FBD004DD03A /* CustomTabbar */ = {
-			isa = PBXGroup;
-			children = (
-				D961EB872DE23FD000FDEAA5 /* CustomTabView.swift */,
-				D961EB852DE23FAE00FDEAA5 /* CustomTabCoordinator.swift */,
-			);
-			path = CustomTabbar;
 			sourceTree = "<group>";
 		};
 		D9B455F92B643FBD004DD03A /* HomeCoordinator */ = {
@@ -362,19 +362,19 @@
 			buildActionMask = 2147483647;
 			files = (
 				D9B456002B643FBD004DD03A /* SheetView.swift in Sources */,
+				D95959E72DF791CE00E8CE28 /* CustomTabView.swift in Sources */,
+				D95959E82DF791CE00E8CE28 /* CustomTabCoordinator.swift in Sources */,
 				D9B456162B643FBD004DD03A /* HomeCoordinator.swift in Sources */,
 				D9630FFF2DE6B73800796C0C /* TabListView.swift in Sources */,
 				D9107CFB2B6703D80039F40D /* NavigationActionListView.swift in Sources */,
 				D9B455FE2B643FBD004DD03A /* PushView.swift in Sources */,
 				D92B4E582DEDFC77000A8B3D /* DefaultTabCoordinator.swift in Sources */,
 				D9B456022B643FBD004DD03A /* FullscreenViewModel.swift in Sources */,
-				D961EB862DE23FAE00FDEAA5 /* CustomTabCoordinator.swift in Sources */,
 				D9B456072B643FBD004DD03A /* DetentsViewModel.swift in Sources */,
 				D9B456012B643FBD004DD03A /* SheetViewModel.swift in Sources */,
 				D9204C0C2DE661EF004D632D /* MyTabPageDataSource.swift in Sources */,
 				D9A4D2162DE65AC900FBAF4E /* TabFlowCoordinator.swift in Sources */,
 				D9B456062B643FBD004DD03A /* DetentsView.swift in Sources */,
-				D961EB882DE23FD000FDEAA5 /* CustomTabView.swift in Sources */,
 				D9B456042B643FBD004DD03A /* ActionListViewModel.swift in Sources */,
 				D9630FFD2DE6B6EB00796C0C /* TabListViewModel.swift in Sources */,
 				D9A4D2182DE65AF600FBAF4E /* MyTabPage.swift in Sources */,

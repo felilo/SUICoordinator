@@ -1,5 +1,5 @@
 //
-//  TabbarCoordinator.swift
+//  TabCoordinator.swift
 //
 //  Copyright (c) Andres F. Lozano
 //
@@ -198,16 +198,15 @@ open class TabCoordinator<Page: TabPage>: TabCoordinatable {
     ///   - animated: A boolean value indicating whether to animate the presentation.
     ///              Defaults to `true`.
     open func start(animated: Bool = true) async {
-        setupPages(pages, currentPage: currentPage)
+        await setupPages(pages, currentPage: currentPage)
         let cView = viewContainer
         
         await startFlow(
             route: .init(
                 presentationStyle: presentationStyle,
                 content: { cView(self) }
-            ),
-            transitionStyle: presentationStyle,
-            animated: animated)
+            )
+        )
     }
     
     // ---------------------------------------------------------

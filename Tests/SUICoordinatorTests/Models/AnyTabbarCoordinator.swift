@@ -1,5 +1,5 @@
 //
-//  AnyTabbarCoordinator.swift
+//  AnyTabCoordinator.swift
 //
 //  Copyright (c) Andres F. Lozano
 //

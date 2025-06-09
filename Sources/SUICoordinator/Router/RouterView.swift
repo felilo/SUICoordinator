@@ -32,7 +32,7 @@ struct RouterView<Router: RouterType>: View {
     // --------------------------------------------------------------------
     
     @ObservedObject var viewModel: Router
-    @State private var mainView: AnyView?
+    @State private var mainView: Router.Route?
     
     // --------------------------------------------------------------------
     // MARK: Constructor
@@ -48,7 +48,6 @@ struct RouterView<Router: RouterType>: View {
     
     var body: some View {
         ZStack { buildBody() }
-            .onChange(of: viewModel.mainView, perform: onChangeFirstView)
             .onViewDidLoad { onChangeFirstView(viewModel.mainView) }
     }
     
@@ -59,22 +58,26 @@ struct RouterView<Router: RouterType>: View {
     
     @ViewBuilder
     private func buildBody() -> some View {
-        if viewModel.isTabCoordinable {
-            addSheetTo(view: mainView)
-        } else {
-            let view = NavigationStack(path: $viewModel.items) {
-                mainView.navigationDestination(for: Router.Route.self) { AnyView($0.view) }
-            }
+        Group {
+            if viewModel.isTabCoordinable {
+                addSheetTo(view: mainView)
+            } else {
+                let view = NavigationStack(
+                    path: $viewModel.items,
+                    root: { mainView.navigationDestination(for: Router.Route.self) { $0 } }
+                )
                 .transaction { $0.disablesAnimations = !viewModel.animated }
                 .onChange(of: viewModel.items, perform: onChangeItems)
-            
-            addSheetTo(view: view)
+                
+                addSheetTo(view: view)
+            }
         }
     }
     
     @ViewBuilder
     private func addSheetTo(view: (some View)?) -> some View {
         view
+            .onChange(of: viewModel.mainView, perform: onChangeFirstView)
             .sheetCoordinator(
                 coordinator: viewModel.sheetCoordinator,
                 onDissmis: { index in Task(priority: .high) { @MainActor [weak viewModel] in
@@ -89,11 +92,9 @@ struct RouterView<Router: RouterType>: View {
     // --------------------------------------------------------------------
     
     private func onChangeFirstView(_ value: Router.Route?) {
-        guard let view = value?.view else {
-            return (mainView = nil)
-        }
+        guard let value else { return (mainView = nil) }
         
-        mainView = AnyView(view)
+        mainView = value
     }
     
     private func onChangeItems(_ value: [Router.Route]) {

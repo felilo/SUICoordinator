@@ -22,7 +22,7 @@
 //  THE SOFTWARE.
 //
 
-import Foundation
+import SwiftUI
 import SUICoordinator
 
 enum HomeRoute: RouteType {
@@ -59,7 +59,7 @@ enum HomeRoute: RouteType {
     }
     
     
-    var view: Body {
+    var body: some View {
         switch self {
         case .push(let viewModel), .viewCustomTransition(let viewModel):
                 PushView(viewModel: viewModel)

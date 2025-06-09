@@ -63,11 +63,29 @@ final class SheetCoordinatorTests: XCTestCase {
         XCTAssertEqual(sut.items.count, 0)
     }
     
+    @MainActor func test_dismiss_lastRouteCoordinator() async throws {
+        let sut = makeSUT()
+        let item = makeSheetItem("Custom Item", presentationStyle: .custom(transition: .move(edge: .bottom), animation: .default, fullScreen: false))
+        
+        await presentSheet(item, with: sut)
+        XCTAssertEqual(sut.items.count, 1)
+        var willDismissAsync = asyncStream(item.willDismiss).makeAsyncIterator()
+        
+        await sut.removeLastSheet(animated: false)
+        let event: Void? = await willDismissAsync.next()
+        
+        XCTAssertNotNil(event)
+        
+        await sut.remove(at: "0")
+        
+        XCTAssertEqual(sut.items.count, 0)
+    }
+    
     @MainActor func test_dismiss_route_atPositon() async throws {
         let sut = makeSUT()
         
         await presentSheet(makeSheetItem("First Item"), with: sut)
-        await presentSheet(makeSheetItem("Second Item"), with: sut)
+        await presentSheet(makeSheetItem("Second Item", isCoordinator: true), with: sut)
         await presentSheet(makeSheetItem("Third Item"), with: sut)
         await sut.remove(at: "\(1)")
         
@@ -93,7 +111,7 @@ final class SheetCoordinatorTests: XCTestCase {
     @MainActor func test_cleanCoordinator() async throws {
         let sut = makeSUT()
         
-        await presentSheet(makeSheetItem("First Item"), with: sut)
+        await presentSheet(makeSheetItem("First Item", presentationStyle: .fullScreenCover), with: sut)
         await presentSheet(makeSheetItem("Second Item"), with: sut)
         await presentSheet(makeSheetItem("Third Item"), with: sut)
         XCTAssertEqual(sut.items.count, 3)
@@ -115,12 +133,21 @@ final class SheetCoordinatorTests: XCTestCase {
     private func makeSheetItem(
         _ item: String,
         presentationStyle: TransitionPresentationStyle = .sheet,
-        animated: Bool = false
+        animated: Bool = false,
+        isCoordinator: Bool = false
     ) -> SheetItem<String> {
-        .init(id: UUID().uuidString, animated: animated, presentationStyle: presentationStyle, view: { item })
+        .init(
+            id: UUID().uuidString,
+            animated: animated,
+            presentationStyle: presentationStyle,
+            isCoordinator: isCoordinator,
+            view: { item }
+        )
     }
     
     @MainActor private func presentSheet( _ item: SheetItem<String>, with sut: SheetCoordinator<String>) async {
         await sut.presentSheet(item)
     }
 }
+
+import Combine

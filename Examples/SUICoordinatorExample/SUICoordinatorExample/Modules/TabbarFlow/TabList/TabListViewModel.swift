@@ -36,8 +36,8 @@ class TabListViewModel: ObservableObject {
         await coordinator.presentDefaultTabCoordinator()
     }
     
-    @MainActor func presentCustomTabbarCoordinator() async {
-        await coordinator.presentCustomTabbarCoordinator()
+    @MainActor func presentCustomTabCoordinator() async {
+        await coordinator.presentCustomTabCoordinator()
     }
     
     @MainActor func finsh() async {

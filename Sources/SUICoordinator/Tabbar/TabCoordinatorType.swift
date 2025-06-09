@@ -1,5 +1,5 @@
 //
-//  TabbarCoordinatorType.swift
+//  TabCoordinatorType.swift
 //
 //  Copyright (c) Andres F. Lozano
 //
