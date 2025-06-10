@@ -54,7 +54,7 @@ struct SheetView<Content: View, T: SheetItemType>: View {
         items: Binding<[Item?]>,
         transitionStyle: TransitionPresentationStyle?,
         animated: Bool,
-        @ViewBuilder content: @escaping (Int, (Item)) -> Content,
+        @ViewBuilder content: @escaping (Int, Item) -> Content,
         onDismiss: ActionClosure? = nil,
         onDidLoad: ActionClosure?
     ) {

@@ -171,19 +171,19 @@
 		D9B455D22B643FBD004DD03A /* Home */ = {
 			isa = PBXGroup;
 			children = (
-				D9B455D32B643FBD004DD03A /* PushView */,
+				D9B455D32B643FBD004DD03A /* ActionListDetail */,
 				D9B455DC2B643FBD004DD03A /* ActionList */,
 			);
 			path = Home;
 			sourceTree = "<group>";
 		};
-		D9B455D32B643FBD004DD03A /* PushView */ = {
+		D9B455D32B643FBD004DD03A /* ActionListDetail */ = {
 			isa = PBXGroup;
 			children = (
 				D9B455D42B643FBD004DD03A /* NavigationActionListDetailView.swift */,
 				D9B455D52B643FBD004DD03A /* NavigationActionListDetailViewModel.swift */,
 			);
-			path = PushView;
+			path = ActionListDetail;
 			sourceTree = "<group>";
 		};
 		D9B455DC2B643FBD004DD03A /* ActionList */ = {

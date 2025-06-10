@@ -198,7 +198,7 @@ open class TabCoordinator<Page: TabPage>: TabCoordinatable {
     ///   - animated: A boolean value indicating whether to animate the presentation.
     ///              Defaults to `true`.
     open func start() async {
-        async let _ = await setupPages(pages, currentPage: currentPage)
+        await setupPages(pages, currentPage: currentPage)
         let cView = viewContainer
         
         await startFlow(

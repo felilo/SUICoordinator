@@ -36,7 +36,7 @@ public class CustomTabCoordinator: TabCoordinator<MyTabPage> {
         
         
         super.init(
-            pages: Page.allCases,
+            pages: Page.sortedByPosition(),
             currentPage: currentPage,
             viewContainer: { CustomTabView(dataSource: $0) }
         )

@@ -37,13 +37,19 @@ struct ClearBackgroundView: UIViewRepresentable {
 
 struct ClearBackgroundViewModifier: ViewModifier {
     
+    let condition: Bool
+    
     func body(content: Content) -> some View {
-        if #available(iOS 16.4, *) {
-            content
-                .presentationBackground(.clear)
+        if condition {
+            if #available(iOS 16.4, *) {
+                content
+                    .presentationBackground(.clear)
+            } else {
+                content
+                    .background(ClearBackgroundView())
+            }
         } else {
             content
-                .background(ClearBackgroundView())
         }
     }
 }

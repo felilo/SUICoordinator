@@ -48,6 +48,7 @@ struct RouterView<Router: RouterType>: View {
     
     var body: some View {
         ZStack { buildBody() }
+            .clearModalBackground(viewModel.isTabCoordinable)
             .onViewDidLoad { onChangeFirstView(viewModel.mainView) }
     }
     

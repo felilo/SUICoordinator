@@ -48,7 +48,7 @@ extension View {
         self.modifier(ViewDidLoadModifier(action: action))
     }
     
-    func clearModalBackground()->some View {
-        self.modifier(ClearBackgroundViewModifier())
+    func clearModalBackground(_ condition: Bool = true)->some View {
+        self.modifier(ClearBackgroundViewModifier(condition: condition))
     }
 }
