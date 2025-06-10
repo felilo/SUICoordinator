@@ -32,46 +32,57 @@ struct PushView: View {
     @State private var counter = 0
     @State var bgColor: Color = Self.randomColor()
     
+    private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
     
-    let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
-    
+    init(coordinator: HomeCoordinator, title: String) {
+        self._viewModel = .init(wrappedValue: .init(
+            coordinator: coordinator,
+            title: title
+        ))
+    }
     
     var body: some View {
         ZStack {
-            
             bgColor.ignoresSafeArea()
             
-            VStack {
-                Text(viewModel.title)
-                    .font(.largeTitle)
-                Text("Time: \(counter)")
-                
-                VStack {
-                    Button("navigate to PushView") {
-                        Task { await  viewModel.navigateToPushView() }
-                    }.buttonStyle(.borderedProminent)
-                    
-                    Button("Presents SheetView") {
-                        Task { await  viewModel.navigateToNextView() }
-                    }.buttonStyle(.borderedProminent)
-                    
-                    Button("Presents FullscreenView") {
-                        Task { await viewModel.presentFullscreen() }
-                    }.buttonStyle(.borderedProminent)
-                    
-                    Button("Presents DetentsView") {
-                        Task { await viewModel.presentDetentsView() }
-                    }.buttonStyle(.borderedProminent)
-                    
-                    Button("Close view") {
-                        Task { await  viewModel.close() }
-                    }.buttonStyle(.borderedProminent)
-                }
+            List {
+                actionRowButton(title: "Navigate to PushView") { await viewModel.navigateToPushView() }
+                actionRowButton(title: "Presents SheetView") { await viewModel.presentSheet() }
+                actionRowButton(title: "Presents FullscreenView") { await viewModel.presentFullscreen() }
+                actionRowButton(title: "Presents DetentsView") { await viewModel.presentDetentsView() }
+                actionRowButton(title: "Presents view with custom presentation") { await viewModel.presentViewWithCustomPresentation() }
+                actionRowButton(title: "Presents custom tab view") { await viewModel.presentCustomTabCoordinator() }
+                actionRowButton(title: "Restart coordinator") { await viewModel.restartCoordinator() }
+                actionRowButton(title: "Close view") { await viewModel.close() }
             }
+            .scrollContentBackground(.hidden)
+            .navigationTitle("\(viewModel.title)")
+            .toolbar { ToolbarItemGroup {
+                Text("Counter: \(counter)")
+            }}
         }
         .onReceive(timer) { _ in counter += 1 }
     }
-
+    
+    private func actionRowButton(
+        title: String,
+        action: @escaping () async -> Void
+    ) -> some View {
+        HStack {
+            Text(title)
+            Spacer()
+            Image(systemName: "chevron.right")
+        }
+        .padding(.vertical, 8)
+        .contentShape(Rectangle())
+        .onTapGesture { Task { await action() } }
+        .foregroundStyle(.white)
+        .font(.callout)
+        .listRowBackground(Color.black.opacity(0.4))
+        .listRowSeparator(.visible)
+        .listStyle(.plain)
+    }
+    
     private static func randomColor() -> Color {
         let red = Double.random(in: 0...1)
         let green = Double.random(in: 0...1)
@@ -81,5 +92,5 @@ struct PushView: View {
 }
 
 #Preview {
-    PushView(viewModel: .init(coordinator: .init(), title: "1"))
+    PushView(coordinator: .init(), title: "1")
 }

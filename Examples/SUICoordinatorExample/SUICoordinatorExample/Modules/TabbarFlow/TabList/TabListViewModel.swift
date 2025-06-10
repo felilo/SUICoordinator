@@ -40,6 +40,10 @@ class TabListViewModel: ObservableObject {
         await coordinator.presentCustomTabCoordinator()
     }
     
+    @MainActor func presentHomeCoordinator() async {
+        await coordinator.presentHomeCoordinator()
+    }
+    
     @MainActor func finsh() async {
         await coordinator.finishFlow()
     }

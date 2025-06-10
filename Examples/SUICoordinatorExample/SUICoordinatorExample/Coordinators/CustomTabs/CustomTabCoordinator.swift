@@ -32,10 +32,13 @@ public class CustomTabCoordinator: TabCoordinator<MyTabPage> {
     // ---------------------------------------------------------------------
     
     public init(currentPage: MyTabPage = .first ) {
+        
+        
+        
         super.init(
             pages: Page.allCases,
             currentPage: currentPage,
-            viewContainer: { CustomTabView(viewModel: $0) }
+            viewContainer: { CustomTabView(dataSource: $0) }
         )
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in

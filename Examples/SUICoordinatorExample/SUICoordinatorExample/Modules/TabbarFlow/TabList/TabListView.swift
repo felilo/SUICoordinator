@@ -33,27 +33,76 @@ struct TabListView: View {
     @StateObject var viewModel: ViewModel
     
     var body: some View {
-        List {
+        ZStack {
             
-            Button("Presents Default Tab View") {
-                Task { await viewModel.presentDefaultTabCoordinator() }
-            }
+            Color.black.opacity(0.7).ignoresSafeArea()
             
-            Button("Presents Custom Tab View") {
-                Task { await viewModel.presentCustomTabCoordinator() }
+            List {
+                actionRowButton(title: "Presents Default Tab Coordinator", systemImage: "rectangle.fill.on.rectangle.fill") {
+                    await viewModel.presentDefaultTabCoordinator()
+                }
+                
+                actionRowButton(title: "Presents Custom Tab Coordinator", systemImage: "square.grid.2x2.fill") {
+                    await viewModel.presentCustomTabCoordinator()
+                }
+                
+                actionRowButton(title: "Presents Home Coordinator", systemImage: "rectangle.bottomthird.inset.fill") {
+                    await viewModel.presentHomeCoordinator()
+                }
             }
-        }
-        .toolbar {
-            Button {
-                Task { await viewModel.finsh() }
-            } label: {
-                Text("Finish flow")
+            .toolbar {
+                Button {
+                    Task { await viewModel.finsh() }
+                } label: {
+                    Text("Finish flow")
+                }
             }
+            .navigationTitle("Coordinator Action List")
+            .listStyle(.plain)
+            .navigationBarTitleDisplayMode(.large)
         }
-        .navigationTitle("Navigation List")
+    }
+    
+    @ViewBuilder
+    private func actionRowButton(
+        title: String,
+        systemImage: String,
+        action: @escaping () async -> Void
+    ) -> some View {
+        HStack(spacing: 16) {
+            Image(systemName: systemImage)
+                .font(.title2.weight(.medium))
+                .foregroundColor(.blue)
+                .frame(width: 30)
+            
+            Text(title)
+                .font(.headline)
+                .foregroundColor(.white)
+            
+            Spacer()
+            
+            Image(systemName: "chevron.right")
+                .font(.body.weight(.semibold))
+                .foregroundColor(Color(white: 0.7))
+        }
+        .contentShape(Rectangle())
+        .onTapGesture { Task { await action() } }
+        .padding(.all, 8)
+        .listRowBackground(
+            RoundedRectangle(cornerRadius: 12)
+                .shadow(
+                    color: Color.black.opacity(0.5),
+                    radius: 5,
+                    x: 0,
+                    y: 4
+                )
+                .padding(.vertical, 8)
+                .padding(.horizontal, 16)
+        )
+        .listRowSeparator(.hidden)
     }
 }
 
 #Preview {
-    NavigationActionListView(viewModel: .init(coordinator: .init()))
+    TabListView(viewModel: .init(coordinator: .init()))
 }

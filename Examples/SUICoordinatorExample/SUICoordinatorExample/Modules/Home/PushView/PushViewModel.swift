@@ -34,12 +34,16 @@ class PushViewModel: ObservableObject {
         self.title = title
     }
     
-    @MainActor func navigateToNextView() async {
+    @MainActor func presentSheet() async {
         await coordinator.presentSheet()
     }
     
     @MainActor func presentFullscreen() async {
         await coordinator.presentFullscreen()
+    }
+    
+    @MainActor func presentViewWithCustomPresentation() async {
+        await coordinator.presentViewWithCustomPresentation()
     }
     
     @MainActor func presentDetentsView() async {
@@ -52,5 +56,13 @@ class PushViewModel: ObservableObject {
     
     @MainActor func close() async {
         await coordinator.close()
+    }
+    
+    @MainActor func restartCoordinator() async {
+        await coordinator.restart()
+    }
+    
+    @MainActor func presentCustomTabCoordinator() async {
+        await coordinator.presentCustomTabCoordinator()
     }
 }

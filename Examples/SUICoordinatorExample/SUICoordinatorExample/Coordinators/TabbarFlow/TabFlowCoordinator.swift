@@ -55,4 +55,9 @@ class TabFlowCoordinator: Coordinator<DefaultRoute> {
         let coordinator = CustomTabCoordinator()
         await navigate(to: coordinator, presentationStyle: .sheet)
     }
+    
+    func presentHomeCoordinator() async {
+        let coordinator = HomeCoordinator()
+        await navigate(to: coordinator, presentationStyle: .sheet)
+    }
 }
