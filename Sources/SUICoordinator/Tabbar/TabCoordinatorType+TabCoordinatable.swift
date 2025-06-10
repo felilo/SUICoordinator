@@ -64,9 +64,10 @@ extension TabCoordinatorType where Self : TabCoordinatable {
     func setupPages(_ value: [Page], currentPage: Page? = nil) async {
         for page in value {
             let item = page.coordinator()
-            if children.contains(where: { $0.uuid == item.uuid }) {
-                break
-            }
+            
+            if children.contains(where: { $0.uuid == item.uuid }) { break }
+            
+            await item.start()
             startChildCoordinator(item)
             item.tagId = "\(page.position)"
         }
