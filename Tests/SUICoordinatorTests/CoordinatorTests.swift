@@ -69,7 +69,7 @@ final class CoordinatorTests: XCTestCase {
         let sut = AnyCoordinator()
         let coordinator = OtherCoordinator()
         
-        await sut.start(animated: animated)
+        await sut.start()
         await sut.router.navigate(toRoute: .pushStep2, animated: animated )
         await navigateToCoordinator(coordinator, in: sut)
         
@@ -83,7 +83,7 @@ final class CoordinatorTests: XCTestCase {
         let coordinator = OtherCoordinator()
         let sut = makeSUT()
         
-        await sut.start(animated: animated)
+        await sut.start()
         await navigateToCoordinator(sut, in: coordinator)
         
         await finishFlow(sut: sut)

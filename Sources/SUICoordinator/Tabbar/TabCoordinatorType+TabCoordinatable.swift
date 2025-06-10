@@ -65,7 +65,6 @@ extension TabCoordinatorType where Self : TabCoordinatable {
         for page in value {
             let item = page.coordinator()
             startChildCoordinator(item)
-            await item.start(animated: false)
             item.tagId = "\(page.position)"
         }
         

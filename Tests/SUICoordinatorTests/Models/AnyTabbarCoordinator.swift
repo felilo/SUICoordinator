@@ -68,5 +68,3 @@ struct AnyTabView<DataSource: TabCoordinatorType>: View where DataSource.DataSou
     
     var body: some View { EmptyView() }
 }
-
-

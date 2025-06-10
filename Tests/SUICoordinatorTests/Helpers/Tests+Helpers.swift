@@ -45,7 +45,7 @@ extension XCTestCase {
             presentationStyle: presentationStyle,
             animated: animated)
         
-        await nextCoordinator.start(animated: animated)
+        await nextCoordinator.start()
     }
     
     @MainActor func finishFlow(sut: (any CoordinatorType), animated: Bool = false) async {

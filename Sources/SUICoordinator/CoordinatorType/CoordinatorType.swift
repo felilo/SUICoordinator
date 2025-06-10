@@ -68,5 +68,5 @@ public protocol CoordinatorType: SCHashable, ObservableObject {
     /// - Parameters:
     ///   - animated: A Boolean value indicating whether to animate the start transition.
     /// - Returns: An asynchronous void task representing the start process.
-    func start(animated: Bool) async -> Void
+    func start() async -> Void
 }
