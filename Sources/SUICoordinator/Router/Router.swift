@@ -220,22 +220,12 @@ public class Router<Route: RouteType>: ObservableObject, RouterType {
         await sheetCoordinator.removeLastSheet(animated: animated)
     }
     
-    /// Closes the current view or sheet, optionally finishing the associated flow.
-    ///
-    /// This method intelligently determines whether to dismiss a modal presentation
-    /// or pop from the navigation stack based on the current navigation state.
+    /// Closes the current view or coordinator.
     ///
     /// - Parameters:
     ///   - animated: A boolean value indicating whether to animate the closing action.
-    ///   - finishFlow: A boolean value indicating whether to finish the associated flow.
-    ///                 Currently unused but reserved for future functionality.
-    @MainActor public func close(animated: Bool = true, finishFlow: Bool = false) async -> Void {
-        if !(await sheetCoordinator.areEmptyItems) {
-            await dismiss(animated: animated)
-            try? await Task.sleep(for: .seconds(animated ? 0.2 : 0.1))
-        } else if !(await itemManager.areItemsEmpty()) {
-            await pop(animated: animated)
-        }
+    @MainActor public func close(animated: Bool = true) async -> Void {
+        await close(animated: animated, finishFlow: false)
     }
     
     /// Cleans up the current view or coordinator, optionally preserving the main view.
@@ -332,6 +322,27 @@ public class Router<Route: RouteType>: ObservableObject, RouterType {
         if counterItems != counterManagerItems {
             await itemManager.setItems(items)
             await updateItems()
+        }
+    }
+    
+    /// Closes the current view or sheet, optionally finishing the associated flow.
+    ///
+    /// This method intelligently determines whether to dismiss a modal presentation
+    /// or pop from the navigation stack based on the current navigation state.
+    ///
+    /// - Parameters:
+    ///   - animated: A boolean value indicating whether to animate the closing action.
+    ///   - finishFlow: A boolean value indicating whether to finish the associated flow.
+    ///                 Currently unused but reserved for future functionality.
+    @MainActor internal func close(animated: Bool, finishFlow: Bool) async -> Void {
+        if !(await sheetCoordinator.areEmptyItems) {
+            await dismiss(animated: animated)
+            if finishFlow {
+                try? await Task.sleep(for: .milliseconds(animated ? 600 : 100))
+            }
+            
+        } else if !(await itemManager.areItemsEmpty()) {
+            await pop(animated: animated)
         }
     }
 }

@@ -103,12 +103,11 @@ public protocol RouterType: ObservableObject {
     ///   - withMainView: A boolean value indicating whether to clean the main view.
     func clean(animated: Bool, withMainView: Bool) async -> Void
     
-    /// Closes the current view or coordinator, optionally finishing the associated flow.
+    /// Closes the current view or coordinator.
     ///
     /// - Parameters:
     ///   - animated: A boolean value indicating whether to animate the closing action.
-    ///   - finishFlow: A boolean value indicating whether to finish the associated flow.
-    @MainActor func close(animated: Bool, finishFlow: Bool) async -> Void
+    @MainActor func close(animated: Bool) async -> Void
     
     /// Restarts the current view or coordinator, optionally animating the restart.
     ///

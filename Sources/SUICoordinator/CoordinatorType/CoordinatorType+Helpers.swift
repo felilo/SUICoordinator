@@ -134,8 +134,8 @@ extension CoordinatorType {
     ///
     /// - Parameters:
     ///   - animated: A boolean value indicating whether to animate the dismissal.
-    func closeLastSheet(animated: Bool = true) async {
-        await router.close(animated: animated)
+    func closeLastSheet(animated: Bool = true, finishFlow: Bool = false) async {
+        await router.close(animated: animated, finishFlow: finishFlow)
     }
     
     /// Cleans up the coordinator, preparing it for dismissal.
@@ -166,11 +166,11 @@ extension CoordinatorType {
         }
         
         if parent is (any TabCoordinatable) {
-            await parent.parent?.closeLastSheet(animated: animated)
+            await parent.parent?.closeLastSheet(animated: animated, finishFlow: true)
             return await parent.emptyCoordinator(animated: animated)
         }
         
-        await parent.closeLastSheet(animated: animated)
+        await parent.closeLastSheet(animated: animated, finishFlow: true)
         await emptyCoordinator(animated: animated)
     }
     
