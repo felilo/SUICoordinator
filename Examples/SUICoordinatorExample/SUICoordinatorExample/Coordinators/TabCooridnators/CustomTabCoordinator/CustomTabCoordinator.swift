@@ -32,6 +32,9 @@ public class CustomTabCoordinator: TabCoordinator<MyTabPage> {
     // ---------------------------------------------------------------------
     
     public init(currentPage: MyTabPage = .first ) {
+        
+        
+        
         super.init(
             pages: Page.sortedByPosition(),
             currentPage: currentPage,
@@ -40,6 +43,15 @@ public class CustomTabCoordinator: TabCoordinator<MyTabPage> {
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
             self?.setBadge.send(( "2", .first ))
+            
+//            DispatchQueue.main.asyncAfter(deadline: .now() + 2) { [weak self] in
+//                Task { @MainActor in
+//                    await self?.clean()
+//                    await self?.setPages([.first], currentPage: .first)
+//                    self?.start()
+//                }
+//            }
+            
         }
     }
 }

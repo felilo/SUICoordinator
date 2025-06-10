@@ -67,6 +67,7 @@ struct CustomTabView<DataSource: TabCoordinatorType>: View where DataSource.Data
             TabView(selection: $dataSource.currentPage) {
                 ForEach(dataSource.pages, id: \.id, content: tabBarItem)
             }
+            .opacity(showTabView ? 1 : 0)
             
             VStack() {
                 Spacer()
