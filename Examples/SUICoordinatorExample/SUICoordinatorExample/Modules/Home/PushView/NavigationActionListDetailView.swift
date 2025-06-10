@@ -1,5 +1,5 @@
 //
-//  ActionListViewModel.swift
+//  NavigationActionListDetailView.swift
 //
 //  Copyright (c) Andres F. Lozano
 //
@@ -24,9 +24,9 @@
 
 import SwiftUI
 
-struct PushView: View {
+struct NavigationActionListDetailView: View {
     
-    @StateObject var viewModel: PushViewModel
+    @StateObject var viewModel: NavigationActionListDetailViewModel
     @State private var counter = 0
     @State var bgColor: Color = Self.randomColor()
     
@@ -90,5 +90,5 @@ struct PushView: View {
 }
 
 #Preview {
-    PushView(coordinator: .init(), title: "1")
+    NavigationActionListDetailView(coordinator: .init(), title: "1")
 }

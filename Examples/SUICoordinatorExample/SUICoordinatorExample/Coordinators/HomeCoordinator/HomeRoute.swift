@@ -66,7 +66,7 @@ enum HomeRoute: RouteType {
             let .sheet(coordinator, title),
             let .fullscreen(coordinator, title),
             let .detents(coordinator, title):
-            PushView(coordinator: coordinator, title: title)
+            NavigationActionListDetailView(coordinator: coordinator, title: title)
         case .actionListView(let coordinator):
             NavigationActionListView(viewModel: .init(coordinator: coordinator))
         }

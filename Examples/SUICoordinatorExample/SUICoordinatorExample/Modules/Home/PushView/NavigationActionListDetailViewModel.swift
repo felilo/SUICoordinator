@@ -1,5 +1,5 @@
 //
-//  PushViewModel.swift
+//  NavigationActionListDetailViewModel.swift
 //
 //  Copyright (c) Andres F. Lozano
 //
@@ -24,7 +24,7 @@
 
 import Foundation
 
-class PushViewModel: ObservableObject {
+class NavigationActionListDetailViewModel: ObservableObject {
     
     var coordinator: HomeCoordinator
     var title: String
