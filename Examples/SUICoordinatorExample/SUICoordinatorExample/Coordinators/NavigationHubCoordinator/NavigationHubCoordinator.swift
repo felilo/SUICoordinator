@@ -58,6 +58,6 @@ class NavigationHubCoordinator: Coordinator<DefaultRoute> {
     
     func presentHomeCoordinator() async {
         let coordinator = HomeCoordinator()
-        await navigate(to: coordinator, presentationStyle: .sheet)
+        await navigate(to: coordinator, presentationStyle: .detents([.medium, .large]))
     }
 }
