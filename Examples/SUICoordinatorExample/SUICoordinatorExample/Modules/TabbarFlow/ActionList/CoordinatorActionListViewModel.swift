@@ -1,5 +1,5 @@
 //
-//  TabbarActionListView.swift
+//  TabbarActionListViewModel.swift
 //
 //  Copyright (c) Andres F. Lozano
 //
@@ -22,38 +22,29 @@
 //  THE SOFTWARE.
 //
 
-import SwiftUI
+import Foundation
 
-struct TabListView: View {
+class CoordinatorActionListViewModel: ObservableObject {
     
-    typealias ViewModel = TabListViewModel
+    let coordinator: NavigationHubCoordinator
     
-    
-    @Environment(\.isPresented) private var isPresented
-    @StateObject var viewModel: ViewModel
-    
-    var body: some View {
-        List {
-            
-            Button("Presents Default Tabbar") {
-                Task { await viewModel.presentDefaultTabCoordinator() }
-            }
-            
-            Button("Presents Custom Tabbar") {
-                Task { await viewModel.presentCustomTabbarCoordinator() }
-            }
-        }
-        .toolbar {
-            Button {
-                Task { await viewModel.finsh() }
-            } label: {
-                Text("Finish flow")
-            }
-        }
-        .navigationTitle("Navigation List")
+    init(coordinator: NavigationHubCoordinator) {
+        self.coordinator = coordinator
     }
-}
-
-#Preview {
-    NavigationActionListView(viewModel: .init(coordinator: .init()))
+    
+    @MainActor func presentDefaultTabCoordinator() async {
+        await coordinator.presentDefaultTabCoordinator()
+    }
+    
+    @MainActor func presentCustomTabCoordinator() async {
+        await coordinator.presentCustomTabCoordinator()
+    }
+    
+    @MainActor func presentHomeCoordinator() async {
+        await coordinator.presentHomeCoordinator()
+    }
+    
+    @MainActor func finsh() async {
+        await coordinator.finishFlow()
+    }
 }

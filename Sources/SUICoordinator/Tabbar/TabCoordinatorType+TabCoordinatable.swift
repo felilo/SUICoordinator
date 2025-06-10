@@ -1,5 +1,5 @@
 //
-//  TabbarCoordinatorType+TabCoordinatable.swift
+//  TabCoordinatorType+TabCoordinatable.swift
 //
 //  Copyright (c) Andres F. Lozano
 //
@@ -44,7 +44,7 @@ extension TabCoordinatorType where Self : TabCoordinatable {
     ///              Make sure to call this method when you need to completely replace the tab structure.
     public func setPages(_ values: [Page], currentPage: Page? = nil) async {
         await removeChildren()
-        setupPages(values, currentPage: currentPage)
+        await setupPages(values, currentPage: currentPage)
     }
     
     /// Sets up the pages for the tab coordinator.
@@ -61,9 +61,12 @@ extension TabCoordinatorType where Self : TabCoordinatable {
     ///
     /// - Note: Each child coordinator's `tagId` is set to match its corresponding page's position
     ///         to enable proper coordination between tabs and their coordinators.
-    func setupPages(_ value: [Page], currentPage: Page? = nil) {
+    func setupPages(_ value: [Page], currentPage: Page? = nil) async {
         for page in value {
             let item = page.coordinator()
+            if children.contains(where: { $0.uuid == item.uuid }) {
+                break
+            }
             startChildCoordinator(item)
             item.tagId = "\(page.position)"
         }

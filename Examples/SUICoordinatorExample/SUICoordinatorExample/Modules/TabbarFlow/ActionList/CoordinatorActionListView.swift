@@ -1,5 +1,5 @@
 //
-//  ActionListView.swift
+//  TabbarActionListView.swift
 //
 //  Copyright (c) Andres F. Lozano
 //
@@ -24,42 +24,37 @@
 
 import SwiftUI
 
-struct NavigationActionListView: View {
+struct CoordinatorActionListView: View {
     
     @Environment(\.isPresented) private var isPresented
-    @StateObject var viewModel: ActionListViewModel
+    @StateObject var viewModel: CoordinatorActionListViewModel
     
     var body: some View {
         ZStack {
+            
             Color.black.opacity(0.7).ignoresSafeArea()
             
             List {
-                actionRowButton(title: "Push NavigationView", systemImage: "arrow.forward.square.fill") {
-                    await viewModel.navigateToPushView()
+                actionRowButton(title: "Presents Default Tab Coordinator", systemImage: "rectangle.fill.on.rectangle.fill") {
+                    await viewModel.presentDefaultTabCoordinator()
                 }
                 
-                actionRowButton(title: "Presents SheetView", systemImage: "rectangle.bottomthird.inset.fill") {
-                    await viewModel.presentSheet()
+                actionRowButton(title: "Presents Custom Tab Coordinator", systemImage: "square.grid.2x2.fill") {
+                    await viewModel.presentCustomTabCoordinator()
                 }
                 
-                actionRowButton(title: "Presents FullscreenView", systemImage: "rectangle.fill.on.rectangle.fill") {
-                    await viewModel.presentFullscreen()
-                }
-                
-                actionRowButton(title: "Presents DetentsView", systemImage: "rectangle.split.2x1.fill") {
-                    await viewModel.presentDetents()
-                }
-                
-                actionRowButton(title: "Present with Custom Presentation", systemImage: "sparkles.rectangle.stack.fill") {
-                    await viewModel.presentViewWithCustomPresentation()
-                }
-                
-                actionRowButton(title: "Presents Tab view Coordinator", systemImage: "square.grid.2x2.fill") {
-                    await viewModel.presentTabCoordinator()
+                actionRowButton(title: "Presents Home Coordinator", systemImage: "rectangle.bottomthird.inset.fill") {
+                    await viewModel.presentHomeCoordinator()
                 }
             }
-            .toolbar(content: toolbarContent)
-            .navigationTitle("Navigation Action List")
+            .toolbar {
+                Button {
+                    Task { await viewModel.finsh() }
+                } label: {
+                    Text("Finish flow")
+                }
+            }
+            .navigationTitle("Coordinator Action List")
             .listStyle(.plain)
             .navigationBarTitleDisplayMode(.large)
         }
@@ -103,21 +98,8 @@ struct NavigationActionListView: View {
         )
         .listRowSeparator(.hidden)
     }
-    
-    @ViewBuilder
-    private func toolbarContent() -> some View {
-        if isPresented && viewModel.showFinishButton() {
-            Button {
-                Task { await viewModel.finish() }
-            } label: {
-                Text("Finish flow")
-                    .font(.headline)
-                    .foregroundColor(.white)
-            }
-        }
-    }
 }
 
 #Preview {
-    NavigationActionListView(viewModel: .init(coordinator: .init()))
+    CoordinatorActionListView(viewModel: .init(coordinator: .init()))
 }

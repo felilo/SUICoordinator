@@ -1,5 +1,5 @@
 //
-//  CustomTabbarCoordinator.swift
+//  TabFlowCoordinator.swift
 //
 //  Copyright (c) Andres F. Lozano
 //
@@ -25,21 +25,39 @@
 import Foundation
 import SUICoordinator
 
-public class CustomTabCoordinator: TabCoordinator<MyTabPage> {
+class NavigationHubCoordinator: Coordinator<DefaultRoute> {
     
     // ---------------------------------------------------------------------
-    // MARK: Init
+    // MARK: Coordinator
     // ---------------------------------------------------------------------
     
-    public init(currentPage: MyTabPage = .first ) {
-        super.init(
-            pages: Page.allCases,
-            currentPage: currentPage,
-            viewContainer: { CustomTabView(viewModel: $0) }
+    override func start() async {
+        let viewModel = CoordinatorActionListViewModel(coordinator: self)
+        
+        let route = DefaultRoute(
+            presentationStyle: .push,
+            content: { CoordinatorActionListView(viewModel: viewModel) }
         )
         
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
-            self?.setBadge.send(( "2", .first ))
-        }
+        await startFlow(route: route )
+    }
+    
+    // ---------------------------------------------------------------------
+    // MARK: Aditional flows
+    // ---------------------------------------------------------------------
+    
+    func presentDefaultTabCoordinator() async {
+        let coordinator = DefaultTabCoordinator()
+        await navigate(to: coordinator, presentationStyle: .fullScreenCover)
+    }
+    
+    func presentCustomTabCoordinator() async {
+        let coordinator = CustomTabCoordinator()
+        await navigate(to: coordinator, presentationStyle: .sheet)
+    }
+    
+    func presentHomeCoordinator() async {
+        let coordinator = HomeCoordinator()
+        await navigate(to: coordinator, presentationStyle: .sheet)
     }
 }

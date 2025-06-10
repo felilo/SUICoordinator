@@ -1,5 +1,5 @@
 //
-//  ViewDidLoadModifier.swift
+//  ViewModifier.swift
 //
 //  Copyright (c) Andres F. Lozano
 //
@@ -24,27 +24,16 @@
 
 import SwiftUI
 
-public extension View {
+struct ViewDidLoadModifier: ViewModifier {
+    @State private var viewDidLoad = false
+    public let action: (() -> Void)?
     
-    func sheetCoordinator(
-        coordinator: SheetCoordinator<(any View)>,
-        index: Int = 0,
-        isLast: Bool = false,
-        onDissmis: ActionClosure? = nil,
-        onDidLoad: ActionClosure? = nil
-    ) -> some View {
-        modifier(
-            SheetCoordinatorView(
-                coordinator: coordinator,
-                index: index,
-                isLast: isLast,
-                onDissmis: onDissmis,
-                onDidLoad: onDidLoad
-            )
-        )
-    }
-    
-    func onViewDidLoad(perform action: (() -> Void)? = nil) -> some View {
-        self.modifier(ViewDidLoadModifier(action: action))
+    public func body(content: Content) -> some View {
+        content.onAppear {
+            if !viewDidLoad {
+                viewDidLoad.toggle()
+                action?()
+            }
+        }
     }
 }

@@ -199,17 +199,6 @@ final public class SheetCoordinator<T>: ObservableObject {
         await updateItems()
     }
     
-    /// Removes the first presented sheet from the stack.
-    ///
-    /// This method dismisses the bottom-most sheet in the stack, which is useful for
-    /// clearing the entire sheet stack from the foundation.
-    ///
-    /// - Parameters:
-    ///   - animated: A boolean value indicating whether to animate the removal.
-    @MainActor func removeFirstSheet(animated: Bool) async -> Void {
-        await removeSheet(at: 0, animated: animated)
-    }
-    
     /// Removes sheets at the specified indices.
     ///
     /// This method allows for bulk removal of sheets at specific positions in the stack.
@@ -226,18 +215,6 @@ final public class SheetCoordinator<T>: ObservableObject {
         await updateItems()
     }
     
-    /// Removes sheets at the specified indices (variadic version).
-    ///
-    /// This convenience method allows passing multiple indices as separate parameters
-    /// instead of as an array.
-    ///
-    /// - Parameters:
-    ///   - index: Variable number of indices indicating which sheets to remove.
-    ///   - animated: A boolean value indicating whether to animate the removal.
-    func removeSheet(at index: Int..., animated: Bool) async -> Void {
-        await removeSheet(at: index, animated: animated)
-    }
-    
     /// Removes the item at the specified string index.
     ///
     /// This method handles the removal of a specific sheet item by its string identifier.
@@ -248,9 +225,7 @@ final public class SheetCoordinator<T>: ObservableObject {
     @MainActor func remove(at index: String) async {
         guard let index = Int(index),
               (await itemManager.isValid(index: index))
-        else {
-            return await updateItems()
-        }
+        else { return await updateItems() }
         
         if let id = backUpItems[index] {
             await onRemoveItem?(id)

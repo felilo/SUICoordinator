@@ -79,7 +79,7 @@ public class Router<Route: RouteType>: ObservableObject, RouterType {
     ///
     /// This coordinator manages all modal presentations (sheets, full-screen covers, etc.)
     /// and provides a unified interface for modal navigation operations.
-    @Published public var sheetCoordinator: SheetCoordinator<Route.Body> = .init()
+    @Published public var sheetCoordinator: SheetCoordinator<AnyViewAlias> = .init()
     
     /// Controls whether navigation operations should be animated.
     ///
@@ -172,7 +172,7 @@ public class Router<Route: RouteType>: ObservableObject, RouterType {
             id: "\(view.id) - \(UUID())",
             animated: animated,
             presentationStyle: presentationStyle ?? view.presentationStyle,
-            view: { view.view }
+            view: { view as AnyViewAlias }
         )
         
         await presentSheet(item: item)
@@ -206,43 +206,7 @@ public class Router<Route: RouteType>: ObservableObject, RouterType {
         await itemManager.removeAll()
         await updateItems()
     }
-    
-    /// Pops to a specific view type in the navigation stack.
-    ///
-    /// This method searches the navigation stack for a view of the specified type
-    /// and removes all views above it, effectively navigating back to that view.
-    ///
-    /// - Parameters:
-    ///   - view: The target view type to pop to.
-    ///   - animated: A boolean value indicating whether to animate the pop action.
-    ///
-    /// - Returns: `true` if the target view was found and navigation occurred,
-    ///            `false` if the view was not found in the stack.
-    @discardableResult
-    @MainActor public func popToView<T>(_ view: T, animated: Bool = true) async -> Bool {
-        let name: (Any) -> String = { String(describing: $0.self) }
-        
-        let isValidName = { (route: Route) in
-            Self.removingParenthesesContent(name(route.view)) == name(view)
-        }
-        
-        let items = await itemManager.getAllItems()
-        guard let index = items.firstIndex(where: isValidName) else {
-            return false
-        }
-        
-        let position = index + 1
-        let range = position..<items.count
-        if position >= items.count { return true }
-        
-        self.animated = animated
-        
-        await itemManager.removeItemsIn(range: range)
-        await updateItems()
-        
-        return true
-    }
-    
+
     /// Dismisses the currently presented view or coordinator.
     ///
     /// This method dismisses the topmost modal presentation, such as a sheet
@@ -256,22 +220,12 @@ public class Router<Route: RouteType>: ObservableObject, RouterType {
         await sheetCoordinator.removeLastSheet(animated: animated)
     }
     
-    /// Closes the current view or sheet, optionally finishing the associated flow.
-    ///
-    /// This method intelligently determines whether to dismiss a modal presentation
-    /// or pop from the navigation stack based on the current navigation state.
+    /// Closes the current view or coordinator.
     ///
     /// - Parameters:
     ///   - animated: A boolean value indicating whether to animate the closing action.
-    ///   - finishFlow: A boolean value indicating whether to finish the associated flow.
-    ///                 Currently unused but reserved for future functionality.
-    @MainActor public func close(animated: Bool = true, finishFlow: Bool = false) async -> Void {
-        if !(await sheetCoordinator.areEmptyItems) {
-            await dismiss(animated: animated)
-            try? await Task.sleep(for: .seconds(animated ? 0.2 : 0.1))
-        } else if !(await itemManager.areItemsEmpty()) {
-            await pop(animated: animated)
-        }
+    @MainActor public func close(animated: Bool = true) async -> Void {
+        await close(animated: animated, finishFlow: false)
     }
     
     /// Cleans up the current view or coordinator, optionally preserving the main view.
@@ -322,44 +276,8 @@ public class Router<Route: RouteType>: ObservableObject, RouterType {
     ///
     /// - Parameters:
     ///   - item: The sheet item containing the view to present.
-    @MainActor func presentSheet(item: SheetItem<RouteType.Body>) async -> Void {
+    @MainActor func presentSheet(item: SheetItem<AnyViewAlias>) async -> Void {
         await sheetCoordinator.presentSheet(item)
-    }
-    
-    /// Removes all content inside parentheses, including nested parentheses, from the string.
-    ///
-    /// This utility method is used for view type comparison by cleaning up type names
-    /// and removing dynamic content like IDs that might be embedded in parentheses.
-    /// It's particularly useful for the `popToView` functionality.
-    ///
-    /// The method works recursively by finding the innermost parentheses and removing them,
-    /// repeating the process until no parentheses are left in the string.
-    /// It handles cases with multiple and nested parentheses.
-    ///
-    /// - Parameter content: The string to clean up.
-    /// - Returns: A new string with all parentheses and their contents removed.
-    static func removingParenthesesContent(_ content: String) -> String {
-        var content = content
-        let regexPattern = #"id: \"([^\"]+)\""#
-
-        if let regex = try? NSRegularExpression(pattern: regexPattern) {
-            let range = NSRange(content.startIndex..<content.endIndex, in: content)
-            if let match = regex.firstMatch(in: content, range: range) {
-                if let idRange = Range(match.range(at: 1), in: content) {
-                    let extractedID = String(content[idRange])
-                    content = extractedID
-                }
-            }
-        }
-        
-        var modifiedString = content
-        let regex = "\\([^()]*\\)"
-
-        while let range = modifiedString.range(of: regex, options: .regularExpression) {
-            modifiedString.removeSubrange(range)
-        }
-        
-        return modifiedString
     }
     
     /// Handles the pop action by updating the navigation stack.
@@ -378,7 +296,9 @@ public class Router<Route: RouteType>: ObservableObject, RouterType {
     /// item manager state, triggering UI updates when the navigation stack changes.
     @MainActor
     func updateItems() async {
-        items = await itemManager.getAllItems()
+        try? await Task.sleep(for: .milliseconds(20))
+        
+        self.items = await self.itemManager.getAllItems()
     }
     
     /// Synchronizes the router's items array with the internal item manager state.
@@ -394,14 +314,35 @@ public class Router<Route: RouteType>: ObservableObject, RouterType {
     ///
     /// This method is typically called automatically by the router's internal mechanisms
     /// and should rarely need to be called directly by client code.
+    @MainActor
     public func syncItems() async {
         let counterManagerItems = await itemManager.getAllItems().count
         let counterItems = items.count
         
-        if counterItems < counterManagerItems {
-            let range = counterItems..<counterManagerItems
-            await itemManager.removeItemsIn(range: range)
+        if counterItems != counterManagerItems {
+            await itemManager.setItems(items)
             await updateItems()
+        }
+    }
+    
+    /// Closes the current view or sheet, optionally finishing the associated flow.
+    ///
+    /// This method intelligently determines whether to dismiss a modal presentation
+    /// or pop from the navigation stack based on the current navigation state.
+    ///
+    /// - Parameters:
+    ///   - animated: A boolean value indicating whether to animate the closing action.
+    ///   - finishFlow: A boolean value indicating whether to finish the associated flow.
+    ///                 Currently unused but reserved for future functionality.
+    @MainActor internal func close(animated: Bool, finishFlow: Bool) async -> Void {
+        if !(await sheetCoordinator.areEmptyItems) {
+            await dismiss(animated: animated)
+            if finishFlow {
+                try? await Task.sleep(for: .milliseconds(animated ? 600 : 100))
+            }
+            
+        } else if !(await itemManager.areItemsEmpty()) {
+            await pop(animated: animated)
         }
     }
 }

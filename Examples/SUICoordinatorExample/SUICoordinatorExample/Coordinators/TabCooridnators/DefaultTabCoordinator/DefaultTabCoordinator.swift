@@ -1,5 +1,5 @@
 //
-//  TabbarActionListViewModel.swift
+//  DefaultTabCoordinator.swift
 //
 //  Copyright (c) Andres F. Lozano
 //
@@ -23,24 +23,24 @@
 //
 
 import Foundation
+import SUICoordinator
 
-class TabListViewModel: ObservableObject {
+class DefaultTabCoordinator: TabCoordinator<MyTabPage> {
     
-    let coordinator: TabFlowCoordinator
+    // ---------------------------------------------------------------------
+    // MARK: Init
+    // ---------------------------------------------------------------------
     
-    init(coordinator: TabFlowCoordinator) {
-        self.coordinator = coordinator
-    }
-    
-    @MainActor func presentDefaultTabCoordinator() async {
-        await coordinator.presentDefaultTabCoordinator()
-    }
-    
-    @MainActor func presentCustomTabbarCoordinator() async {
-        await coordinator.presentCustomTabbarCoordinator()
-    }
-    
-    @MainActor func finsh() async {
-        await coordinator.finishFlow()
+    init() {
+        super.init(
+            pages: Page.allCases,
+            currentPage: .first,
+            viewContainer: { DefaultTabView(dataSource: $0)}
+        )
+        
+        /// Set badge of a tap
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
+            self?.setBadge.send(( "2", .first ))
+        }
     }
 }

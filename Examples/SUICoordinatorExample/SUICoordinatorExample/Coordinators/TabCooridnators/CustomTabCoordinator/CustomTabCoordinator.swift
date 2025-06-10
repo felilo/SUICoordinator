@@ -1,5 +1,5 @@
 //
-//  DetentsView.swift
+//  CustomTabCoordinator.swift
 //
 //  Copyright (c) Andres F. Lozano
 //
@@ -22,37 +22,36 @@
 //  THE SOFTWARE.
 //
 
-import SwiftUI
+import Foundation
+import SUICoordinator
 
-struct DetentsView: View {
+public class CustomTabCoordinator: TabCoordinator<MyTabPage> {
     
-    typealias ViewModel = DetentsViewModel
+    // ---------------------------------------------------------------------
+    // MARK: Init
+    // ---------------------------------------------------------------------
     
-    @StateObject var viewModel: ViewModel
-    
-    var body: some View {
-        ZStack {
+    public init(currentPage: MyTabPage = .first ) {
+        
+        
+        
+        super.init(
+            pages: Page.allCases,
+            currentPage: currentPage,
+            viewContainer: { CustomTabView(dataSource: $0) }
+        )
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
+            self?.setBadge.send(( "2", .first ))
             
-            Color.yellow.ignoresSafeArea()
+//            DispatchQueue.main.asyncAfter(deadline: .now() + 2) { [weak self] in
+//                Task { @MainActor in
+//                    await self?.clean()
+//                    await self?.setPages([.first], currentPage: .first)
+//                    self?.start()
+//                }
+//            }
             
-            VStack {
-                Text("Hello, DetentsView!")
-                    .font(.largeTitle)
-                
-                VStack {
-                    Button("Presents Tabbar Coordinator") {
-                        Task { await viewModel.navigateToNextView() }
-                    }.buttonStyle(.borderedProminent)
-                    
-                    Button("Close view") {
-                        Task { await viewModel.close() }
-                    }.buttonStyle(.borderedProminent)
-                }
-            }
         }
     }
-}
-
-#Preview {
-    DetentsView(viewModel: .init(coordinator: .init()))
 }

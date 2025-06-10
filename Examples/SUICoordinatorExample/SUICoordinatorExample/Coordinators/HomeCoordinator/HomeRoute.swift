@@ -22,17 +22,17 @@
 //  THE SOFTWARE.
 //
 
-import Foundation
+import SwiftUI
 import SUICoordinator
 
 enum HomeRoute: RouteType {
     
-    case push(viewModel: PushViewModel)
-    case sheet(viewModel: SheetViewModel)
-    case fullscreen(viewModel: FullscreenViewModel)
-    case detents(viewModel: DetentsViewModel)
-    case actionListView(viewModel: ActionListViewModel)
-    case viewCustomTransition(viewModel: PushViewModel)
+    case push(coordinator: HomeCoordinator, title: String)
+    case sheet(coordinator: HomeCoordinator, title: String)
+    case fullscreen(coordinator: HomeCoordinator, title: String)
+    case detents(coordinator: HomeCoordinator, title: String)
+    case actionListView(coordinator: HomeCoordinator)
+    case viewCustomTransition(coordinator: HomeCoordinator, title: String)
     
     // ---------------------------------------------------------------------
     // MARK: RouteType
@@ -40,16 +40,16 @@ enum HomeRoute: RouteType {
     
     var presentationStyle: TransitionPresentationStyle {
         switch self {
-            case .push:
-                return .push
-            case .sheet:
-                return .sheet
-            case .fullscreen:
-                return .fullScreenCover
-            case .detents:
-                return .detents([.medium])
-            case .actionListView:
-                return .push
+        case .push:
+            return .push
+        case .sheet:
+            return .sheet
+        case .fullscreen:
+            return .fullScreenCover
+        case .detents:
+            return .detents([.medium])
+        case .actionListView:
+            return .push
         case .viewCustomTransition:
             return .custom(
                 transition: .move(edge: .leading),
@@ -59,18 +59,16 @@ enum HomeRoute: RouteType {
     }
     
     
-    var view: Body {
+    var body: some View {
         switch self {
-        case .push(let viewModel), .viewCustomTransition(let viewModel):
-                PushView(viewModel: viewModel)
-            case .sheet(let viewModel):
-                SheetView(viewModel: viewModel)
-            case .fullscreen(let viewModel):
-                FullscreenView(viewModel: viewModel)
-            case .detents(let viewModel):
-                DetentsView(viewModel: viewModel)
-            case .actionListView(let viewModel):
-                NavigationActionListView(viewModel: viewModel)
+        case let .push(coordinator, title),
+            let .viewCustomTransition(coordinator, title),
+            let .sheet(coordinator, title),
+            let .fullscreen(coordinator, title),
+            let .detents(coordinator, title):
+            PushView(coordinator: coordinator, title: title)
+        case .actionListView(let coordinator):
+            NavigationActionListView(viewModel: .init(coordinator: coordinator))
         }
     }
 }

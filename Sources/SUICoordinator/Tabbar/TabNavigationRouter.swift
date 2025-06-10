@@ -1,5 +1,5 @@
 //
-//  TabbarNavigationRouter.swift
+//  TabNavigationRouter.swift
 //
 //  Copyright (c) Andres F. Lozano
 //

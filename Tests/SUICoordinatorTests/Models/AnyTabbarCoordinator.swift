@@ -1,5 +1,5 @@
 //
-//  AnyTabbarCoordinator.swift
+//  AnyTabCoordinator.swift
 //
 //  Copyright (c) Andres F. Lozano
 //
@@ -68,5 +68,3 @@ struct AnyTabView<DataSource: TabCoordinatorType>: View where DataSource.DataSou
     
     var body: some View { EmptyView() }
 }
-
-

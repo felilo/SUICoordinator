@@ -1,5 +1,5 @@
 //
-//  FullscreenViewModel.swift
+//  View+Helpers.swift
 //
 //  Copyright (c) Andres F. Lozano
 //
@@ -22,37 +22,17 @@
 //  THE SOFTWARE.
 //
 
-import Foundation
+import SwiftUI
 
-class FullscreenViewModel: ObservableObject {
-    
-    let coordinator: HomeCoordinator
-    
-    init(coordinator: HomeCoordinator) {
-        self.coordinator = coordinator
-    }
-    
-    @MainActor func presentDetentsView() async {
-        await coordinator.presentDetents()
-    }
-    
-    @MainActor func presentFullscreen() async {
-        await coordinator.presentFullscreen()
-    }
-    
-    @MainActor func close() async {
-        await coordinator.close()
-    }
-    
-    @MainActor func presentSheetView() async {
-        await coordinator.presentSheet()
-    }
-    
-    @MainActor func finish() async {
-        await coordinator.finish()
-    }
-    
-    @MainActor func restart() async {
-        await coordinator.restart()
+public extension View {
+    /// Wraps the view in an `AnyView` type eraser.
+    ///
+    /// This is useful when you need to store or return a view of an
+    /// unknown concrete type, for example, in collections or when
+    /// implementing generic view-building functions.
+    ///
+    /// - Returns: An `AnyView` wrapping this view.
+    func asAnyView() -> AnyView {
+        AnyView(self)
     }
 }

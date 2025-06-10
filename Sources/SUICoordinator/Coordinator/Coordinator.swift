@@ -184,7 +184,7 @@ open class Coordinator<Route: RouteType>: ObservableObject, CoordinatorType {
     /// - **Conditional Flow**: Choose initial route based on app state
     /// - **Tab Flow**: Initialize tab-based navigation
     /// - **Onboarding Flow**: Start with authentication or tutorial flows
-    open func start(animated: Bool = true) async {
+    open func start() async {
         fatalError("This method must be overwritten")
     }
 }

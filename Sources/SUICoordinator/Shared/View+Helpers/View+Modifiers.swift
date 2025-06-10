@@ -1,5 +1,5 @@
 //
-//  MyTabbarPage.swift
+//  ViewDidLoadModifier.swift
 //
 //  Copyright (c) Andres F. Lozano
 //
@@ -22,34 +22,33 @@
 //  THE SOFTWARE.
 //
 
-import SUICoordinator
+import SwiftUI
 
-public enum MyTabPage: TabPage, CaseIterable {
+extension View {
     
-    case first
-    case second
-    
-    // ---------------------------------------------------------
-    // MARK: TabbarPage
-    // ---------------------------------------------------------
-    
-    public var position: Int {
-        switch self {
-            case .first: return 0
-            case .second: return 1
-        }
+    func sheetCoordinator(
+        coordinator: SheetCoordinator<AnyViewAlias>,
+        index: Int = 0,
+        isLast: Bool = false,
+        onDissmis: ActionClosure? = nil,
+        onDidLoad: ActionClosure? = nil
+    ) -> some View {
+        modifier(
+            SheetCoordinatorView(
+                coordinator: coordinator,
+                index: index,
+                isLast: isLast,
+                onDissmis: onDissmis,
+                onDidLoad: onDidLoad
+            )
+        )
     }
     
-    public func coordinator() -> (any CoordinatorType) {
-        switch self {
-            case .first:
-                return HomeCoordinator()
-            case .second:
-                return TabFlowCoordinator()
-        }
+    func onViewDidLoad(perform action: (() -> Void)? = nil) -> some View {
+        self.modifier(ViewDidLoadModifier(action: action))
     }
     
-    public var dataSource: MyTabPageDataSource {
-        .init(page: self)
+    func clearModalBackground()->some View {
+        self.modifier(ClearBackgroundViewModifier())
     }
 }

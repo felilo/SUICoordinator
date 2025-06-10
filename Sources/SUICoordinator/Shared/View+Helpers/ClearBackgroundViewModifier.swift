@@ -47,9 +47,3 @@ struct ClearBackgroundViewModifier: ViewModifier {
         }
     }
 }
-
-extension View {
-    func clearModalBackground()->some View {
-        self.modifier(ClearBackgroundViewModifier())
-    }
-}

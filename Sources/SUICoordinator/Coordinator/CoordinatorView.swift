@@ -48,7 +48,7 @@ public struct CoordinatorView<DataSource: CoordinatorType>: View {
     public var body: some View {
         RouterView(viewModel: dataSource.router)
             .onViewDidLoad {
-                Task(priority: .high) { await dataSource.start(animated: true) }
+                Task(priority: .high) { await dataSource.start() }
             }
     }
 }
