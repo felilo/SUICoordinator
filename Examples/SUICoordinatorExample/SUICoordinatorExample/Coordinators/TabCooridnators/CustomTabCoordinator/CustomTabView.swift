@@ -43,7 +43,6 @@ struct CustomTabView<DataSource: TabCoordinatorType>: View where DataSource.Data
     
     @StateObject private var dataSource: DataSource
     @State private var badges = [BadgeItem]()
-    @State private var showTabView: Bool = false
     
     private let widthIcon: CGFloat = 22
     
@@ -65,14 +64,9 @@ struct CustomTabView<DataSource: TabCoordinatorType>: View where DataSource.Data
     
     var body: some View {
         ZStack(alignment: .bottomLeading) {
-            
-            Color.black.opacity(0.7).ignoresSafeArea()
-                .opacity(!showTabView ? 1 : 0)
-            
             TabView(selection: $dataSource.currentPage) {
                 ForEach(dataSource.pages, id: \.id, content: tabBarItem)
             }
-            .opacity(showTabView ? 1 : 0)
             
             VStack() {
                 Spacer()
@@ -93,9 +87,6 @@ struct CustomTabView<DataSource: TabCoordinatorType>: View where DataSource.Data
             badges[index].value = value
         }.task {
             badges = dataSource.pages.map { (nil, $0) }
-            
-            try? await Task.sleep(for: .milliseconds(100))
-            showTabView = true
         }
     }
     
