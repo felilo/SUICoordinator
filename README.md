@@ -53,8 +53,8 @@ import SwiftUI
 import SUICoordinator
 
 enum HomeRoute: RouteType {
-    case push(viewModel: PushViewModel)
-    case sheet(viewModel: SheetViewModel)
+    case push(dependencies: DependenciesPushView)
+    case sheet(viewModel: DependenciesSheetView)
     
     var presentationStyle: TransitionPresentationStyle {
         switch self {
@@ -66,8 +66,8 @@ enum HomeRoute: RouteType {
     @ViewBuilder
     var view: some View {
         switch self {
-            case .push(let viewModel): PushView(viewModel: viewModel)
-            case .sheet(let viewModel): SheetView(viewModel: viewModel)
+            case .push(let dependencies): PushView(viewModel: .init(dependencies: dependencies))
+            case .sheet(let dependencies): SheetView(viewModel: .init(dependencies: dependencies))
         }
     }
 }
@@ -83,7 +83,7 @@ import SUICoordinator
 
 class HomeCoordinator: Coordinator<HomeRoute> {
     
-    override func start(animated: Bool = true) async {
+    override func start() async {
         // This is the first view the coordinator will show.
         // 'startFlow' clears any existing navigation stack and presents this route.
         let viewModel = ActionListViewModel(coordinator: self)
@@ -284,7 +284,7 @@ import SUICoordinator
 class CustomAppTabCoordinator: TabCoordinator<AppTabPage> {
     init(initialPage: AppTabPage = .home) {
         super.init(
-            pages: AppTabPage.allCases.sorted(by: { $0.position < $1.position }),
+            pages: AppTabPage.allCases,
             currentPage: initialPage,
             viewContainer: { dataSource in
                 // Provide your custom tab bar view.
@@ -295,7 +295,7 @@ class CustomAppTabCoordinator: TabCoordinator<AppTabPage> {
 }
 ```
 
-For a detailed example, you can take a look at the [CustomTabView.swift](https://github.com/felilo/SUICoordinator/blob/main/Examples/SUICoordinatorExample/SUICoordinatorExample/Coordinators/DefaultTab/TabViewCoordinator.swift) implementation.
+For a detailed example, you can take a look at the [CustomTabView.swift](https://github.com/felilo/SUICoordinator/blob/main/Examples/SUICoordinatorExample/SUICoordinatorExample/Coordinators/TabCooridnators/DefaultTabCoordinator/DefaultTabView.swift) implementation.
 
 #### 3. Using the `TabCoordinator`
 Instantiate and start your `TabCoordinator` from a parent coordinator, just like any other coordinator.
@@ -531,7 +531,7 @@ enum AppRoute: RouteType { // AppRoute now conforms to RouteType
 
 By defining routes this way, `SUICoordinator` can manage the presentation and lifecycle of your views in a type-safe and structured manner. The `SCHashable` conformance allows routes to be used in navigation stacks and for SwiftUI to differentiate between them.
 
-You can also use `DefaultRoute` for generic views if you don't need a specific enum for routes, as demonstrated in the `TabFlowCoordinator` [example](https://github.com/felilo/SUICoordinator/blob/main/Examples/SUICoordinatorExample/SUICoordinatorExample/Coordinators/TabFlow/TabFlowCoordinator.swift).
+You can also use `DefaultRoute` for generic views if you don't need a specific enum for routes, as demonstrated in the `TabFlowCoordinator` [example](https://github.com/felilo/SUICoordinator/blob/main/Examples/SUICoordinatorExample/SUICoordinatorExample/Coordinators/NavigationHubCoordinator/NavigationHubCoordinator.swift).
 <br>
 
 ### API
