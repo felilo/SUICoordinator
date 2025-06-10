@@ -42,13 +42,9 @@ public enum TransitionPresentationStyle: @unchecked Sendable, SCEquatable {
     /// A custom presentation style.
     case custom(transition: AnyTransition, animation: Animation?, fullScreen: Bool = false)
     
-    
-    var isCustom: Bool {
-        switch self {
-        case .custom:
-            return true
-        default:
-            return false
-        }
+    internal var isCustom: Bool {
+        guard case .custom = self else { return false }
+        
+        return true
     }
 }

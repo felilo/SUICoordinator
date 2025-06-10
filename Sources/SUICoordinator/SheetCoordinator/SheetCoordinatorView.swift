@@ -32,7 +32,7 @@ struct SheetCoordinatorView: ViewModifier {
     // ---------------------------------------------------------
     
     typealias Action = ((String) -> Void)
-    typealias Value = (any View)
+    typealias Value = AnyViewAlias
     
     // ---------------------------------------------------------
     // MARK: Wrapper Properties
@@ -81,7 +81,7 @@ struct SheetCoordinatorView: ViewModifier {
         with index: Int,
         item: SheetItem<Value>
     ) -> some View {
-        let view = (item.view() ?? AnyView(EmptyView()))
+        let view = item.view()?.asAnyView()
             .sheetCoordinator(
                 coordinator: coordinator,
                 index: coordinator.getNextIndex(index),
@@ -90,7 +90,7 @@ struct SheetCoordinatorView: ViewModifier {
                 onDidLoad: onDidLoad
             )
             
-        return addSheet(to: AnyView(view), with: item.presentationStyle)
+        return addSheet(to: view, with: item.presentationStyle)
     }
     
     @ViewBuilder

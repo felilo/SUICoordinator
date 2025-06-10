@@ -1,5 +1,5 @@
 //
-//  TabbarCoordinator.swift
+//  TabCoordinator.swift
 //
 //  Copyright (c) Andres F. Lozano
 //
@@ -22,8 +22,8 @@
 //  THE SOFTWARE.
 //
 
-import Foundation
 import Combine
+import Foundation
 
 /// A coordinator class for managing tab-based navigation in SwiftUI applications.
 ///
@@ -197,17 +197,16 @@ open class TabCoordinator<Page: TabPage>: TabCoordinatable {
     /// - Parameters:
     ///   - animated: A boolean value indicating whether to animate the presentation.
     ///              Defaults to `true`.
-    open func start(animated: Bool = true) async {
-        setupPages(pages, currentPage: currentPage)
+    open func start() async {
+        async let _ = await setupPages(pages, currentPage: currentPage)
         let cView = viewContainer
         
         await startFlow(
             route: .init(
                 presentationStyle: presentationStyle,
                 content: { cView(self) }
-            ),
-            transitionStyle: presentationStyle,
-            animated: animated)
+            )
+        )
     }
     
     // ---------------------------------------------------------

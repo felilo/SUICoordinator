@@ -1,5 +1,5 @@
 //
-//  CustomTabbarView.swift
+//  CustomTabView.swift
 //
 //  Copyright (c) Andres F. Lozano
 //
@@ -41,12 +41,11 @@ struct CustomTabView<DataSource: TabCoordinatorType>: View where DataSource.Data
     // ---------------------------------------------------------------------
     
     
-    @StateObject private var viewModel: DataSource
-    @State private var currentPage: Page
-    @State private var pages: [Page] = []
-    @State var badges = [BadgeItem]()
+    @StateObject private var dataSource: DataSource
+    @State private var badges = [BadgeItem]()
+    @State private var showTabView: Bool = false
     
-    let widthIcon: CGFloat = 22
+    private let widthIcon: CGFloat = 22
     
     
     // ---------------------------------------------------------------------
@@ -54,9 +53,8 @@ struct CustomTabView<DataSource: TabCoordinatorType>: View where DataSource.Data
     // ---------------------------------------------------------------------
     
     
-    init(viewModel: DataSource) {
-        self._viewModel = .init(wrappedValue: viewModel)
-        currentPage = viewModel.currentPage
+    init(dataSource: DataSource) {
+        self._dataSource = .init(wrappedValue: dataSource)
     }
     
     
@@ -67,35 +65,37 @@ struct CustomTabView<DataSource: TabCoordinatorType>: View where DataSource.Data
     
     var body: some View {
         ZStack(alignment: .bottomLeading) {
-            TabView(selection: $currentPage) {
-                ForEach(pages, id: \.id, content: tabBarItem)
+            
+            Color.black.opacity(0.7).ignoresSafeArea()
+                .opacity(!showTabView ? 1 : 0)
+            
+            TabView(selection: $dataSource.currentPage) {
+                ForEach(dataSource.pages, id: \.id, content: tabBarItem)
             }
+            .opacity(showTabView ? 1 : 0)
             
             VStack() {
                 Spacer()
-                customTabbar()
-            }.background(
-                .gray.opacity(0.5),
-                in: RoundedRectangle(cornerRadius: 0, style: .continuous)
-            )
+                customTabView()
+            }.background {
+                RoundedRectangle(cornerRadius: 60)
+                    .shadow(color: Color.black.opacity(0.5), radius: 5, y: 4)
+            }
             .frame(maxWidth: .infinity, maxHeight: 60)
-            .clipShape(RoundedRectangle(cornerRadius: 30, style: .continuous))
-            .padding(.horizontal, 10)
+            .padding(.horizontal, 16)
         }
         .ignoresSafeArea(.all, edges: [.leading, .trailing, .top])
-        .onChange(of: viewModel.currentPage) { currentPage = $0 }
-        .onChange(of: viewModel.pages) { pages in
-            self.pages = pages
+        .onChange(of: dataSource.pages) { pages in
             badges = pages.map { (nil, $0) }
         }
-        .onReceive(viewModel.setBadge) { (value, page) in
+        .onReceive(dataSource.setBadge) { (value, page) in
             guard let index = getBadgeIndex(page: page) else { return }
             badges[index].value = value
-        }
-        .task {
-            currentPage = viewModel.currentPage
-            pages = viewModel.pages
-            badges = viewModel.pages.map { (nil, $0) }
+        }.task {
+            badges = dataSource.pages.map { (nil, $0) }
+            
+            try? await Task.sleep(for: .milliseconds(100))
+            showTabView = true
         }
     }
     
@@ -107,9 +107,9 @@ struct CustomTabView<DataSource: TabCoordinatorType>: View where DataSource.Data
     
     @ViewBuilder
     func tabBarItem(page: Page) -> some View {
-        if let item = viewModel.getCoordinator(with: page.position) {
-            AnyView(item.getView())
-                .toolbar(.hidden)
+        if let item = dataSource.getCoordinator(with: page.position) {
+            item.getView().asAnyView()
+                .toolbar(.hidden, for: .tabBar)
                 .tag(page)
         }
     }
@@ -117,13 +117,13 @@ struct CustomTabView<DataSource: TabCoordinatorType>: View where DataSource.Data
     
     private func customTabBarItem(@State page: Page, size: CGRect) -> some View {
         Button {
-            viewModel.setCurrentPage(page)
+            dataSource.setCurrentPage(page)
         } label: {
             ZStack(alignment: .bottom) {
                 VStack(alignment: .center , spacing: 2) {
                     page.dataSource.icon
                     page.dataSource.title
-                }.foregroundColor(currentPage == page ? .blue : .black)
+                }.foregroundColor(dataSource.currentPage == page ? .blue : .white)
             }
         }
         .frame(width: getWidthButton(with: size))
@@ -139,7 +139,6 @@ struct CustomTabView<DataSource: TabCoordinatorType>: View where DataSource.Data
                     .font(.footnote)
                     .foregroundStyle(.white)
                     .padding(5)
-                
             }
             .frame(height: 40 / 2 )
             .background(.red)
@@ -150,10 +149,10 @@ struct CustomTabView<DataSource: TabCoordinatorType>: View where DataSource.Data
     
     
     @ViewBuilder
-    func customTabbar() -> some View {
+    func customTabView() -> some View {
         GeometryReader { proxy in
             HStack(spacing: 0) {
-                ForEach(pages, id: \.id) {
+                ForEach(dataSource.pages, id: \.id) {
                     customTabBarItem(
                         page: $0,
                         size: proxy.frame(in: .global)
@@ -183,6 +182,6 @@ struct CustomTabView<DataSource: TabCoordinatorType>: View where DataSource.Data
     
     
     private func getWidthButton(with size: CGRect) -> CGFloat {
-        size.width / CGFloat(pages.count)
+        size.width / CGFloat(dataSource.pages.count)
     }
 }

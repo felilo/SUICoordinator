@@ -1,5 +1,5 @@
 //
-//  DetentsView.swift
+//  DefaultTabCoordinator.swift
 //
 //  Copyright (c) Andres F. Lozano
 //
@@ -22,37 +22,25 @@
 //  THE SOFTWARE.
 //
 
-import SwiftUI
+import Foundation
+import SUICoordinator
 
-struct DetentsView: View {
+class DefaultTabCoordinator: TabCoordinator<MyTabPage> {
     
-    typealias ViewModel = DetentsViewModel
+    // ---------------------------------------------------------------------
+    // MARK: Init
+    // ---------------------------------------------------------------------
     
-    @StateObject var viewModel: ViewModel
-    
-    var body: some View {
-        ZStack {
-            
-            Color.yellow.ignoresSafeArea()
-            
-            VStack {
-                Text("Hello, DetentsView!")
-                    .font(.largeTitle)
-                
-                VStack {
-                    Button("Presents Tabbar Coordinator") {
-                        Task { await viewModel.navigateToNextView() }
-                    }.buttonStyle(.borderedProminent)
-                    
-                    Button("Close view") {
-                        Task { await viewModel.close() }
-                    }.buttonStyle(.borderedProminent)
-                }
-            }
+    init() {
+        super.init(
+            pages: Page.allCases,
+            currentPage: .first,
+            viewContainer: { DefaultTabView(dataSource: $0)}
+        )
+        
+        /// Set badge of a tap
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
+            self?.setBadge.send(( "2", .first ))
         }
     }
-}
-
-#Preview {
-    DetentsView(viewModel: .init(coordinator: .init()))
 }

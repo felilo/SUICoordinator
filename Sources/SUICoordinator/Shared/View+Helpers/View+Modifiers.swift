@@ -1,5 +1,5 @@
 //
-//  TabbarActionListView.swift
+//  ViewDidLoadModifier.swift
 //
 //  Copyright (c) Andres F. Lozano
 //
@@ -24,36 +24,31 @@
 
 import SwiftUI
 
-struct TabListView: View {
+extension View {
     
-    typealias ViewModel = TabListViewModel
-    
-    
-    @Environment(\.isPresented) private var isPresented
-    @StateObject var viewModel: ViewModel
-    
-    var body: some View {
-        List {
-            
-            Button("Presents Default Tabbar") {
-                Task { await viewModel.presentDefaultTabCoordinator() }
-            }
-            
-            Button("Presents Custom Tabbar") {
-                Task { await viewModel.presentCustomTabbarCoordinator() }
-            }
-        }
-        .toolbar {
-            Button {
-                Task { await viewModel.finsh() }
-            } label: {
-                Text("Finish flow")
-            }
-        }
-        .navigationTitle("Navigation List")
+    func sheetCoordinator(
+        coordinator: SheetCoordinator<AnyViewAlias>,
+        index: Int = 0,
+        isLast: Bool = false,
+        onDissmis: ActionClosure? = nil,
+        onDidLoad: ActionClosure? = nil
+    ) -> some View {
+        modifier(
+            SheetCoordinatorView(
+                coordinator: coordinator,
+                index: index,
+                isLast: isLast,
+                onDissmis: onDissmis,
+                onDidLoad: onDidLoad
+            )
+        )
     }
-}
-
-#Preview {
-    NavigationActionListView(viewModel: .init(coordinator: .init()))
+    
+    func onViewDidLoad(perform action: (() -> Void)? = nil) -> some View {
+        self.modifier(ViewDidLoadModifier(action: action))
+    }
+    
+    func clearModalBackground()->some View {
+        self.modifier(ClearBackgroundViewModifier())
+    }
 }

@@ -1,5 +1,5 @@
 //
-//  TabbarActionListViewModel.swift
+//  NavigationActionListDetailViewModel.swift
 //
 //  Copyright (c) Andres F. Lozano
 //
@@ -24,23 +24,45 @@
 
 import Foundation
 
-class TabListViewModel: ObservableObject {
+class NavigationActionListDetailViewModel: ObservableObject {
     
-    let coordinator: TabFlowCoordinator
+    var coordinator: HomeCoordinator
+    var title: String
     
-    init(coordinator: TabFlowCoordinator) {
+    init(coordinator: HomeCoordinator, title: String) {
         self.coordinator = coordinator
+        self.title = title
     }
     
-    @MainActor func presentDefaultTabCoordinator() async {
-        await coordinator.presentDefaultTabCoordinator()
+    @MainActor func presentSheet() async {
+        await coordinator.presentSheet()
     }
     
-    @MainActor func presentCustomTabbarCoordinator() async {
-        await coordinator.presentCustomTabbarCoordinator()
+    @MainActor func presentFullscreen() async {
+        await coordinator.presentFullscreen()
     }
     
-    @MainActor func finsh() async {
-        await coordinator.finishFlow()
+    @MainActor func presentViewWithCustomPresentation() async {
+        await coordinator.presentViewWithCustomPresentation()
+    }
+    
+    @MainActor func presentDetentsView() async {
+        await coordinator.presentDetents()
+    }
+    
+    @MainActor func navigateToPushView() async {
+        await coordinator.navigateToPushView()
+    }
+    
+    @MainActor func close() async {
+        await coordinator.close()
+    }
+    
+    @MainActor func restartCoordinator() async {
+        await coordinator.restart()
+    }
+    
+    @MainActor func presentCustomTabCoordinator() async {
+        await coordinator.presentCustomTabCoordinator()
     }
 }

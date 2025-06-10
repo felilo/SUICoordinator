@@ -1,5 +1,5 @@
 //
-//  DefaultTabCoordinator.swift
+//  TabFlowCoordinator.swift
 //
 //  Copyright (c) Andres F. Lozano
 //
@@ -25,22 +25,39 @@
 import Foundation
 import SUICoordinator
 
-class DefaultTabCoordinator: TabCoordinator<MyTabPage> {
+class NavigationHubCoordinator: Coordinator<DefaultRoute> {
     
     // ---------------------------------------------------------------------
-    // MARK: Init
+    // MARK: Coordinator
     // ---------------------------------------------------------------------
     
-    init() {
-        super.init(
-            pages: Page.allCases,
-            currentPage: .first,
-            viewContainer: { TabViewCoordinator(dataSource: $0, currentPage: .first) }
+    override func start() async {
+        let viewModel = CoordinatorActionListViewModel(coordinator: self)
+        
+        let route = DefaultRoute(
+            presentationStyle: .push,
+            content: { CoordinatorActionListView(viewModel: viewModel) }
         )
         
-        /// Set badge of a tap
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
-            self?.setBadge.send(( "2", .first ))
-        }
+        await startFlow(route: route )
+    }
+    
+    // ---------------------------------------------------------------------
+    // MARK: Aditional flows
+    // ---------------------------------------------------------------------
+    
+    func presentDefaultTabCoordinator() async {
+        let coordinator = DefaultTabCoordinator()
+        await navigate(to: coordinator, presentationStyle: .fullScreenCover)
+    }
+    
+    func presentCustomTabCoordinator() async {
+        let coordinator = CustomTabCoordinator()
+        await navigate(to: coordinator, presentationStyle: .sheet)
+    }
+    
+    func presentHomeCoordinator() async {
+        let coordinator = HomeCoordinator()
+        await navigate(to: coordinator, presentationStyle: .detents([.medium, .large]))
     }
 }

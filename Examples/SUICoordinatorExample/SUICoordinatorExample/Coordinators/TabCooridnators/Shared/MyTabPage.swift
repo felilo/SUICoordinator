@@ -1,5 +1,5 @@
 //
-//  TabFlowCoordinator.swift
+//  MyTabPage.swift
 //
 //  Copyright (c) Andres F. Lozano
 //
@@ -22,37 +22,34 @@
 //  THE SOFTWARE.
 //
 
-import Foundation
 import SUICoordinator
 
-class TabFlowCoordinator: Coordinator<DefaultRoute> {
+public enum MyTabPage: TabPage, CaseIterable {
     
-    // ---------------------------------------------------------------------
-    // MARK: Coordinator
-    // ---------------------------------------------------------------------
+    case first
+    case second
     
-    override func start(animated: Bool = true) async {
-        let viewModel = TabListViewModel(coordinator: self)
-        
-        let route = DefaultRoute(
-            presentationStyle: .push,
-            content: { TabListView(viewModel: viewModel) }
-        )
-        
-        await startFlow(route: route )
+    // ---------------------------------------------------------
+    // MARK: TabPage
+    // ---------------------------------------------------------
+    
+    public var position: Int {
+        switch self {
+            case .first: return 0
+            case .second: return 1
+        }
     }
     
-    // ---------------------------------------------------------------------
-    // MARK: Adiotional flows
-    // ---------------------------------------------------------------------
-    
-    func presentDefaultTabCoordinator() async {
-        let coordinator = DefaultTabCoordinator()
-        await navigate(to: coordinator, presentationStyle: .fullScreenCover)
+    public func coordinator() -> AnyCoordinatorType {
+        switch self {
+            case .first:
+                return HomeCoordinator()
+            case .second:
+                return NavigationHubCoordinator()
+        }
     }
     
-    func presentCustomTabbarCoordinator() async {
-        let coordinator = CustomTabCoordinator()
-        await navigate(to: coordinator, presentationStyle: .sheet)
+    public var dataSource: MyTabPageDataSource {
+        .init(page: self)
     }
 }

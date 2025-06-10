@@ -49,7 +49,7 @@ public protocol SheetCoordinatorType: ObservableObject {
     ///
     /// This type alias simplifies working with sheet items that can contain any type of SwiftUI view,
     /// providing type safety while maintaining flexibility for different view types.
-    typealias Item = SheetItem<(any View)>
+    typealias Item = SheetItem<AnyViewAlias>
     
     // ---------------------------------------------------------
     // MARK: Properties

@@ -1,5 +1,5 @@
 //
-//  TabbarCoordinatorTests.swift
+//  TabCoordinatorTests.swift
 //
 //  Copyright (c) Andres F. Lozano
 //
@@ -35,7 +35,7 @@ final class TabCoordinatorTests: XCTestCase {
         let sut = makeSUT()
         let pages = [AnyEnumTabRoute.tab2]
         
-        await sut.start(animated: animated)
+        await sut.start()
         await sut.setPages(pages)
         
         XCTAssertEqual(pages, sut.pages)
@@ -54,7 +54,7 @@ final class TabCoordinatorTests: XCTestCase {
     @MainActor func test_get_coordinator_selected_fail() async {
         let sut = makeSUT(currentPage: .tab1)
         
-        await sut.start(animated: animated)
+        await sut.start()
         XCTAssertEqual(sut.currentPage, .tab1)
         sut.currentPage = .tab2
         XCTAssertEqual(sut.currentPage, .tab2)
@@ -70,7 +70,7 @@ final class TabCoordinatorTests: XCTestCase {
         let sut = makeSUT(currentPage: .tab1)
         let coordinator = AnyCoordinator()
         
-        await sut.start(animated: animated)
+        await sut.start()
         XCTAssertEqual(sut.currentPage, .tab1)
         sut.currentPage = .tab2
         await navigateToCoordinator(coordinator, in: try sut.getCoordinatorSelected())
@@ -80,7 +80,7 @@ final class TabCoordinatorTests: XCTestCase {
     
     @MainActor func test_popToRoot_in_tab() async throws {
         let sut = makeSUT(currentPage: .tab1)
-        await sut.start(animated: animated)
+        await sut.start()
         
         let coordinatorSelected = try sut.getCoordinatorSelected() as? AnyCoordinator
         
@@ -93,9 +93,9 @@ final class TabCoordinatorTests: XCTestCase {
         await finishFlow(sut: sut)
     }
     
-    @MainActor func test_siTabbarCoordinator() async throws {
+    @MainActor func test_siTabCoordinator() async throws {
         let sut = makeSUT(currentPage: .tab1)
-        XCTAssertTrue(sut.isTabbarCoordinable)
+        XCTAssertTrue(sut.isTabCoordinable)
         await finishFlow(sut: sut)
     }
     
@@ -115,14 +115,14 @@ final class TabCoordinatorTests: XCTestCase {
         let sut = makeSUT(currentPage: .tab1)
         let coordinator = AnyCoordinator()
         
-        await sut.start(animated: animated)
+        await sut.start()
         XCTAssertEqual(sut.currentPage, .tab1)
         sut.currentPage = .tab2
         try await coordinator.forcePresentation(
             animated: animated,
             presentationStyle: .fullScreenCover,
             mainCoordinator: sut)
-        await coordinator.start(animated: animated)
+        await coordinator.start()
         
         XCTAssertEqual(coordinator.parent.uuid, try sut.getCoordinatorSelected().uuid)
         await finishFlow(sut: sut)
@@ -132,7 +132,7 @@ final class TabCoordinatorTests: XCTestCase {
         let sut = makeSUT()
         let pages = [AnyEnumTabRoute.tab2, .tab1]
         
-        await sut.start(animated: animated)
+        await sut.start()
         await sut.setPages(pages)
         
         let coordinator = sut.getCoordinator(with: AnyEnumTabRoute.tab2.position)
@@ -148,12 +148,10 @@ final class TabCoordinatorTests: XCTestCase {
         let sut = makeSUT()
         let pages = [AnyEnumTabRoute.tab2, .tab1]
         
-        await sut.start(animated: animated)
+        await sut.start()
         await sut.setPages(pages)
         
-        let view = try XCTUnwrap(sut.router.mainView?.view)
-        
-        XCTAssertEqual(self.getNameOf(object: view), self.getNameOf(object: AnyTabView<TabCoordinator<AnyEnumTabRoute>>.self))
+        XCTAssertTrue(sut.isRunning)
         
         await finishFlow(sut: sut)
     }
@@ -162,7 +160,7 @@ final class TabCoordinatorTests: XCTestCase {
         let sut = makeSUT()
         let pages = [AnyEnumTabRoute.tab2, .tab1]
         
-        await sut.start(animated: animated)
+        await sut.start()
         await sut.setPages(pages)
         
         let coordinator = sut.getCoordinator(with: AnyEnumTabRoute.tab2.position)

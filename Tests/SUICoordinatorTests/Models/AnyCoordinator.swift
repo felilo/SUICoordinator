@@ -26,14 +26,14 @@ import SwiftUI
 @testable import SUICoordinator
 
 class AnyCoordinator: Coordinator<AnyEnumRoute> {
-    override func start(animated: Bool = true) async {
-        await startFlow(route: .pushStep)
+    override func start() async {
+        await startFlow(route: .pushStep(1))
     }
 }
 
 class OtherCoordinator: Coordinator<DefaultRoute> { 
-    override func start(animated: Bool = true) async {
-        let page = AnyEnumRoute.pushStep
-        await startFlow(route: .init(presentationStyle: page.presentationStyle, content: { page.view }))
+    override func start() async {
+        let page = AnyEnumRoute.pushStep(1)
+        await startFlow(route: .init(presentationStyle: page.presentationStyle, content: { page }))
     }
 }

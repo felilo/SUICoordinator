@@ -46,11 +46,9 @@ public extension CoordinatorType {
     /// }
     /// ```
     func topCoordinator(pCoordinator: AnyCoordinatorType? = nil) throws -> AnyCoordinatorType? {
-        if let tabCoordinator = getTabbarCoordinable(self) {
-            var auxCoordinator = try tabCoordinator.getCoordinatorSelected() ?? self.children.last
+        if let tabCoordinator = getTabCoordinable(self) {
             return try tabCoordinator.getCoordinatorSelected()
         }
-        
         
         guard children.last != nil else { return self }
         var auxCoordinator = pCoordinator ?? self.children.last
@@ -129,8 +127,9 @@ public extension CoordinatorType {
     ///     animated: true
     /// )
     /// ```
-    func startFlow(route: Route, transitionStyle: TransitionPresentationStyle? = nil, animated: Bool = true) async -> Void {
-        router.mainView = route
+    
+    @MainActor func startFlow(route: Route) async -> Void {
+        if !isRunning { router.mainView = route }
     }
     
     /// Forces the presentation of the coordinator.

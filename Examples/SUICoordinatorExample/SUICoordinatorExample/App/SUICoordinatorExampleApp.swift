@@ -47,7 +47,10 @@ struct SUICoordinatorExampleApp: App {
     ///   on application launch, demonstrating programmatic navigation.
     var body: some Scene {
         WindowGroup {
-            mainCoordinator.getView()
+            ZStack {
+                Color.black.opacity(0.7).ignoresSafeArea()
+                mainCoordinator.getView()
+            }
                 .onReceive(NotificationCenter.default.publisher(for: Notification.Name.PushNotification)) { object in
                     // Assumes `incomingURL` is accessible or passed via notification's object/userInfo
                     // For demonstration, let's assume `object.object` contains the URL string

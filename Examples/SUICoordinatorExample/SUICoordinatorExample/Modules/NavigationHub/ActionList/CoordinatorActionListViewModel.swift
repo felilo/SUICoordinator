@@ -1,5 +1,5 @@
 //
-//  CustomTabbarCoordinator.swift
+//  TabbarActionListViewModel.swift
 //
 //  Copyright (c) Andres F. Lozano
 //
@@ -23,23 +23,28 @@
 //
 
 import Foundation
-import SUICoordinator
 
-public class CustomTabCoordinator: TabCoordinator<MyTabPage> {
+class CoordinatorActionListViewModel: ObservableObject {
     
-    // ---------------------------------------------------------------------
-    // MARK: Init
-    // ---------------------------------------------------------------------
+    let coordinator: NavigationHubCoordinator
     
-    public init(currentPage: MyTabPage = .first ) {
-        super.init(
-            pages: Page.allCases,
-            currentPage: currentPage,
-            viewContainer: { CustomTabView(viewModel: $0) }
-        )
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
-            self?.setBadge.send(( "2", .first ))
-        }
+    init(coordinator: NavigationHubCoordinator) {
+        self.coordinator = coordinator
+    }
+    
+    @MainActor func presentDefaultTabCoordinator() async {
+        await coordinator.presentDefaultTabCoordinator()
+    }
+    
+    @MainActor func presentCustomTabCoordinator() async {
+        await coordinator.presentCustomTabCoordinator()
+    }
+    
+    @MainActor func presentHomeCoordinator() async {
+        await coordinator.presentHomeCoordinator()
+    }
+    
+    @MainActor func finsh() async {
+        await coordinator.finishFlow()
     }
 }

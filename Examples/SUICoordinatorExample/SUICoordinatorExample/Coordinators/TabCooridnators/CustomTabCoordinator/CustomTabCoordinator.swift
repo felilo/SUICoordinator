@@ -1,5 +1,5 @@
 //
-//  MyTabbarPage.swift
+//  CustomTabCoordinator.swift
 //
 //  Copyright (c) Andres F. Lozano
 //
@@ -22,34 +22,36 @@
 //  THE SOFTWARE.
 //
 
+import Foundation
 import SUICoordinator
 
-public enum MyTabPage: TabPage, CaseIterable {
+public class CustomTabCoordinator: TabCoordinator<MyTabPage> {
     
-    case first
-    case second
+    // ---------------------------------------------------------------------
+    // MARK: Init
+    // ---------------------------------------------------------------------
     
-    // ---------------------------------------------------------
-    // MARK: TabbarPage
-    // ---------------------------------------------------------
-    
-    public var position: Int {
-        switch self {
-            case .first: return 0
-            case .second: return 1
+    public init(currentPage: MyTabPage = .first ) {
+        
+        
+        
+        super.init(
+            pages: Page.allCases,
+            currentPage: currentPage,
+            viewContainer: { CustomTabView(dataSource: $0) }
+        )
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
+            self?.setBadge.send(( "2", .first ))
+            
+//            DispatchQueue.main.asyncAfter(deadline: .now() + 2) { [weak self] in
+//                Task { @MainActor in
+//                    await self?.clean()
+//                    await self?.setPages([.first], currentPage: .first)
+//                    self?.start()
+//                }
+//            }
+            
         }
-    }
-    
-    public func coordinator() -> (any CoordinatorType) {
-        switch self {
-            case .first:
-                return HomeCoordinator()
-            case .second:
-                return TabFlowCoordinator()
-        }
-    }
-    
-    public var dataSource: MyTabPageDataSource {
-        .init(page: self)
     }
 }

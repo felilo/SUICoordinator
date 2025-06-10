@@ -40,6 +40,10 @@ actor ItemManager<T> {
         items.append(item)
     }
     
+    func setItems(_ items: [T]) {
+        self.items = items
+    }
+    
     /// The index of the last item in the collection (count - 1). Returns 0 if empty.
     var totalItems: Int {
         guard !items.isEmpty else {
@@ -83,11 +87,6 @@ actor ItemManager<T> {
         guard isValid(index: index) else { return nil }
         return items.remove(at: index)
     }
-    
-    /// Removes all items from the collection.
-    func removeAllItems() {
-        items.removeAll()
-    }
         
     /// Removes and returns the last item in the collection.
     /// - Returns: The last item, or `nil` if the collection was empty.
@@ -99,10 +98,6 @@ actor ItemManager<T> {
     func removeAll() {
         guard !areItemsEmpty() else { return }
         return items.removeAll()
-    }
-    
-    func removeItemsIn(range: Range<Int>) {
-        items.remove(atOffsets: IndexSet.init(integersIn: range))
     }
 }
 
@@ -137,17 +132,6 @@ extension ItemManager where T: OptionalType {
         guard items.indices.contains(index) else { return nil }
         return items[index].unwrap()
     }
-    
-    /// Sets the item at the specified index to its `nil` representation (e.g., `.none`).
-    /// This is useful when `T` is an `Optional` type.
-    /// - Parameter index: The index of the item to set to `nil`.
-    /// - Returns: `true` if the index was valid and the item was set to `nil`, `false` otherwise.
-    @discardableResult
-    func makeItemNil(at index: Int) -> Bool {
-        guard isValid(index: index) else { return false }
-        items[index] = T.from(nilLiteral: ())
-        return true
-    }
 
     /// Sets the items at the specified indices to their `nil` representation.
     /// - Parameter indexes: An array of indices for items to be set to `nil`.
@@ -162,20 +146,6 @@ extension ItemManager where T: OptionalType {
     /// - Parameter indexes: A variadic list of indices for items to be set to `nil`.
     func makeItemsNil(at indexes: Int...) {
         makeItemsNil(at: indexes)
-    }
-    
-    /// Sets all items after a specified index to their `nil` representation.
-    /// - Parameter index: The index after which all subsequent items will be set to `nil`.
-    func makeItemsNil(after index: Int) {
-        guard isValid(index: index) else { return }
-        for i in (index + 1)..<items.count {
-           items[i] = T.from(nilLiteral: ())
-        }
-    }
-    
-    /// Sets all items in the collection to their `nil` representation.
-    func makeAllItemsNil() {
-        items = items.map { _ in T.from(nilLiteral: ()) }
     }
 
     /// Removes all items from the collection where the wrapped value of the `Optional` `T` is `nil`.

@@ -1,5 +1,5 @@
 //
-//  TabbarCoordinatorView.swift
+//  TabCoordinatorView.swift
 //
 //  Copyright (c) Andres F. Lozano
 //
@@ -41,7 +41,7 @@ import SUICoordinator
 /// responds to badge update events through the `setBadge` publisher.
 ///
 /// - Note: This is the default view used by `TabCoordinator` when a custom `viewContainer` is not provided.
-public struct TabViewCoordinator<DataSource: TabCoordinatorType>: View where DataSource.DataSourcePage == MyTabPageDataSource {
+public struct DefaultTabView<DataSource: TabCoordinatorType>: View where DataSource.DataSourcePage == MyTabPageDataSource {
     
     /// Type alias for the page type used by the data source.
     public typealias Page = DataSource.Page
@@ -78,7 +78,7 @@ public struct TabViewCoordinator<DataSource: TabCoordinatorType>: View where Dat
     /// - Parameters:
     ///   - dataSource: The tab coordinator that provides the data and coordination logic.
     ///   - currentPage: The initial page to select. Should match the data source's current page.
-    public init(dataSource: DataSource, currentPage: Page) {
+    public init(dataSource: DataSource) {
         self._dataSource = .init(wrappedValue: dataSource)
         self.currentPage = dataSource.currentPage
     }
@@ -126,7 +126,7 @@ public struct TabViewCoordinator<DataSource: TabCoordinatorType>: View where Dat
     @ViewBuilder
     func tabBarItem(with page: Page) -> some View {
         if let item = dataSource.getCoordinator(with: page.position) {
-            AnyView( item.getView() )
+            item.getView().asAnyView()
                 .tabItem {
                     Label(
                         title: { page.dataSource.title },
