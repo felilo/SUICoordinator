@@ -25,25 +25,25 @@
 import Foundation
 import SUICoordinator
 
-class TabFlowCoordinator: Coordinator<DefaultRoute> {
+class NavigationHubCoordinator: Coordinator<DefaultRoute> {
     
     // ---------------------------------------------------------------------
     // MARK: Coordinator
     // ---------------------------------------------------------------------
     
-    override func start(animated: Bool = true) async {
-        let viewModel = TabListViewModel(coordinator: self)
+    override func start() async {
+        let viewModel = CoordinatorActionListViewModel(coordinator: self)
         
         let route = DefaultRoute(
             presentationStyle: .push,
-            content: { TabListView(viewModel: viewModel) }
+            content: { CoordinatorActionListView(viewModel: viewModel) }
         )
         
         await startFlow(route: route )
     }
     
     // ---------------------------------------------------------------------
-    // MARK: Adiotional flows
+    // MARK: Aditional flows
     // ---------------------------------------------------------------------
     
     func presentDefaultTabCoordinator() async {

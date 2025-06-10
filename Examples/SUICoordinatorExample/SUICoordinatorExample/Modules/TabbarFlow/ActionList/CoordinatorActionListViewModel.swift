@@ -24,11 +24,11 @@
 
 import Foundation
 
-class TabListViewModel: ObservableObject {
+class CoordinatorActionListViewModel: ObservableObject {
     
-    let coordinator: TabFlowCoordinator
+    let coordinator: NavigationHubCoordinator
     
-    init(coordinator: TabFlowCoordinator) {
+    init(coordinator: NavigationHubCoordinator) {
         self.coordinator = coordinator
     }
     

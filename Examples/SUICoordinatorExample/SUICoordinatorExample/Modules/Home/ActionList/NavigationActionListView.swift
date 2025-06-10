@@ -26,10 +26,8 @@ import SwiftUI
 
 struct NavigationActionListView: View {
     
-    typealias ViewModel = ActionListViewModel
-    
     @Environment(\.isPresented) private var isPresented
-    @StateObject var viewModel: ViewModel
+    @StateObject var viewModel: ActionListViewModel
     
     var body: some View {
         ZStack {

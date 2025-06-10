@@ -26,9 +26,7 @@ import SwiftUI
 
 struct PushView: View {
     
-    typealias ViewModel = PushViewModel
-    
-    @StateObject var viewModel: ViewModel
+    @StateObject var viewModel: PushViewModel
     @State private var counter = 0
     @State var bgColor: Color = Self.randomColor()
     

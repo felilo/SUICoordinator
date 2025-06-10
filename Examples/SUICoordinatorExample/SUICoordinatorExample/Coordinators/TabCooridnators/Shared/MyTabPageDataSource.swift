@@ -1,5 +1,5 @@
 //
-//  DetentsViewModel.swift
+//  MyTabPageDataSource.swift
 //
 //  Copyright (c) Andres F. Lozano
 //
@@ -22,25 +22,25 @@
 //  THE SOFTWARE.
 //
 
-import Foundation
+import SwiftUI
 
-class DetentsViewModel: ObservableObject {
+public struct MyTabPageDataSource {
+
+    let page: MyTabPage
     
-    let coordinator: HomeCoordinator
-    
-    init(coordinator: HomeCoordinator) {
-        self.coordinator = coordinator
+    @ViewBuilder
+    public var icon: some View {
+        switch page {
+            case .first: Image.init(systemName: "homekit")
+            case .second: Image.init(systemName: "gear")
+        }
     }
     
-    @MainActor func navigateToNextView() async {
-        await coordinator.presentCustomTabCoordinator()
-    }
-    
-    @MainActor func close() async {
-        await coordinator.close()
-    }
-    
-    @MainActor func finishFlow() async {
-        await coordinator.finish()
+    @ViewBuilder
+    public var title: some View {
+        switch page {
+            case .first: Text("first")
+            case .second: Text("second")
+        }
     }
 }

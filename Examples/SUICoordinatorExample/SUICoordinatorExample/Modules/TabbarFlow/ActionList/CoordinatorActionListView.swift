@@ -24,13 +24,10 @@
 
 import SwiftUI
 
-struct TabListView: View {
-    
-    typealias ViewModel = TabListViewModel
-    
+struct CoordinatorActionListView: View {
     
     @Environment(\.isPresented) private var isPresented
-    @StateObject var viewModel: ViewModel
+    @StateObject var viewModel: CoordinatorActionListViewModel
     
     var body: some View {
         ZStack {
@@ -104,5 +101,5 @@ struct TabListView: View {
 }
 
 #Preview {
-    TabListView(viewModel: .init(coordinator: .init()))
+    CoordinatorActionListView(viewModel: .init(coordinator: .init()))
 }

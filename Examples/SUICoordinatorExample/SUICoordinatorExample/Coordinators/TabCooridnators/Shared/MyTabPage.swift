@@ -1,5 +1,5 @@
 //
-//  DetentsView.swift
+//  MyTabPage.swift
 //
 //  Copyright (c) Andres F. Lozano
 //
@@ -22,37 +22,34 @@
 //  THE SOFTWARE.
 //
 
-import SwiftUI
+import SUICoordinator
 
-struct DetentsView: View {
+public enum MyTabPage: TabPage, CaseIterable {
     
-    typealias ViewModel = DetentsViewModel
+    case first
+    case second
     
-    @StateObject var viewModel: ViewModel
+    // ---------------------------------------------------------
+    // MARK: TabPage
+    // ---------------------------------------------------------
     
-    var body: some View {
-        ZStack {
-            
-            Color.yellow.ignoresSafeArea()
-            
-            VStack {
-                Text("Hello, DetentsView!")
-                    .font(.largeTitle)
-                
-                VStack {
-                    Button("Presents Tabbar Coordinator") {
-                        Task { await viewModel.navigateToNextView() }
-                    }.buttonStyle(.borderedProminent)
-                    
-                    Button("Close view") {
-                        Task { await viewModel.close() }
-                    }.buttonStyle(.borderedProminent)
-                }
-            }
+    public var position: Int {
+        switch self {
+            case .first: return 0
+            case .second: return 1
         }
     }
-}
-
-#Preview {
-    DetentsView(viewModel: .init(coordinator: .init()))
+    
+    public func coordinator() -> AnyCoordinatorType {
+        switch self {
+            case .first:
+                return HomeCoordinator()
+            case .second:
+                return NavigationHubCoordinator()
+        }
+    }
+    
+    public var dataSource: MyTabPageDataSource {
+        .init(page: self)
+    }
 }
