@@ -1,5 +1,5 @@
 //
-//  MyTabPageDataSource.swift
+//  DefaultTabCoordinator.swift
 //
 //  Copyright (c) Andres F. Lozano
 //
@@ -22,25 +22,25 @@
 //  THE SOFTWARE.
 //
 
-import SwiftUI
+import Foundation
+import SUICoordinator
 
-public struct MyTabPageDataSource {
-
-    let page: MyTabPage
+class DefaultTabCoordinator: TabCoordinator<MyTabPage> {
     
-    @ViewBuilder
-    public var icon: some View {
-        switch page {
-            case .first: Image.init(systemName: "homekit")
-            case .second: Image.init(systemName: "gear")
-        }
-    }
+    // ---------------------------------------------------------------------
+    // MARK: Init
+    // ---------------------------------------------------------------------
     
-    @ViewBuilder
-    public var title: some View {
-        switch page {
-            case .first: Text("first")
-            case .second: Text("second")
+    init() {
+        super.init(
+            pages: Page.allCases,
+            currentPage: .first,
+            viewContainer: { DefaultTabView(dataSource: $0)}
+        )
+        
+        /// Set badge of a tap
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
+            self?.setBadge.send(( "2", .first ))
         }
     }
 }
