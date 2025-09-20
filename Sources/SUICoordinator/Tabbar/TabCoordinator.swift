@@ -110,7 +110,7 @@ open class TabCoordinator<Page: TabPage>: TabCoordinatable {
     /// The parent coordinator associated with the coordinator.
     ///
     /// This represents the coordinator that presented or contains this tab coordinator.
-    public var parent: (any CoordinatorType)!
+    public var parent: (any CoordinatorType)?
     
     /// The array of children coordinators associated with the coordinator.
     ///

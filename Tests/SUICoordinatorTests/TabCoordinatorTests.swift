@@ -74,7 +74,7 @@ final class TabCoordinatorTests: XCTestCase {
         XCTAssertEqual(sut.currentPage, .tab1)
         sut.currentPage = .tab2
         await navigateToCoordinator(coordinator, in: try sut.getCoordinatorSelected())
-        XCTAssertEqual(coordinator.parent.uuid, try sut.getCoordinatorSelected().uuid)
+        XCTAssertEqual(coordinator.parent?.uuid, try sut.getCoordinatorSelected().uuid)
         await finishFlow(sut: sut)
     }
     
@@ -124,7 +124,7 @@ final class TabCoordinatorTests: XCTestCase {
             mainCoordinator: sut)
         await coordinator.start()
         
-        XCTAssertEqual(coordinator.parent.uuid, try sut.getCoordinatorSelected().uuid)
+        XCTAssertEqual(coordinator.parent?.uuid, try sut.getCoordinatorSelected().uuid)
         await finishFlow(sut: sut)
     }
     

@@ -51,7 +51,7 @@ public protocol CoordinatorType: SCHashable, ObservableObject {
     var tagId: String? { get set }
     
     /// The parent coordinator, if any, to which this coordinator is a child.
-    var parent: AnyCoordinatorType! { get set }
+    var parent: AnyCoordinatorType? { get set }
     
     /// An array of child coordinators associated with this coordinator.
     var children: [AnyCoordinatorType] { get set }
