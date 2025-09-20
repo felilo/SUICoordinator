@@ -70,4 +70,15 @@ public extension CoordinatorType {
     func getView() -> some View {
         CoordinatorView(dataSource: self)
     }
+    
+    /// Returns this coordinator's view in a type-erased `AnyView`.
+    ///
+    /// Use this helper when the concrete view type is irrelevant or must be
+    /// hidden—e.g. when storing multiple, heterogenous coordinator views in a
+    /// collection, or when an API expects a single `AnyView` value.
+    ///
+    /// - Returns: An `AnyView` wrapping the coordinator’s SwiftUI view.
+    func viewAsAnyView() -> AnyView {
+        getView().asAnyView()
+    }
 }
