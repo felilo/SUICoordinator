@@ -85,7 +85,7 @@ public class Router<Route: RouteType>: ObservableObject, RouterType {
     ///
     /// This property affects all navigation operations performed by the router.
     /// When `true`, transitions are animated; when `false`, they occur immediately.
-    @Published public var animated: Bool = true
+    public var animated: Bool = true
     
     /// Thread-safe item manager for navigation stack operations.
     ///
