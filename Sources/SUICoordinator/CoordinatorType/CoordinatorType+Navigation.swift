@@ -26,33 +26,12 @@ import Foundation
 
 public extension CoordinatorType {
     
-    /// Retrieves the top coordinator in the hierarchy, optionally starting from a specified coordinator.
-    ///
-    /// This method traverses the coordinator hierarchy to find the deepest active coordinator,
-    /// which is typically the one currently handling user interactions. It's useful for
-    /// determining where new navigation operations should be performed.
-    ///
-    /// - Parameters:
-    ///   - pCoodinator: The optional starting point for finding the top coordinator.
-    ///                  If `nil`, starts from the last child of the current coordinator.
-    ///
-    /// - Returns: The top coordinator in the hierarchy, or `nil` if none is found.
-    /// - Throws: An error if the top coordinator retrieval fails due to hierarchy issues.
-    ///
-    /// ## Example Usage
-    /// ```swift
-    /// if let topCoordinator = try coordinator.topCoordinator() {
-    ///     await topCoordinator.navigate(to: newCoordinator, presentationStyle: .sheet)
-    /// }
-    /// ```
-    func topCoordinator(pCoordinator: AnyCoordinatorType? = nil) throws -> AnyCoordinatorType? {
-        if let tabCoordinator = getTabCoordinable(self) {
+    func getCoordinatorPresented(customRootCoordinator: AnyCoordinatorType? = nil) throws -> AnyCoordinatorType? {
+        let topCoordinator = try topCoordinator(pCoordinator: customRootCoordinator)
+        if let tabCoordinator = topCoordinator?.parent as? (any TabCoordinatable) {
             return try tabCoordinator.getCoordinatorSelected()
         }
-        
-        guard children.last != nil else { return self }
-        var auxCoordinator = pCoordinator ?? self.children.last
-        return try getDeepCoordinator(from: &auxCoordinator)
+        return topCoordinator
     }
     
     /// Navigates to a new coordinator with a specified presentation style.
