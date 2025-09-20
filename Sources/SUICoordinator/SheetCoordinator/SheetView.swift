@@ -191,9 +191,8 @@ struct SheetView<Content: View, T: SheetItemType>: View {
             .fullScreenCover(
                 item: item,
                 onDismiss: {onDismiss?(String(index))},
-                content: { content($0) }
+                content: { content($0).onViewDidLoad { onDidLoad?(String(index)) } }
             )
-            .onAppear(perform: { onDidLoad?(String(index)) })
             .transaction { $0.disablesAnimations = !(animated) }
     }
     
@@ -209,9 +208,8 @@ struct SheetView<Content: View, T: SheetItemType>: View {
             .sheet(
                 item: item,
                 onDismiss: { onDismiss?(String(index)) },
-                content: { content($0) }
+                content: { content($0).onViewDidLoad { onDidLoad?(String(index)) } }
             )
-            .onAppear(perform: { onDidLoad?(String(index)) })
             .transaction { $0.disablesAnimations = !(animated) }
     }
     
