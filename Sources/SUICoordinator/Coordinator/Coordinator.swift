@@ -146,8 +146,6 @@ open class Coordinator<Route: RouteType>: ObservableObject, CoordinatorType {
     public init() {
         self.router = .init()
         self.uuid = "\(NSStringFromClass(type(of: self))) - \(UUID().uuidString)"
-        
-        router.isTabCoordinable = false
     }
     
     // --------------------------------------------------------------------

@@ -94,16 +94,6 @@ public class Router<Route: RouteType>: ObservableObject, RouterType {
     private let itemManager = ItemManager<Route>()
     
     // --------------------------------------------------------------------
-    // MARK: Properties
-    // --------------------------------------------------------------------
-    
-    /// Indicates whether this router is associated with an tab-coordinable coordinator.
-    ///
-    /// This flag affects how the router handles navigation operations, particularly
-    /// for coordinators that manage tab-based interfaces.
-    public var isTabCoordinable: Bool = false
-    
-    // --------------------------------------------------------------------
     // MARK: Constructor
     // --------------------------------------------------------------------
     
