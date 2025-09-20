@@ -44,14 +44,14 @@ struct NavigationActionListDetailView: View {
             bgColor.ignoresSafeArea()
             
             List {
-                actionRowButton(title: "Navigate to PushView") { await viewModel.navigateToPushView() }
+                actionRowButton(title: "Navigate To PushView") { await viewModel.navigateToPushView() }
                 actionRowButton(title: "Presents SheetView") { await viewModel.presentSheet() }
                 actionRowButton(title: "Presents FullscreenView") { await viewModel.presentFullscreen() }
                 actionRowButton(title: "Presents DetentsView") { await viewModel.presentDetentsView() }
-                actionRowButton(title: "Presents view with custom presentation") { await viewModel.presentViewWithCustomPresentation() }
-                actionRowButton(title: "Presents custom tab view") { await viewModel.presentCustomTabCoordinator() }
-                actionRowButton(title: "Restart coordinator") { await viewModel.restartCoordinator() }
-                actionRowButton(title: "Close view") { await viewModel.close() }
+                actionRowButton(title: "Presents View With Custom Presentation") { await viewModel.presentViewWithCustomPresentation() }
+                actionRowButton(title: "Restart Coordinator") { await viewModel.restartCoordinator() }
+                actionRowButton(title: "Close View") { await viewModel.close() }
+                actionRowButton(title: "Finish Coordinator") { await viewModel.finish() }
             }
             .scrollContentBackground(.hidden)
             .navigationTitle("\(viewModel.title)")
