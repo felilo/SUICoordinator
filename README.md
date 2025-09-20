@@ -602,7 +602,6 @@ The `Router` (a property on every `Coordinator` instance, e.g., `coordinator.rou
       <td>
         <ul>
           <li><b>animated:</b> <code>Bool</code>, default: <code style="color: #ec6b6f;">true</code></li>
-          <li><b>finishFlow:</b> <code>Bool</code>, default: <code style="color: #ec6b6f;">false</code> (currently unused by the router itself, but might be relevant for coordinator logic)</li>
         </ul>
       </td>
       <td>Intelligently closes the top-most view: dismisses a sheet if one is presented by this router's <code>sheetCoordinator</code>, otherwise pops a view from this router's navigation stack.</td>
