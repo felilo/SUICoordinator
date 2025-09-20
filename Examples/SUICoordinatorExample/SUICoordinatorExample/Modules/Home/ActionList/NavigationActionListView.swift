@@ -71,24 +71,28 @@ struct NavigationActionListView: View {
         systemImage: String,
         action: @escaping () async -> Void
     ) -> some View {
-        HStack(spacing: 16) {
-            Image(systemName: systemImage)
-                .font(.title2.weight(.medium))
-                .foregroundColor(.blue)
-                .frame(width: 30)
-            
-            Text(title)
-                .font(.headline)
-                .foregroundColor(.white)
-            
-            Spacer()
-            
-            Image(systemName: "chevron.right")
-                .font(.body.weight(.semibold))
-                .foregroundColor(Color(white: 0.7))
+        
+        Button {
+            Task { await action() }
+        } label: {
+            HStack(spacing: 16) {
+                Image(systemName: systemImage)
+                    .font(.title2.weight(.medium))
+                    .foregroundColor(.blue)
+                    .frame(width: 30)
+                
+                Text(title)
+                    .font(.headline)
+                    .foregroundColor(.white)
+                
+                Spacer()
+                
+                Image(systemName: "chevron.right")
+                    .font(.body.weight(.semibold))
+                    .foregroundColor(Color(white: 0.7))
+            }
         }
         .contentShape(Rectangle())
-        .onTapGesture { Task { await action() } }
         .padding(.all, 8)
         .listRowBackground(
             RoundedRectangle(cornerRadius: 12)
