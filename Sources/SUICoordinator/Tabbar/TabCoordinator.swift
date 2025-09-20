@@ -174,14 +174,14 @@ open class TabCoordinator<Page: TabPage>: TabCoordinatable {
         presentationStyle: TransitionPresentationStyle = .sheet,
         viewContainer: @escaping (TabCoordinator<Page>) -> Page.View
     ) {
+        defer { Task { [weak self] in await self?.start() } }
+        
         self.router = .init()
         self.uuid = "\(NSStringFromClass(type(of: self))) - \(UUID().uuidString)"
         self.presentationStyle = presentationStyle
         self.currentPage = currentPage
         self.viewContainer = viewContainer
         self.pages = pages
-        
-        router.isTabCoordinable = true
     }
     
     // ---------------------------------------------------------
@@ -198,6 +198,8 @@ open class TabCoordinator<Page: TabPage>: TabCoordinatable {
     ///   - animated: A boolean value indicating whether to animate the presentation.
     ///              Defaults to `true`.
     open func start() async {
+        guard !isRunning else { return }
+        
         await setupPages(pages, currentPage: currentPage)
         let cView = viewContainer
         
