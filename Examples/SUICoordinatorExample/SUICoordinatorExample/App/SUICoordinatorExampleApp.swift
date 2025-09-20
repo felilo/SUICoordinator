@@ -100,24 +100,21 @@ struct SUICoordinatorExampleApp: App {
     ) async throws {
         switch path {
         case .tabCoordinator:
-            // This case demonstrates deep linking to a view (with detents) within a specific tab.
-            // It ensures that the action is performed on a HomeCoordinator if it's managing the currently selected tab.
-            //
-            // 1. `rootCoordinator.topCoordinator()`: Gets the topmost coordinator. This could be a modal's coordinator
-            //    or the selected tab's coordinator if `rootCoordinator` is a TabCoordinator without a modal presented directly by it.
-            // 2. `?.parent as? CustomTabCoordinator`: Checks if the parent of the topmost coordinator is our
-            //    main `CustomTabCoordinator`. This confirms we are operating within the main tab structure.
-            //    If true, `tabCoordinator` becomes this `CustomTabCoordinator` (which is `mainCoordinator`).
-            // 3. `tabCoordinator.getCoordinatorSelected()`: Retrieves the coordinator for the *currently selected tab*
-            //    from the (now confirmed) `CustomTabCoordinator`.
-            // 4. `as? HomeCoordinator`: Checks if this selected tab's coordinator is an instance of `HomeCoordinator`.
-            // 5. `await coordinatorSelected.presentDetents()`: If all checks pass, calls `presentDetents()` on the
-            //    `HomeCoordinator` of the active tab, typically showing a sheet with detents.
-            // This pattern allows for deep linking into a specific state (like showing a detents view) of a specific tab.
-            if let tabCoordinator = try rootCoordinator.topCoordinator()?.parent as? CustomTabCoordinator {
-                if let coordinatorSelected = try tabCoordinator.getCoordinatorSelected() as? HomeCoordinator {
-                    await coordinatorSelected.presentDetents()
-                }
+            /// Deep-link intent:
+            /// Present the detents sheet that belongs to the `HomeCoordinator`
+            /// ‑-but only if that coordinator is the one *currently visible* to the user.
+            ///
+            /// How it works:
+            /// `getCoordinatorPresented()` walks the hierarchy to return
+            ///    • the “top-most” coordinator of any modal stack, **or**
+            ///    • the coordinator that controls the *selected* tab when inside a tab container.
+            ///    In short, it yields the coordinator the user is actively interacting with.
+            /// When the cast succeeds we call `presentDetents()` which
+            ///    brings up the sheet configured inside `HomeCoordinator`.
+
+            if let coordinator = try rootCoordinator.getCoordinatorPresented() as? HomeCoordinator {
+                await coordinator.presentDetents()
+                
             }
         case .home:
             // This case demonstrates presenting a different Coordinator modally (HomeCoordinator in this example).
