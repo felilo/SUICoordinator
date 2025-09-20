@@ -54,7 +54,7 @@ struct CoordinatorActionListView: View {
                     Text("Finish flow")
                 }
             }
-            .navigationTitle("Coordinator Action List")
+            .navigationTitle("Coordinators List")
             .listStyle(.plain)
             .navigationBarTitleDisplayMode(.large)
         }
