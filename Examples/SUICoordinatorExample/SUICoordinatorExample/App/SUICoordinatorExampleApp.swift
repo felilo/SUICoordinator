@@ -78,7 +78,7 @@ struct SUICoordinatorExampleApp: App {
     /// - `tabCoordinator`: Represents a path to present a `CustomTabCoordinator` modally.
     enum DeepLinkPath: String {
         case home = "home" // Example: "yourapp://home" or a notification payload "home"
-        case tabCoordinator = "tabs-coordinator" // Example: "yourapp://tabs-coordinator"
+        case tabCoordinator = "tabs-coordinator" // Example: "coordinatorApp://tabs-coordinator"
     }
     
     
@@ -111,10 +111,13 @@ struct SUICoordinatorExampleApp: App {
             ///    In short, it yields the coordinator the user is actively interacting with.
             /// When the cast succeeds we call `presentDetents()` which
             ///    brings up the sheet configured inside `HomeCoordinator`.
-
+            
             if let coordinator = try rootCoordinator.getCoordinatorPresented() as? HomeCoordinator {
                 await coordinator.presentDetents()
-                
+            } else {
+                let homeCoordinator = HomeCoordinator()
+                try await homeCoordinator.forcePresentation(rootCoordinator: rootCoordinator)
+                await homeCoordinator.presentDetents()
             }
         case .home:
             // This case demonstrates presenting a different Coordinator modally (HomeCoordinator in this example).
@@ -123,7 +126,7 @@ struct SUICoordinatorExampleApp: App {
             let coordinator = HomeCoordinator()
             try await coordinator.forcePresentation(
                 presentationStyle: .sheet,
-                mainCoordinator: mainCoordinator
+                rootCoordinator: mainCoordinator
             )
         }
     }

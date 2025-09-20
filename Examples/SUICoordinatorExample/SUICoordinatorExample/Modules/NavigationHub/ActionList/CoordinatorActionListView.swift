@@ -28,6 +28,7 @@ struct CoordinatorActionListView: View {
     
     @Environment(\.isPresented) private var isPresented
     @StateObject var viewModel: CoordinatorActionListViewModel
+    @EnvironmentObject var coordinator: NavigationHubCoordinator
     
     var body: some View {
         ZStack {
@@ -36,15 +37,19 @@ struct CoordinatorActionListView: View {
             
             List {
                 actionRowButton(title: "Presents Default Tab Coordinator", systemImage: "rectangle.fill.on.rectangle.fill") {
-                    await viewModel.presentDefaultTabCoordinator()
+                    await coordinator.presentDefaultTabCoordinator()
                 }
                 
                 actionRowButton(title: "Presents Custom Tab Coordinator", systemImage: "square.grid.2x2.fill") {
-                    await viewModel.presentCustomTabCoordinator()
+                    await coordinator.presentCustomTabCoordinator()
                 }
                 
                 actionRowButton(title: "Presents Home Coordinator", systemImage: "rectangle.bottomthird.inset.fill") {
-                    await viewModel.presentHomeCoordinator()
+                    await coordinator.presentHomeCoordinator()
+                }
+                
+                actionRowButton(title: "Presents Coordinator with push navigation", systemImage: "rectangle.bottomthird.inset.fill") {
+                    await coordinator.presentHomeCoordinatorWithCustomNavigation()
                 }
             }
             .toolbar {
