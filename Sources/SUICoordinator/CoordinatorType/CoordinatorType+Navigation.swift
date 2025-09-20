@@ -122,7 +122,7 @@ public extension CoordinatorType {
     ///               Defaults to `true`.
     ///   - presentationStyle: The transition presentation style for the forced presentation.
     ///                        Defaults to `.sheet`.
-    ///   - mainCoordinator: The main coordinator from which to find the top coordinator.
+    ///   - rootCoordinator: The main coordinator from which to find the top coordinator.
     ///                      If `nil`, the operation may fail if no proper hierarchy exists.
     ///
     /// - Throws: An error if the presentation cannot be forced due to hierarchy issues
@@ -133,15 +133,15 @@ public extension CoordinatorType {
     /// try await emergencyCoordinator.forcePresentation(
     ///     animated: true,
     ///     presentationStyle: .fullScreenCover,
-    ///     mainCoordinator: appCoordinator
+    ///     rootCoordinator: appCoordinator
     /// )
     /// ```
     func forcePresentation(
         animated: Bool = true,
         presentationStyle: TransitionPresentationStyle = .sheet,
-        mainCoordinator: (any CoordinatorType)? = nil
+        rootCoordinator: (any CoordinatorType)? = nil
     ) async throws {
-        let topCoordinator = try mainCoordinator?.topCoordinator()
+        let topCoordinator = try rootCoordinator?.topCoordinator()
         await topCoordinator?.navigate(to: self, presentationStyle: presentationStyle)
     }
     
