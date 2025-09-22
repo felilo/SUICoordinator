@@ -121,7 +121,7 @@ final class TabCoordinatorTests: XCTestCase {
         try await coordinator.forcePresentation(
             animated: animated,
             presentationStyle: .fullScreenCover,
-            mainCoordinator: sut)
+            rootCoordinator: sut)
         await coordinator.start()
         
         XCTAssertEqual(coordinator.parent?.uuid, try sut.getCoordinatorSelected().uuid)
@@ -182,7 +182,7 @@ final class TabCoordinatorTests: XCTestCase {
         
         XCTAssertTrue(try sut.getCoordinatorPresented() is ThirdCoordinator)
         
-        try await myCustomCoordinator.forcePresentation(mainCoordinator: sut)
+        try await myCustomCoordinator.forcePresentation(rootCoordinator: sut)
         
         XCTAssertTrue(try sut.getCoordinatorPresented() is AnyCoordinator)
         

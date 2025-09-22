@@ -157,7 +157,7 @@ final class CoordinatorTests: XCTestCase {
         try await coordinator2.forcePresentation(
             animated: animated,
             presentationStyle: .fullScreenCover,
-            mainCoordinator: sut)
+            rootCoordinator: sut)
         
         XCTAssertEqual(coordinator2.parent?.uuid, coordinator1.uuid)
         await finishFlow(sut: sut)
