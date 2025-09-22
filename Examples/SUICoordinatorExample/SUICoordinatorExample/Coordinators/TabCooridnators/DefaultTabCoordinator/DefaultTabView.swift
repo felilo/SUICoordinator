@@ -91,7 +91,7 @@ public struct DefaultTabView<DataSource: TabCoordinatorType>: View where DataSou
         .onChange(of: dataSource.pages) { pages in
             badges = pages.map { (nil, $0) }
         }
-        .onReceive(dataSource.setBadge) { (value, page) in
+        .onReceive(dataSource.badge) { (value, page) in
             guard let index = getBadgeIndex(page: page) else { return }
             badges[index].value = value
         }

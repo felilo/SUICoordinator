@@ -40,7 +40,7 @@ class DefaultTabCoordinator: TabCoordinator<MyTabPage> {
         
         /// Set badge of a tap
         DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
-            self?.setBadge.send(( "2", .first ))
+            self?.setBadge(for: .second, with: "2")
         }
     }
 }
