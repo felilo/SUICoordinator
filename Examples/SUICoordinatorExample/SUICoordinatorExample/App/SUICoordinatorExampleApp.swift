@@ -37,7 +37,7 @@ struct SUICoordinatorExampleApp: App {
     
     /// The main coordinator for the application, responsible for managing the primary tab-based navigation.
     /// It's an instance of `CustomTabCoordinator` which uses the standard SwiftUI `TabView`.
-    var mainCoordinator = CustomTabCoordinator()
+    var mainCoordinator = DefaultTabCoordinator()
     
     /// The body of the app, defining the main scene.
     /// It sets up a `WindowGroup` containing the view provided by the `mainCoordinator`.
