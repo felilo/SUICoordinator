@@ -217,4 +217,27 @@ public extension PageDataSource where Self: CaseIterable {
 /// - Ensure position values are unique and sequential for predictable tab ordering
 /// - Create dedicated coordinator types for each tab to maintain separation of concerns
 /// - Consider the data source pattern for complex tab visual representations
-public typealias TabPage = PageDataSource & TabNavigationRouter & SCEquatable
+public typealias TabPage = PageDataSource & TabNavigationRouter & SCEquatable & SCHashable
+
+/// A convenience extension that gives every `PageDataSource` a stable,
+/// human-readable string identifier.
+///
+/// The `id` is built by concatenating:
+/// 1. The concrete page type’s name (`Self`)
+/// 2. The page’s `position`
+/// 3. The associated data-source type’s name
+///
+/// This guarantees uniqueness across pages and remains stable for the
+/// life-time of the page, making it useful for:
+/// • SwiftUI `id:` values  
+/// • `.customizationID(_:)` when using the iOS-18 Tab API  
+/// • Dictionary / Set keys when tracking pages externally.
+public extension PageDataSource {
+    
+    var id: String {
+        let name = String(describing: Self.self)
+        let position = "\(self.position)"
+        let ds = String(describing: type(of: dataSource))
+        return "\(name)_\(position)_\(ds)"
+    }
+}
