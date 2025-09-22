@@ -96,7 +96,7 @@ public protocol TabCoordinatorType: ObservableObject {
     /// setBadge.send(("5", myPage)) // Set badge to "5"
     /// setBadge.send((nil, myPage)) // Remove badge
     /// ```
-    var setBadge: PassthroughSubject<(String?, Page), Never> { get set }
+    var badge: PassthroughSubject<(String?, Page), Never> { get }
     
     /// An array containing all pages managed by the tab coordinator.
     ///
@@ -176,6 +176,8 @@ public protocol TabCoordinatorType: ObservableObject {
     /// await tabCoordinator.clean()
     /// ```
     @MainActor func clean() async
+    
+    func setBadge(for page: Page, with value: String?)
 }
 
 /// A type alias representing a coordinator that conforms to both `CoordinatorType` and `TabCoordinatorType`.

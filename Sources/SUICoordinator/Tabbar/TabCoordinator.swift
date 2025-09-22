@@ -137,7 +137,7 @@ open class TabCoordinator<Page: TabPage>: TabCoordinatable {
     ///
     /// Use this subject to asynchronously update badge values for individual tabs.
     /// Send a tuple containing the badge value (or nil to remove) and the target page.
-    public var setBadge: PassthroughSubject<(String?, Page), Never> = .init()
+    public let badge: PassthroughSubject<(String?, Page), Never>
     
     /// A closure that provides the custom view container for the tab interface.
     ///
@@ -182,6 +182,7 @@ open class TabCoordinator<Page: TabPage>: TabCoordinatable {
         self.currentPage = currentPage
         self.viewContainer = viewContainer
         self.pages = pages
+        self.badge = .init()
     }
     
     // ---------------------------------------------------------
@@ -241,6 +242,10 @@ open class TabCoordinator<Page: TabPage>: TabCoordinatable {
         guard let index = children.firstIndex(where: { $0.tagId == "\(currentPage.position)" })
         else { throw TabCoordinatorError.coordinatorSelected }
         return children[index]
+    }
+    
+    public func setBadge(for page: Page, with value: String?) {
+        badge.send((value, page))
     }
     
     /// Performs cleanup operations for the tab coordinator.
