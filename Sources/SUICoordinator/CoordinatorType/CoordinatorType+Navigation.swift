@@ -68,6 +68,36 @@ public extension CoordinatorType {
         await router.presentSheet(item: item)
     }
     
+    
+    /// Navigates to a destination described by a `Route`.
+    ///
+    /// This overload is handy when you only need to push or present a view and
+    /// do not require the overhead of instantiating a dedicated coordinator.
+    /// The call is forwarded to the underlying `router`, which will decide how
+    /// to display the destination based on the supplied `presentationStyle`.
+    ///
+    /// - Parameters:
+    ///   - route: The destination route to display.
+    ///   - presentationStyle: Optionally override the router’s default
+    ///     presentation style (e.g., `.push`, `.sheet`, `.fullScreenCover`).
+    ///     Pass `nil` to let the router decide.
+    ///   - animated: `true` to animate the transition. Defaults to `true`.
+    ///
+    /// ## Example
+    /// ```swift
+    /// await coordinator.navigate(
+    ///     toRoute: ProfileRoute.details(userID: id),
+    ///     presentationStyle: .sheet
+    /// )
+    /// ```
+    func navigate(
+        toRoute route: Route,
+        presentationStyle: TransitionPresentationStyle? = nil,
+        animated: Bool = true
+    ) async -> Void {
+        await router.navigate(toRoute: route, presentationStyle: presentationStyle, animated: animated)
+    }
+    
     /// Finishes the flow of the coordinator.
     ///
     /// This method cleanly terminates the coordinator's flow by performing cleanup operations
