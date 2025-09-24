@@ -32,9 +32,6 @@ public class CustomTabCoordinator: TabCoordinator<MyTabPage> {
     // ---------------------------------------------------------------------
     
     public init(currentPage: MyTabPage = .first ) {
-        
-        
-        
         super.init(
             pages: Page.sortedByPosition(),
             currentPage: currentPage,
