@@ -98,7 +98,7 @@ struct CustomTabView<DataSource: TabCoordinatorType>: View where DataSource.Data
     
     @ViewBuilder
     func tabBarItem(page: Page) -> some View {
-        if let item = dataSource.getCoordinator(with: page.position) {
+        if let item = dataSource.getCoordinator(with: page) {
             item.getView().asAnyView()
                 .toolbar(.hidden, for: .tabBar)
                 .tag(page)

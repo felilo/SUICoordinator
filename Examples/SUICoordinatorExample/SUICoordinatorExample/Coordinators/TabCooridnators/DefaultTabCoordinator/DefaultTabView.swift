@@ -108,7 +108,7 @@ public struct DefaultTabView<DataSource: TabCoordinatorType>: View where DataSou
     private func legacyTabContainerView() -> some View {
         TabView(selection: $dataSource.currentPage){
             ForEach(dataSource.pages, id: \.id) { page in
-                if let item = dataSource.getCoordinator(with: page.position) {
+                if let item = dataSource.getCoordinator(with: page) {
                     item.viewAsAnyView()
                         .tabItem { Label(
                             title: { page.dataSource.title },
@@ -126,7 +126,7 @@ public struct DefaultTabView<DataSource: TabCoordinatorType>: View where DataSou
     private func modernTabContainerView() -> some View {
         TabView(selection: $dataSource.currentPage) {
             ForEach(dataSource.pages, id: \.id) { page in
-                if let coordinator = dataSource.getCoordinator(with: page.position) {
+                if let coordinator = dataSource.getCoordinator(with: page) {
                     Tab(value: page) {
                         coordinator.viewAsAnyView()
                     } label: {

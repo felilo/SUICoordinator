@@ -69,7 +69,7 @@ extension TabCoordinatorType where Self : TabCoordinatable {
             
             await item.start()
             startChildCoordinator(item)
-            item.tagId = "\(page.position)"
+            item.tagId = "\(page.id)"
         }
         
         pages = value

@@ -225,8 +225,8 @@ open class TabCoordinator<Page: TabPage>: TabCoordinatable {
     ///   - position: The zero-based position of the coordinator to retrieve.
     /// - Returns: The coordinator at the specified position, or `nil` if no coordinator
     ///           is found at that position.
-    public func getCoordinator(with position: Int) -> AnyCoordinatorType? {
-        children.first { $0.tagId == "\(position)" }
+    public func getCoordinator(with page: Page) -> AnyCoordinatorType? {
+        children.first { $0.tagId == page.id }
     }
     
     /// Retrieves the currently selected coordinator within the tab coordinator.
@@ -239,7 +239,7 @@ open class TabCoordinator<Page: TabPage>: TabCoordinatable {
     ///          cannot be found. This can happen if the current page's position doesn't
     ///          match any child coordinator's `tagId`.
     open func getCoordinatorSelected() throws -> (any CoordinatorType) {
-        guard let index = children.firstIndex(where: { $0.tagId == "\(currentPage.position)" })
+        guard let index = children.firstIndex(where: { $0.tagId == "\(currentPage.id)" })
         else { throw TabCoordinatorError.coordinatorSelected }
         return children[index]
     }

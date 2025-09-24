@@ -138,7 +138,7 @@ public protocol TabCoordinatorType: ObservableObject {
     ///     // Interact with the first tab's coordinator
     /// }
     /// ```
-    func getCoordinator(with position: Int) -> AnyCoordinatorType?
+    func getCoordinator(with page: Page) -> AnyCoordinatorType?
     
     /// Retrieves the currently selected coordinator within the tab coordinator.
     ///
