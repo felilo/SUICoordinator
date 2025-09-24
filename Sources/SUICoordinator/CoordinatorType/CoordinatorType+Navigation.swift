@@ -192,4 +192,15 @@ public extension CoordinatorType {
     func restart(animated: Bool = true) async {
         await router.restart(animated: animated)
     }
+    
+    /// Closes the current screen.
+    ///
+    /// The underlying `router` determines whether to dismiss a modal
+    /// presentation or pop the current view from a navigation stack,
+    /// depending on the active presentation context.
+    ///
+    /// - Parameter animated: `true` to animate the transition. Defaults to `true`.
+    func close(animated: Bool = true) async {
+        await router.close(animated: animated)
+    }
 }
