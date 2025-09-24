@@ -135,11 +135,9 @@ final class TabCoordinatorTests: XCTestCase {
         await sut.start()
         await sut.setPages(pages)
         
-        let coordinator = sut.getCoordinator(with: AnyEnumTabRoute.tab2.position)
-        XCTAssertNotNil(coordinator)
-        
-        let coordinatorNil = sut.getCoordinator(with: 500)
-        XCTAssertNil(coordinatorNil)
+        XCTAssertNotNil(sut.getCoordinator(with: .tab1))
+        XCTAssertNotNil(sut.getCoordinator(with: .tab2))
+        XCTAssertNil(sut.getCoordinator(with: .tab3))
         
         await finishFlow(sut: sut)
     }
@@ -167,7 +165,7 @@ final class TabCoordinatorTests: XCTestCase {
         await sut.start()
         await sut.setPages(pages)
         
-        let coordinator = sut.getCoordinator(with: AnyEnumTabRoute.tab2.position)
+        let coordinator = sut.getCoordinator(with: .tab2)
         
         await coordinator?.finishFlow(animated: animated)
         
