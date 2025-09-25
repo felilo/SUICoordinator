@@ -38,7 +38,7 @@ class HomeCoordinator: Coordinator<HomeRoute> {
     }
     
     // ---------------------------------------------------------------------
-    // MARK: Aditional flows
+    // MARK: Additional flows
     // ---------------------------------------------------------------------
     
     func navigateToPushView() async {

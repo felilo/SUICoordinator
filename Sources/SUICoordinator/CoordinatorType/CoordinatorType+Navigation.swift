@@ -26,6 +26,21 @@ import Foundation
 
 public extension CoordinatorType {
     
+    /// Returns the coordinator that is currently visible to the user.
+    ///
+    /// The method first resolves the **top-most coordinator** in the hierarchy
+    /// (starting from `customRootCoordinator` when provided, otherwise from
+    /// `self`).  
+    /// If that coordinator is embedded in a `TabCoordinatable`, the function
+    /// asks the tab container which child coordinator is **selected** and
+    /// returns it; otherwise it simply returns the discovered top coordinator.
+    ///
+    /// - Parameter customRootCoordinator: Optional starting point for the
+    ///   traversal. Pass `nil` to start the search from `self`.
+    /// - Returns: The `AnyCoordinatorType` that represents the screen currently
+    ///   being presented, or `nil` when no coordinator could be found.
+    /// - Throws: Propagates errors thrown by `topCoordinator(pCoordinator:)`,
+    ///   usually indicating an invalid or missing hierarchy.
     func getCoordinatorPresented(customRootCoordinator: AnyCoordinatorType? = nil) throws -> AnyCoordinatorType? {
         let topCoordinator = try topCoordinator(pCoordinator: customRootCoordinator)
         if let tabCoordinator = topCoordinator?.parent as? (any TabCoordinatable) {
