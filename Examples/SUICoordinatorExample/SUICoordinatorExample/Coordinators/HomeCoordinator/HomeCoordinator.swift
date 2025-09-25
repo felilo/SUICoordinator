@@ -34,7 +34,7 @@ class HomeCoordinator: Coordinator<HomeRoute> {
     // ---------------------------------------------------------------------
     
     override func start() async {
-        await startFlow(route: .actionListView(coordinator: self))
+        await startFlow(route: .actionListView)
     }
     
     // ---------------------------------------------------------------------
