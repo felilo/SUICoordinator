@@ -48,7 +48,7 @@ struct SUICoordinatorExampleApp: App {
     var body: some Scene {
         WindowGroup {
             ZStack {
-                Color.black.opacity(0.7).ignoresSafeArea()
+                Color.gray.ignoresSafeArea()
                 mainCoordinator.getView()
             }
                 .onReceive(NotificationCenter.default.publisher(for: Notification.Name.PushNotification)) { object in

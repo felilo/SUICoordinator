@@ -33,7 +33,7 @@ struct CoordinatorActionListView: View {
     var body: some View {
         ZStack {
             
-            Color.black.opacity(0.7).ignoresSafeArea()
+            Color.gray.ignoresSafeArea()
             
             List {
                 actionRowButton(title: "Presents Default Tab Coordinator", systemImage: "rectangle.fill.on.rectangle.fill") {
