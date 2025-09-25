@@ -18,9 +18,20 @@ _____
 - **Deep Linking**: Force presentation capabilities for push notifications and external triggers
 - **Type-Safe Routes**: Strongly typed navigation routes with compile-time safety
 - **Async Navigation**: Full async/await support for smooth navigation flows
-- **Custom Tab Bars**: Create completely custom tab interfaces with `TabCoordinator`
-- **Badge Support**: Dynamic badge management for tab items in `TabCoordinator`
-- **Memory Management**: Automatic cleanup and resource management
+
+_____
+
+### Concept Glossary (🧭 quick definitions)
+
+| Term | One-liner |
+|------|-----------|
+| **Route** | Enum case that maps directly to a SwiftUI `View` and knows how it should be presented. |
+| **Coordinator** | Orchestrates a navigation flow. Owns a `Router`. |
+| **Router** | Executes the navigation mechanics (push / sheet / dismiss) requested by its coordinator. |
+| **TabCoordinator** | A coordinator that manages multiple child coordinators—one per tab. |
+| **TransitionPresentationStyle** | Value describing *how* a view is shown (`.push`, `.sheet`, `.detents`, …). |
+
+Having these terms in mind will make the code samples easier to digest.
 
 _____
 
@@ -41,6 +52,7 @@ _____
 2. Drag and drop the `SUICoordinator` folder into your Xcode project.
 3. Make sure to add it to your target.
 
+*Want to run something immediately?* **Clone the example app** → [Examples folder](https://github.com/felilo/SUICoordinator/blob/main/Examples/SUICoordinatorExample/SUICoordinatorExample).
 _____
 
 ## Basic Usage
@@ -53,21 +65,23 @@ import SwiftUI
 import SUICoordinator
 
 enum HomeRoute: RouteType {
-    case push(dependencies: DependenciesPushView)
-    case sheet(viewModel: DependenciesSheetView)
+    case homeView(dependencies: DependenciesHomeView)
+    case pushView(dependencies: DependenciesPushView)
+    case sheetView(coordinator: HomeCoordinator)
     
     var presentationStyle: TransitionPresentationStyle {
         switch self {
-            case .push: .push
-            case .sheet: .sheet
+            case .sheetView: .sheet
+            default: .push
         }
     }
 
     @ViewBuilder
     var view: some View {
         switch self {
-            case .push(let dependencies): PushView(viewModel: .init(dependencies: dependencies))
-            case .sheet(let dependencies): SheetView(viewModel: .init(dependencies: dependencies))
+            case .homeView(let dependencies): HomeView(dependencies: .init(dependencies))
+            case .pushView(let dependencies): PushView(dependencies: .init(dependencies))
+            case .sheetView(let coordinator): SheetView(coordinator: coordinator)
         }
     }
 }
@@ -86,63 +100,67 @@ class HomeCoordinator: Coordinator<HomeRoute> {
     override func start() async {
         // This is the first view the coordinator will show.
         // 'startFlow' clears any existing navigation stack and presents this route.
-        let viewModel = ActionListViewModel(coordinator: self)
-        await startFlow(route: .actionListView(viewModel: viewModel), animated: animated)
+        let dependencies = HomeViewDependencies()
+        await startFlow(route: .homeView(dependencies: dependencies))
     }
     
     // Example: Navigating to another view within this coordinator's flow
     func navigateToPushView() async {
-        let viewModel = PushViewModel(coordinator: self)
-        // Use the 'router' to navigate to other routes defined in HomeRoute.
-        await router.navigate(toRoute: .push(viewModel: viewModel))
+        let dependencies = PushViewDependencies()
+        await navigate(toRoute: .pushView(dependencies: dependencies))
     }
     
     // Example: Presenting a sheet
     func presentSheet() async {
-        let viewModel = SheetViewModel(coordinator: self)
-        // Use 'presentSheet(route:)' for modal presentations.
-        // The route's presentationStyle (e.g., .sheet, .fullScreenCover) will be used.
-        await presentSheet(route: .sheet(viewModel: viewModel))
+        await navigate(toRoute: .sheetView(coordinator: self))
     }
     
     // Example: Navigating to another Coordinator (e.g., a TabCoordinator)
-    func presentCustomTabs() async {
-        let tabCoordinator = CustomAppTabCoordinator() // Assuming this is your TabCoordinator
-        // The 'navigate(to:presentationStyle:)' method on a coordinator
-        // is used to present another coordinator.
-        await navigate(to: tabCoordinator, presentationStyle: .sheet)
+    func presentDefaultTabs() async {
+        let coordinator = DefaultTabCoordinator() // Assuming this is your TabCoordinator
+        await navigate(to: coordinator, presentationStyle: .sheet))
     }
     
-    func close() async {
-        // 'router.close()' will either dismiss a presented sheet or pop a pushed view.
-        await router.close(animated: true)
+    // Example: Override the default presentation style
+    func presentSheet() async {
+        await navigate(toRoute: .sheetView(coordinator: self), presentationStyle: .detents([.medium, .large]))
     }
     
+    // 'finishFlow()' will dismiss/pop all views of this coordinator
     func endThisCoordinator() async {
-        // 'finishFlow()' will dismiss/pop all views of this coordinator
-        // and remove it from its parent coordinator.
-        await finishFlow(animated: true)
-    }
-    
-    func restart(animated: Bool = true) async {
-        // Resets the coordinator's navigation state by calling `router.restart()`.
-        // This clears all navigation stacks and modal presentations managed by this coordinator.
-        // All navigation history will be lost, modal presentations dismissed, and the coordinator returns to its initial state as if `start()` was just called (depending on how `start()` and `startFlow()` are implemented).
-        // Useful for logout scenarios or major state changes.
-        await router.restart(animated: animated)
+        await finishFlow()
     }
 }
 ```
 
-### 3. Define Views and ViewModels
+### 3. Define Views 
+
+```swift
+import SwiftUI
+
+struct HomeView: View {
+    @EnvironmentObject var coordinator: HomeCoordinator
+    
+    var body: some View {
+        List {
+            Button("Push Example View") { Task { await coordinator.navigateToPushView() } }
+            Button("Present Sheet Example") { Task { await coordinator.presentSheet() } }
+            Button("Present Tab Coordinator") { Task { await coordinator.presentDefaultTabs() } }
+        }
+        .navigationTitle("Coordinator Actions")
+    }
+}
+```
+
+#### 3.1 Do you prefer to use ViewModels and Dependency Injection? 
 Your SwiftUI views will typically be initialized with a ViewModel. The ViewModel can hold a reference to its coordinator to trigger navigation actions.
 
 ```swift
 // ActionListViewModel.swift
 import Foundation
 
-class ActionListViewModel: ObservableObject {
-    let coordinator: HomeCoordinator // Or a protocol if you prefer
+class HomeViewModel: ObservableObject {
+    let coordinator: HomeCoordinator 
     
     init(coordinator: HomeCoordinator) {
         self.coordinator = coordinator
@@ -157,15 +175,12 @@ class ActionListViewModel: ObservableObject {
     }
 
     @MainActor func userTappedShowTabs() async {
-        await coordinator.presentCustomTabs()
+        await coordinator.presentDefaultTabs()
     }
 }
 
-// NavigationActionListView.swift
-import SwiftUI
-
-struct NavigationActionListView: View {
-    @StateObject var viewModel: ActionListViewModel
+struct HomeView: View {
+    @StateObject var viewModel: HomeViewModel
     
     var body: some View {
         List {
@@ -176,7 +191,9 @@ struct NavigationActionListView: View {
         .navigationTitle("Coordinator Actions")
     }
 }
+
 ```
+
 
 ### 4. Setup in your App
 In your main `App` struct, instantiate your root coordinator and use its `getView()` method.
@@ -186,15 +203,13 @@ import SwiftUI
 import SUICoordinator // Import the library
 
 @main
-struct SUICoordinatorExampleApp: App {
+struct MyExampleApp: App {
     
     // Instantiate your main/root coordinator
-    var mainCoordinator = HomeCoordinator() // Or your primary app coordinator
+    var rootCoordinator = HomeCoordinator() // Or your primary app coordinator
     
     var body: some Scene {
-        WindowGroup {
-            mainCoordinator.getView()
-        }
+        WindowGroup { rootCoordinator.getView() }
     }
 }
 ```
@@ -223,29 +238,29 @@ public struct AppTabPageDataSource {
 
     @ViewBuilder public var icon: some View {
         switch page {
-            case .home: Image(systemName: "house.fill")
-            case .settings: Image(systemName: "gearshape.fill")
+            case .homeCoordinator: Image(systemName: "house.fill")
+            case .settingsCoordinator: Image(systemName: "gearshape.fill")
         }
     }
 
     @ViewBuilder public var title: some View {
         switch page {
-            case .home: Text("Home")
-            case .settings: Text("Settings")
+            case .homeCoordinator: Text("Home")
+            case .settingsCoordinator: Text("Settings")
         }
     }
 }
 
 // Step 1.2: Define your TabPage enum
 enum AppTabPage: TabPage, CaseIterable { // CaseIterable is useful for providing .allCases
-    case home
-    case settings
+    case homeCoordinator
+    case settingsCoordinator
 
     // PageDataSource conformance
     var position: Int {
         switch self {
-            case .home: return 0
-            case .settings: return 1
+            case .homeCoordinator: return 0
+            case .settingsCoordinator: return 1
         }
     }
 
@@ -258,8 +273,8 @@ enum AppTabPage: TabPage, CaseIterable { // CaseIterable is useful for providing
     func coordinator() -> any CoordinatorType {
         // Return the specific coordinator instance for this tab's flow
         switch self {
-            case .home: return HomeCoordinator() // Create and return a new instance
-            case .settings: return SettingsCoordinator() // Create and return a new instance
+            case .homeCoordinator: return HomeCoordinator() // Create and return a new instance
+            case .settingsCoordinator: return SettingsCoordinator() // Create and return a new instance
         }
     }
 }
@@ -280,38 +295,44 @@ Subclass `TabCoordinator<YourTabPageEnum>`. In its initializer, you'll typically
 import SUICoordinator
 
 // Example: TabCoordinator using a custom TabView UI
-// (See CustomTabView.swift and CustomTabCoordinator.swift in the example project for a full implementation)
-class CustomAppTabCoordinator: TabCoordinator<AppTabPage> {
+// (See CustomTabView.swift and DefaultTabCoordinator.swift in the example project for a full implementation)
+class DefaultTabCoordinator: TabCoordinator<AppTabPage> {
     init(initialPage: AppTabPage = .home) {
         super.init(
             pages: AppTabPage.allCases,
             currentPage: initialPage,
             viewContainer: { dataSource in
                 // Provide your custom tab bar view.
-                CustomTabView(dataSource: dataSource)
+                DefaultTabView(dataSource: dataSource)
             }
         )
     }
 }
 ```
 
-For a detailed example, you can take a look at the [CustomTabView.swift](https://github.com/felilo/SUICoordinator/blob/main/Examples/SUICoordinatorExample/SUICoordinatorExample/Coordinators/TabCooridnators/DefaultTabCoordinator/DefaultTabView.swift) implementation.
+For a detailed example, you can take a look at the [DefaultTabView.swift](https://github.com/felilo/SUICoordinator/blob/main/Examples/SUICoordinatorExample/SUICoordinatorExample/Coordinators/TabCooridnators/DefaultTabCoordinator/DefaultTabView.swift) implementation.
 
 #### 3. Using the `TabCoordinator`
-Instantiate and start your `TabCoordinator` from a parent coordinator, just like any other coordinator.
+Instantiate and start your `TabCoordinator` from a parent coordinator or as a root coordinator, just like any other coordinator.
 
 ```swift
 // In a parent coordinator (e.g., your main AppRootCoordinator)
-func showMainApplicationTabs() async {
-    let tabCoordinator = CustomAppTabCoordinator()
-    // Present the TabCoordinator. '.fullScreenCover' is common for main tab interfaces.
-    await navigate(to: tabCoordinator, presentationStyle: .fullScreenCover)
+class HomeCoordinator: Coordinator<HomeRoute> {
+    ...
+    
+    // Example: Navigating to another Coordinator (e.g., a TabCoordinator)
+    func presentDefaultTabs() async {
+        let tabCoordinator = DefaultTabCoordinator() // Assuming this is your TabCoordinator
+        await navigate(to: tabCoordinator, presentationStyle: .detents(.medium))
+    }
+    
+    ...
 }
 ```
 
 ### Deep Linking or Push Notifications
 
-`SUICoordinator` facilitates deep linking (e.g., from push notifications) by allowing you to programmatically navigate to specific parts of your application. The primary method for this is `forcePresentation(mainCoordinator:)` on a target coordinator. For tab-based applications, you'll combine this with `TabCoordinator` methods like `setCurrentPage(with:)` (or direct assignment to `currentPage`) and then use the child coordinator's `router` for further navigation.
+`SUICoordinator` facilitates deep linking (e.g., from push notifications) by allowing you to programmatically navigate to specific parts of your application. The primary method for this is `forcePresentation(rootCoordinator:)` on a target coordinator. For tab-based applications, you'll combine this with `TabCoordinator` methods like `setCurrentPage(with:)` (or direct assignment to `currentPage`) and then use the child coordinator's `router` for further navigation.
 
 #### General Strategy for Deep Linking:
 
@@ -319,9 +340,9 @@ func showMainApplicationTabs() async {
     *   If it's within a `TabCoordinator`, identify the `TabCoordinator` itself, the target `TabPage`, and the specific `Route` within that tab's child coordinator.
     *   If it's a standalone flow, identify the `Coordinator` and its initial `Route`.
 2.  **Instantiate Coordinators:** Create instances of the necessary coordinators. For a deep link into a tab, this usually means instantiating the relevant `TabCoordinator`.
-3.  **Force Present the Entry Coordinator:** Call `yourTargetCoordinator.forcePresentation(presentationStyle: mainCoordinator:)`.
+3.  **Force Present the Entry Coordinator:** Call `yourTargetCoordinator.forcePresentation(presentationStyle: rootCoordinator:)`.
     *   `yourTargetCoordinator` is the coordinator that directly leads to the deep link's entry point (e.g., a `TabCoordinator` or a specific feature `Coordinator`).
-    *   `mainCoordinator` should be your application's root/main coordinator to establish the correct presentation context. This step ensures the target coordinator's view hierarchy becomes active, potentially dismissing or covering other views.
+    *   `rootCoordinator` should be your application's root/main coordinator to establish the correct presentation context. This step ensures the target coordinator's view hierarchy becomes active, potentially dismissing or covering other views.
 4.  **Navigate to the Specific Tab (if applicable):** If `yourTargetCoordinator` is a `TabCoordinator`:
     *   Set its `currentPage` to the desired `TabPage`. For example: `yourTabCoordinator.currentPage = .settingsTab`.
     *   A brief `Task.sleep` (e.g., `try? await Task.sleep(nanoseconds: 100_000_000)` for 0.1s) after setting `currentPage` can sometimes help ensure UI updates complete before further navigation.
@@ -333,28 +354,28 @@ func showMainApplicationTabs() async {
 
 ```swift
 @main
-struct SUICoordinatorExampleApp: App {
+struct MyExampleApp: App {
     
     /// The main coordinator for the application, responsible for managing the primary tab-based navigation.
-    /// It's an instance of `CustomTabCoordinator` which uses the standard SwiftUI `TabView`.
-    var mainCoordinator = CustomTabCoordinator()
+    /// It's an instance of `DefaultTabCoordinator` which uses the standard SwiftUI `TabView`.
+    var rootCoordinator = DefaultTabCoordinator()
     
     /// The body of the app, defining the main scene.
-    /// It sets up a `WindowGroup` containing the view provided by the `mainCoordinator`.
+    /// It sets up a `WindowGroup` containing the view provided by the `rootCoordinator`.
     /// - It includes `onReceive` for handling custom notifications that might trigger deep links.
     /// - It includes `onOpenURL` for handling URL-based deep links.
     /// - An `onAppear` modifier simulates an automatic deep link handling scenario after a 3-second delay
     ///   on application launch, demonstrating programmatic navigation.
     var body: some Scene {
         WindowGroup {
-            mainCoordinator.getView()
+                rootCoordinator.getView()
                 .onReceive(NotificationCenter.default.publisher(for: Notification.Name.PushNotification)) { object in
                     // Assumes `incomingURL` is accessible or passed via notification's object/userInfo
                     // For demonstration, let's assume `object.object` contains the URL string
                     guard let urlString = object.object as? String,
                           let path = DeepLinkPath(rawValue: urlString) else { return }
                     Task {
-                        await try? handlePushNotificationDeepLink(path: path, rootCoordinator: mainCoordinator)
+                        await try? handlePushNotificationDeepLink(path: path, rootCoordinator: rootCoordinator)
                     }
                 }
                 .onOpenURL { incomingURL in
@@ -363,7 +384,7 @@ struct SUICoordinatorExampleApp: App {
                     else { return }
                     
                     Task { @MainActor in
-                        try? await handlePushNotificationDeepLink(path: path, rootCoordinator: mainCoordinator)
+                        try? await handlePushNotificationDeepLink(path: path, rootCoordinator: rootCoordinator)
                     }
                 }
         }
@@ -372,7 +393,7 @@ struct SUICoordinatorExampleApp: App {
     /// Defines possible deep link paths for the application.
     /// These raw string values would typically match URL schemes or notification payloads.
     /// - `home`: Represents a path to a home-like view, potentially within a tab, to present a detents sheet.
-    /// - `tabCoordinator`: Represents a path to present a `CustomTabCoordinator` modally.
+    /// - `tabCoordinator`: Represents a path to present a `DefaultTabCoordinator` modally.
     enum DeepLinkPath: String {
         case home = "home" // Example: "yourapp://home" or a notification payload "home"
         case tabCoordinator = "tabs-coordinator" // Example: "yourapp://tabs/coordinator"
@@ -387,43 +408,41 @@ struct SUICoordinatorExampleApp: App {
     ///
     /// - Parameters:
     ///   - path: The `DeepLinkPath` indicating the destination within the app.
-    ///   - rootCoordinator: The root `AnyCoordinatorType` instance of the application (e.g., `mainCoordinator`),
+    ///   - rootCoordinator: The root `AnyCoordinatorType` instance of the application (e.g., `rootCoordinator`),
     ///     used as a starting point to traverse and manipulate the coordinator tree.
-    /// - Throws: Can throw errors from coordinator operations, such as `topCoordinator()` or `getCoordinatorSelected()`,
-    ///           if the navigation path is invalid or a coordinator is not in the expected state.
-    func handlePushNotificationDeepLink(
+    @MainActor func handlePushNotificationDeepLink(
         path: DeepLinkPath,
         rootCoordinator: AnyCoordinatorType
     ) async throws {
         switch path {
         case .tabCoordinator:
-            // This case demonstrates deep linking to a view (with detents) within a specific tab.
-            // It ensures that the action is performed on a HomeCoordinator if it's managing the currently selected tab.
-            //
-            // 1. `rootCoordinator.topCoordinator()`: Gets the topmost coordinator. This could be a modal's coordinator
-            //    or the selected tab's coordinator if `rootCoordinator` is a TabCoordinator without a modal presented directly by it.
-            // 2. `?.parent as? CustomTabCoordinator`: Checks if the parent of the topmost coordinator is our
-            //    main `CustomTabCoordinator`. This confirms we are operating within the main tab structure.
-            //    If true, `tabCoordinator` becomes this `CustomTabCoordinator` (which is `mainCoordinator`).
-            // 3. `tabCoordinator.getCoordinatorSelected()`: Retrieves the coordinator for the *currently selected tab*
-            //    from the (now confirmed) `CustomTabCoordinator`.
-            // 4. `as? HomeCoordinator`: Checks if this selected tab's coordinator is an instance of `HomeCoordinator`.
-            // 5. `await coordinatorSelected.presentDetents()`: If all checks pass, calls `presentDetents()` on the
-            //    `HomeCoordinator` of the active tab, typically showing a sheet with detents.
-            // This pattern allows for deep linking into a specific state (like showing a detents view) of a specific tab.
-            if let tabCoordinator = try rootCoordinator.topCoordinator()?.parent as? CustomTabCoordinator {
-                if let coordinatorSelected = try tabCoordinator.getCoordinatorSelected() as? HomeCoordinator {
-                    await coordinatorSelected.presentDetents()
-                }
+            /// Deep-link intent:
+            /// Present the detents sheet that belongs to the `HomeCoordinator`
+            /// ‑-but only if that coordinator is the one *currently visible* to the user.
+            ///
+            /// How it works:
+            /// `getCoordinatorPresented()` walks the hierarchy to return
+            ///    • the “top-most” coordinator of any modal stack, **or**
+            ///    • the coordinator that controls the *selected* tab when inside a tab container.
+            ///    In short, it yields the coordinator the user is actively interacting with.
+            /// When the cast succeeds we call `presentSheet()` which
+            ///    brings up the sheet configured inside `HomeCoordinator`.
+            
+            if let coordinator = try rootCoordinator.getCoordinatorPresented() as? HomeCoordinator {
+                await coordinator.presentSheet()
+            } else {
+                let homeCoordinator = HomeCoordinator()
+                try await homeCoordinator.forcePresentation(rootCoordinator: rootCoordinator)
+                await homeCoordinator.presentSheet()
             }
         case .home:
             // This case demonstrates presenting a different Coordinator modally (HomeCoordinator in this example).
             // It creates a new `HomeCoordinator` instance and uses `forcePresentation`
-            // to display it as a sheet over the current context, managed by the `mainCoordinator`.
+            // to display it as a sheet over the current context, managed by the `rootCoordinator`.
             let coordinator = HomeCoordinator()
-            try? await coordinator.forcePresentation(
+            try await coordinator.forcePresentation(
                 presentationStyle: .sheet,
-                mainCoordinator: mainCoordinator
+                rootCoordinator: rootCoordinator
             )
         }
     }
@@ -598,13 +617,27 @@ The `Router` (a property on every `Coordinator` instance, e.g., `coordinator.rou
       <td>Dismisses the top-most modally presented view (sheet, fullScreenCover, etc.) managed by this router's <code>sheetCoordinator</code>.</td>
     </tr>
     <tr>
-      <td><code style="color: blue;">close(animated:finishFlow:)</code></td>
+      <td><code style="color: blue;">close(animated:)</code></td>
       <td>
         <ul>
           <li><b>animated:</b> <code>Bool</code>, default: <code style="color: #ec6b6f;">true</code></li>
         </ul>
       </td>
-      <td>Intelligently closes the top-most view: dismisses a sheet if one is presented by this router's <code>sheetCoordinator</code>, otherwise pops a view from this router's navigation stack.</td>
+      <td>Closes the current screen context: if presented modally it dismisses, otherwise it pops the navigation stack.</td>
+    </tr>
+    <tr>
+      <td><code style="color: blue;">restart(animated:)</code></td>
+      <td>
+        <ul>
+          <li><b>animated:</b> <code>Bool</code>, default: <code style="color: #ec6b6f;">true</code></li>
+        </ul>
+      </td>
+      <td>Clears the router’s navigation state — all stacks and sheet presentations are removed and the router returns to its initial state (<code>mainView</code> remains intact).</td>
+    </tr>
+    <tr>
+      <td><code style="color: blue;">syncItems()</code></td>
+      <td>N/A</td>
+      <td>Synchronises the published <code>items</code> array with the internal navigation-stack state. Useful when UI state becomes out-of-sync after complex mutations.</td>
     </tr>
   </tbody>
 </table>
@@ -658,12 +691,12 @@ The `Coordinator` is the brain for a specific navigation flow or feature. You su
       <td>Dismisses all views (pushed or presented) managed by *this* coordinator and removes *this* coordinator from its parent coordinator's children list. Effectively ends this coordinator's lifecycle and its associated UI.</td>
     </tr>
     <tr>
-      <td><code style="color: blue;">forcePresentation(presentationStyle:animated:mainCoordinator:)</code></td>
+      <td><code style="color: blue;">forcePresentation(presentationStyle:animated:rootCoordinator:)</code></td>
       <td>
         <ul>
           <li><b>presentationStyle:</b> <code>TransitionPresentationStyle?</code>, default: <code style="color: #ec6b6f;">nil</code> (uses presentation style of the coordinator's root view defined in its <code>start()</code> via <code>startFlow()</code>)</li>
           <li><b>animated:</b> <code>Bool</code>, default: <code style="color: #ec6b6f;">true</code></li>
-          <li><b>mainCoordinator:</b> <code>(any CoordinatorType)?</code>, default: <code style="color: #ec6b6f;">nil</code> (attempts to find the top-most coordinator in the app to present from)</li>
+          <li><b>rootCoordinator:</b> <code>(any CoordinatorType)?</code>, default: <code style="color: #ec6b6f;">nil</code> (attempts to find the top-most coordinator in the app to present from)</li>
         </ul>
       </td>
       <td>Forcefully presents *this* coordinator, even if other coordinators or views are active. Useful for handling deep links or push notifications. It will call this coordinator's <code>start()</code> method.</td>
@@ -680,6 +713,17 @@ The `Coordinator` is the brain for a specific navigation flow or feature. You su
       <td>Navigates from *this* coordinator to *another* coordinator. It adds the target coordinator as a child, sets its parent, and calls the target coordinator's <code>start()</code> method. The presentation style determines how the new coordinator's view is shown (e.g., pushed onto this coordinator's stack, or presented as a sheet by this coordinator).</td>
     </tr>
     <tr>
+      <td><code style="color: blue;">navigate(toRoute:presentationStyle:animated:)</code></td>
+      <td>
+        <ul>
+          <li><b>toRoute:</b> <code>Route</code> (Your specific RouteType)</li>
+          <li><b>presentationStyle:</b> <code>TransitionPresentationStyle?</code>, default: <code style="color: #ec6b6f;">nil</code> (uses presentation style of the target coordinator's root view, or can be overridden)</li>
+          <li><b>animated:</b> <code>Bool</code>, default: <code style="color: #ec6b6f;">true</code></li>
+        </ul>
+      </td>
+      <td>Simple convenience wrapper for the router’s <code>navigate(toRoute:presentationStyle:animated:)</code> method.</td>
+    </tr>
+    <tr>
       <td><code style="color: blue;">restart(animated:)</code></td>
       <td>
         <ul>
@@ -687,6 +731,24 @@ The `Coordinator` is the brain for a specific navigation flow or feature. You su
         </ul>
       </td>
       <td>Resets the coordinator's navigation state by calling <code>router.restart()</code>. This clears all navigation stacks and modal presentations managed by this coordinator. All navigation history will be lost, modal presentations dismissed, and the coordinator returns to its initial state as if <code>start()</code> was just called (depending on how <code>start()</code> and <code>startFlow()</code> are implemented). Useful for logout scenarios or major state changes.</td>
+    </tr>
+    <tr>
+      <td><code style="color: blue;">close(animated:)</code></td>
+      <td>
+        <ul>
+          <li><b>animated:</b> <code>Bool</code>, default: <code style="color: #ec6b6f;">true</code></li>
+        </ul>
+      </td>
+      <td>Forwards to the router’s <code>close(animated:)</code> method.</td>
+    </tr>
+    <tr>
+      <td><code style="color: blue;">getCoordinatorPresented(customRootCoordinator:)</code></td>
+      <td>
+        <ul>
+          <li><b>customRootCoordinator:</b> <code>AnyCoordinatorType?</code>, default: <code style="color: #ec6b6f;">nil</code></li>
+        </ul>
+      </td>
+      <td>Returns the coordinator currently visible to the user. It searches for the top-most coordinator starting from <code>customRootCoordinator</code> (or <code>self</code> when <code>nil</code>). If that coordinator is inside a <code>TabCoordinatable</code>, the selected tab’s coordinator is returned; otherwise the top coordinator itself is returned.</td>
     </tr>
   </tbody>
 </table>
@@ -738,7 +800,7 @@ The `Coordinator` is the brain for a specific navigation flow or feature. You su
       <td><code style="color: blue;">getCoordinator(with:)</code></td>
       <td>
         <ul cellspacing="0" cellpadding="0">
-          <li><b>position:</b> <code>Int</code></li>
+          <li><b>page:</b> <code>TabPage</code></li>
         </ul>
         Returns <code>AnyCoordinatorType?</code>
       </td>
@@ -757,18 +819,8 @@ The `Coordinator` is the brain for a specific navigation flow or feature. You su
   </tbody>
 </table>
 <br>
-
-**Key Steps:**
-1.  **Instantiate Target Coordinator**: Create an instance of the coordinator you want to present (e.g., `MainTabCoordinator`).
-2.  **`forcePresentation`**: Call this on the instantiated coordinator, passing your app's current root/main coordinator. This makes the target coordinator active.
-3.  **Set State (if needed)**: For a `TabCoordinator`, update `currentPage` to the desired tab.
-4.  **Get Child Coordinator**: Use `getCoordinatorSelected()` if navigating within a tab.
-5.  **Navigate in Child**: Call relevant navigation methods on the child coordinator.
-
-This approach ensures that the navigation hierarchy is correctly established before attempting to navigate to the final destination screen.
 _____
 
 ## Contributing
 
 Contributions to the SUICoordinator library are welcome! To contribute, simply fork this repository and make your changes in a new branch. When your changes are ready, submit a pull request to this repository for review.
-
