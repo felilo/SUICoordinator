@@ -39,7 +39,7 @@ struct CustomTransitionView<Item: SheetItemType, Content: View>: View {
     
     var onDidLoad: ActionClosure? = nil
     var onDismiss: ActionClosure? = nil
-    var content: (Item) -> Content
+    var content: Content?
     var transition: AnyTransition
     var animation: Animation?
     let animated: Bool
@@ -60,13 +60,16 @@ struct CustomTransitionView<Item: SheetItemType, Content: View>: View {
         @ViewBuilder content: @escaping (Item) -> Content
     ) {
         self._item = item
-        self.content = content
         self.transition = transition
         self.animation = animation
         self.animated = animated
         self.onDismiss = onDismiss
         self.onDidLoad = onDidLoad
         self.isFullScreen = isFullScreen
+        
+        if let value = item.wrappedValue {
+            self.content = content(value)
+        }
     }
     
     // ---------------------------------------------------------
@@ -97,7 +100,7 @@ struct CustomTransitionView<Item: SheetItemType, Content: View>: View {
     @ViewBuilder
     var contentItem: some View {
         if let item = item {
-            content(item)
+            content
                 .onViewDidLoad { onDidLoad?("") }
                 .onReceive(item.willDismiss) { _ in
                     Task { await finish() }

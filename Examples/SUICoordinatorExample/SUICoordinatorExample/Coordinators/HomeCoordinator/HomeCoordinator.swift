@@ -34,45 +34,41 @@ class HomeCoordinator: Coordinator<HomeRoute> {
     // ---------------------------------------------------------------------
     
     override func start() async {
-        await startFlow(route: .actionListView(coordinator: self))
+        await startFlow(route: .actionListView)
     }
     
     // ---------------------------------------------------------------------
-    // MARK: Aditional flows
+    // MARK: Additional flows
     // ---------------------------------------------------------------------
     
     func navigateToPushView() async {
         let title = "Hello, PushView! \(router.items.count + 1)"
-        await router.navigate(toRoute: .push(coordinator: self, title: title), animated: animated)
+        await navigate(toRoute: .push(coordinator: self, title: title), animated: animated)
     }
     
     func presentSheet() async {
         let title = "Hello, Sheet! \(router.items.count + 1)"
-        await router.navigate(toRoute: .sheet(coordinator: self, title: title), animated: animated)
+        await navigate(toRoute: .sheet(coordinator: self, title: title), animated: animated)
     }
     
     func presentFullscreen() async {
         let title = "Hello, Fullscreen! \(router.items.count + 1)"
-        await router.navigate(toRoute: .fullscreen(coordinator: self, title: title), animated: animated)
+        await navigate(toRoute: .fullscreen(coordinator: self, title: title), animated: animated)
     }
     
     func presentDetents() async {
         let title = "Hello, Detents! \(router.items.count + 1)"
-        await router.navigate(toRoute: .detents(coordinator: self, title: title), animated: animated)
+        await navigate(toRoute: .detents(coordinator: self, title: title), animated: animated)
     }
     
     func presentViewWithCustomPresentation() async {
         let title = "Hello, Custom presentation! \(router.items.count + 1)"
-        await router.navigate(toRoute: .viewCustomTransition(coordinator: self, title: title), animated: animated)
+        await navigate(toRoute: .viewCustomTransition(coordinator: self, title: title), animated: animated)
     }
     
     func presentCustomTabCoordinator() async {
         let coordinator = CustomTabCoordinator()
         await navigate(to: coordinator, presentationStyle: .sheet, animated: animated)
-    }
-    
-    func close() async {
-        await router.close(animated: animated)
     }
     
     func finish() async {

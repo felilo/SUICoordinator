@@ -110,7 +110,7 @@ open class TabCoordinator<Page: TabPage>: TabCoordinatable {
     /// The parent coordinator associated with the coordinator.
     ///
     /// This represents the coordinator that presented or contains this tab coordinator.
-    public var parent: (any CoordinatorType)!
+    public var parent: (any CoordinatorType)?
     
     /// The array of children coordinators associated with the coordinator.
     ///
@@ -137,7 +137,7 @@ open class TabCoordinator<Page: TabPage>: TabCoordinatable {
     ///
     /// Use this subject to asynchronously update badge values for individual tabs.
     /// Send a tuple containing the badge value (or nil to remove) and the target page.
-    public var setBadge: PassthroughSubject<(String?, Page), Never> = .init()
+    public let badge: PassthroughSubject<(String?, Page), Never>
     
     /// A closure that provides the custom view container for the tab interface.
     ///
@@ -174,14 +174,15 @@ open class TabCoordinator<Page: TabPage>: TabCoordinatable {
         presentationStyle: TransitionPresentationStyle = .sheet,
         viewContainer: @escaping (TabCoordinator<Page>) -> Page.View
     ) {
+        defer { Task { [weak self] in await self?.start() } }
+        
         self.router = .init()
         self.uuid = "\(NSStringFromClass(type(of: self))) - \(UUID().uuidString)"
         self.presentationStyle = presentationStyle
         self.currentPage = currentPage
         self.viewContainer = viewContainer
         self.pages = pages
-        
-        router.isTabCoordinable = true
+        self.badge = .init()
     }
     
     // ---------------------------------------------------------
@@ -198,6 +199,8 @@ open class TabCoordinator<Page: TabPage>: TabCoordinatable {
     ///   - animated: A boolean value indicating whether to animate the presentation.
     ///              Defaults to `true`.
     open func start() async {
+        guard !isRunning else { return }
+        
         await setupPages(pages, currentPage: currentPage)
         let cView = viewContainer
         
@@ -222,8 +225,8 @@ open class TabCoordinator<Page: TabPage>: TabCoordinatable {
     ///   - position: The zero-based position of the coordinator to retrieve.
     /// - Returns: The coordinator at the specified position, or `nil` if no coordinator
     ///           is found at that position.
-    public func getCoordinator(with position: Int) -> AnyCoordinatorType? {
-        children.first { $0.tagId == "\(position)" }
+    public func getCoordinator(with page: Page) -> AnyCoordinatorType? {
+        children.first { $0.tagId == page.id }
     }
     
     /// Retrieves the currently selected coordinator within the tab coordinator.
@@ -236,9 +239,13 @@ open class TabCoordinator<Page: TabPage>: TabCoordinatable {
     ///          cannot be found. This can happen if the current page's position doesn't
     ///          match any child coordinator's `tagId`.
     open func getCoordinatorSelected() throws -> (any CoordinatorType) {
-        guard let index = children.firstIndex(where: { $0.tagId == "\(currentPage.position)" })
+        guard let index = children.firstIndex(where: { $0.tagId == "\(currentPage.id)" })
         else { throw TabCoordinatorError.coordinatorSelected }
         return children[index]
+    }
+    
+    public func setBadge(for page: Page, with value: String?) {
+        badge.send((value, page))
     }
     
     /// Performs cleanup operations for the tab coordinator.

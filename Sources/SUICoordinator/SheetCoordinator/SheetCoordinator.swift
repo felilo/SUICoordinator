@@ -129,7 +129,6 @@ final public class SheetCoordinator<T>: ObservableObject {
         self.onRemoveItem = onRemoveItem
     }
     
-    
     // ---------------------------------------------------------
     // MARK: Computed vars
     // ---------------------------------------------------------

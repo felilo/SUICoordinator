@@ -82,7 +82,7 @@ struct CustomTabView<DataSource: TabCoordinatorType>: View where DataSource.Data
         .onChange(of: dataSource.pages) { pages in
             badges = pages.map { (nil, $0) }
         }
-        .onReceive(dataSource.setBadge) { (value, page) in
+        .onReceive(dataSource.badge) { (value, page) in
             guard let index = getBadgeIndex(page: page) else { return }
             badges[index].value = value
         }.task {
@@ -98,7 +98,7 @@ struct CustomTabView<DataSource: TabCoordinatorType>: View where DataSource.Data
     
     @ViewBuilder
     func tabBarItem(page: Page) -> some View {
-        if let item = dataSource.getCoordinator(with: page.position) {
+        if let item = dataSource.getCoordinator(with: page) {
             item.getView().asAnyView()
                 .toolbar(.hidden, for: .tabBar)
                 .tag(page)

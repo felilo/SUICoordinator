@@ -74,7 +74,7 @@ final class TabCoordinatorTests: XCTestCase {
         XCTAssertEqual(sut.currentPage, .tab1)
         sut.currentPage = .tab2
         await navigateToCoordinator(coordinator, in: try sut.getCoordinatorSelected())
-        XCTAssertEqual(coordinator.parent.uuid, try sut.getCoordinatorSelected().uuid)
+        XCTAssertEqual(coordinator.parent?.uuid, try sut.getCoordinatorSelected().uuid)
         await finishFlow(sut: sut)
     }
     
@@ -121,10 +121,10 @@ final class TabCoordinatorTests: XCTestCase {
         try await coordinator.forcePresentation(
             animated: animated,
             presentationStyle: .fullScreenCover,
-            mainCoordinator: sut)
+            rootCoordinator: sut)
         await coordinator.start()
         
-        XCTAssertEqual(coordinator.parent.uuid, try sut.getCoordinatorSelected().uuid)
+        XCTAssertEqual(coordinator.parent?.uuid, try sut.getCoordinatorSelected().uuid)
         await finishFlow(sut: sut)
     }
     
@@ -135,11 +135,9 @@ final class TabCoordinatorTests: XCTestCase {
         await sut.start()
         await sut.setPages(pages)
         
-        let coordinator = sut.getCoordinator(with: AnyEnumTabRoute.tab2.position)
-        XCTAssertNotNil(coordinator)
-        
-        let coordinatorNil = sut.getCoordinator(with: 500)
-        XCTAssertNil(coordinatorNil)
+        XCTAssertNotNil(sut.getCoordinator(with: .tab1))
+        XCTAssertNotNil(sut.getCoordinator(with: .tab2))
+        XCTAssertNil(sut.getCoordinator(with: .tab3))
         
         await finishFlow(sut: sut)
     }
@@ -149,8 +147,12 @@ final class TabCoordinatorTests: XCTestCase {
         let pages = [AnyEnumTabRoute.tab2, .tab1]
         
         await sut.start()
+        
+        XCTAssertTrue(sut.pages.count == 3)
+        
         await sut.setPages(pages)
         
+        XCTAssertTrue(sut.pages.count == 2)
         XCTAssertTrue(sut.isRunning)
         
         await finishFlow(sut: sut)
@@ -163,11 +165,26 @@ final class TabCoordinatorTests: XCTestCase {
         await sut.start()
         await sut.setPages(pages)
         
-        let coordinator = sut.getCoordinator(with: AnyEnumTabRoute.tab2.position)
+        let coordinator = sut.getCoordinator(with: .tab2)
         
         await coordinator?.finishFlow(animated: animated)
         
         XCTAssertTrue(sut.isEmptyCoordinator)
+    }
+    
+    @MainActor func test_getCoordinator_selected_given_a_coordinatorObject() async throws {
+        let sut = makeSUT(currentPage: .tab3)
+        let myCustomCoordinator = AnyCoordinator()
+        
+        await sut.start()
+        
+        XCTAssertTrue(try sut.getCoordinatorPresented() is ThirdCoordinator)
+        
+        try await myCustomCoordinator.forcePresentation(rootCoordinator: sut)
+        
+        XCTAssertTrue(try sut.getCoordinatorPresented() is AnyCoordinator)
+        
+        await sut.finishFlow(animated: animated)
     }
     
     

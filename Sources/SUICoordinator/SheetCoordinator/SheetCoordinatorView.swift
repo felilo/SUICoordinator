@@ -107,7 +107,8 @@ struct SheetCoordinatorView: ViewModifier {
 
 
 extension View {
-    func hidden(_ shouldHide: Bool) -> some View {
-        opacity(shouldHide ? 0 : 1)
+    func hidden(_ isHidden: Bool) -> some View {
+        self.frame(maxHeight: !isHidden ? .infinity : 0)
+            .opacity(!isHidden ? 1 : 0)
     }
 }

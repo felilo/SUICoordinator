@@ -109,7 +109,7 @@ final class CoordinatorTests: XCTestCase {
         
         await navigateToCoordinator(coordinator, in: sut)
         
-        XCTAssertEqual(coordinator.parent.uuid, sut.uuid)
+        XCTAssertEqual(coordinator.parent?.uuid, sut.uuid)
         await finishFlow(sut: sut)
     }
     
@@ -120,7 +120,7 @@ final class CoordinatorTests: XCTestCase {
         await navigateToCoordinator(coordinator, in: sut)
         
         XCTAssertEqual(sut.children.last?.id, coordinator.id)
-        XCTAssertEqual(sut.uuid, coordinator.parent.uuid)
+        XCTAssertEqual(sut.uuid, coordinator.parent?.uuid)
         await finishFlow(sut: sut)
     }
     
@@ -131,7 +131,7 @@ final class CoordinatorTests: XCTestCase {
         await navigateToCoordinator(coordinator, in: sut, presentationStyle: .push)
         
         XCTAssertEqual(sut.children.last?.id, coordinator.id)
-        XCTAssertEqual(sut.uuid, coordinator.parent.uuid)
+        XCTAssertEqual(sut.uuid, coordinator.parent?.uuid)
         await finishFlow(sut: sut)
     }
     
@@ -157,7 +157,7 @@ final class CoordinatorTests: XCTestCase {
         try await coordinator2.forcePresentation(
             animated: animated,
             presentationStyle: .fullScreenCover,
-            mainCoordinator: sut)
+            rootCoordinator: sut)
         
         XCTAssertEqual(coordinator2.parent?.uuid, coordinator1.uuid)
         await finishFlow(sut: sut)

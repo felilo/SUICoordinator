@@ -44,14 +44,14 @@ struct NavigationActionListDetailView: View {
             bgColor.ignoresSafeArea()
             
             List {
-                actionRowButton(title: "Navigate to PushView") { await viewModel.navigateToPushView() }
+                actionRowButton(title: "Navigate To PushView") { await viewModel.navigateToPushView() }
                 actionRowButton(title: "Presents SheetView") { await viewModel.presentSheet() }
                 actionRowButton(title: "Presents FullscreenView") { await viewModel.presentFullscreen() }
                 actionRowButton(title: "Presents DetentsView") { await viewModel.presentDetentsView() }
-                actionRowButton(title: "Presents view with custom presentation") { await viewModel.presentViewWithCustomPresentation() }
-                actionRowButton(title: "Presents custom tab view") { await viewModel.presentCustomTabCoordinator() }
-                actionRowButton(title: "Restart coordinator") { await viewModel.restartCoordinator() }
-                actionRowButton(title: "Close view") { await viewModel.close() }
+                actionRowButton(title: "Presents View With Custom Presentation") { await viewModel.presentViewWithCustomPresentation() }
+                actionRowButton(title: "Restart Coordinator") { await viewModel.restartCoordinator() }
+                actionRowButton(title: "Close View") { await viewModel.close() }
+                actionRowButton(title: "Finish Coordinator") { await viewModel.finish() }
             }
             .scrollContentBackground(.hidden)
             .navigationTitle("\(viewModel.title)")
@@ -62,23 +62,41 @@ struct NavigationActionListDetailView: View {
         .onReceive(timer) { _ in counter += 1 }
     }
     
+    @ViewBuilder
     private func actionRowButton(
         title: String,
         action: @escaping () async -> Void
     ) -> some View {
-        HStack {
-            Text(title)
-            Spacer()
-            Image(systemName: "chevron.right")
+        
+        Button {
+            Task { await action() }
+        } label: {
+            HStack(spacing: 16) {
+                Text(title)
+                    .font(.headline)
+                    .foregroundColor(.white)
+                
+                Spacer()
+                
+                Image(systemName: "chevron.right")
+                    .font(.body.weight(.semibold))
+                    .foregroundColor(Color(white: 0.7))
+            }
         }
-        .padding(.vertical, 8)
         .contentShape(Rectangle())
-        .onTapGesture { Task { await action() } }
-        .foregroundStyle(.white)
-        .font(.callout)
-        .listRowBackground(Color.black.opacity(0.4))
-        .listRowSeparator(.visible)
-        .listStyle(.plain)
+        .padding(.all, 8)
+        .listRowBackground(
+            RoundedRectangle(cornerRadius: 12)
+                .shadow(
+                    color: Color.black.opacity(0.5),
+                    radius: 5,
+                    x: 0,
+                    y: 2
+                )
+                .padding(.vertical, 8)
+                .padding(.horizontal, 16)
+        )
+        .listRowSeparator(.hidden)
     }
     
     private static func randomColor() -> Color {

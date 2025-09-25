@@ -40,23 +40,27 @@ class AnyTabCoordinator: TabCoordinator<AnyEnumTabRoute> {
 enum AnyEnumTabRoute: TabPage, CaseIterable {
     case tab1
     case tab2
+    case tab3
     
     
     var dataSource: AnyTabDataSource { .init()  }
     
     public var position: Int {
         switch self {
-            case .tab1: return 0
-            case .tab2: return 1
+        case .tab1: return 0
+        case .tab2: return 1
+        case .tab3: return 2
         }
     }
     
     public func coordinator() -> (any CoordinatorType) {
         switch self {
-            case .tab1:
-                return AnyCoordinator()
-            case .tab2:
-                return OtherCoordinator()
+        case .tab1:
+            return AnyCoordinator()
+        case .tab2:
+            return OtherCoordinator()
+        case .tab3:
+            return ThirdCoordinator()
         }
     }
 }

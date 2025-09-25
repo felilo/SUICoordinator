@@ -26,8 +26,7 @@ import SwiftUI
 
 struct NavigationActionListView: View {
     
-    @Environment(\.isPresented) private var isPresented
-    @StateObject var viewModel: ActionListViewModel
+    @EnvironmentObject var coordinator: HomeCoordinator
     
     var body: some View {
         ZStack {
@@ -35,33 +34,33 @@ struct NavigationActionListView: View {
             
             List {
                 actionRowButton(title: "Push NavigationView", systemImage: "arrow.forward.square.fill") {
-                    await viewModel.navigateToPushView()
+                    await coordinator.navigateToPushView()
                 }
                 
                 actionRowButton(title: "Presents SheetView", systemImage: "rectangle.bottomthird.inset.fill") {
-                    await viewModel.presentSheet()
+                    await coordinator.presentSheet()
                 }
                 
                 actionRowButton(title: "Presents FullscreenView", systemImage: "rectangle.fill.on.rectangle.fill") {
-                    await viewModel.presentFullscreen()
+                    await coordinator.presentFullscreen()
                 }
                 
                 actionRowButton(title: "Presents DetentsView", systemImage: "rectangle.split.2x1.fill") {
-                    await viewModel.presentDetents()
+                    await coordinator.presentDetents()
                 }
                 
                 actionRowButton(title: "Present with Custom Presentation", systemImage: "sparkles.rectangle.stack.fill") {
-                    await viewModel.presentViewWithCustomPresentation()
+                    await coordinator.presentViewWithCustomPresentation()
                 }
                 
                 actionRowButton(title: "Presents Tab view Coordinator", systemImage: "square.grid.2x2.fill") {
-                    await viewModel.presentTabCoordinator()
+                    await coordinator.presentCustomTabCoordinator()
                 }
             }
             .toolbar(content: toolbarContent)
             .navigationTitle("Navigation Action List")
             .listStyle(.plain)
-            .navigationBarTitleDisplayMode(.large)
+            .navigationBarTitleDisplayMode(.automatic)
         }
     }
     
@@ -71,24 +70,28 @@ struct NavigationActionListView: View {
         systemImage: String,
         action: @escaping () async -> Void
     ) -> some View {
-        HStack(spacing: 16) {
-            Image(systemName: systemImage)
-                .font(.title2.weight(.medium))
-                .foregroundColor(.blue)
-                .frame(width: 30)
-            
-            Text(title)
-                .font(.headline)
-                .foregroundColor(.white)
-            
-            Spacer()
-            
-            Image(systemName: "chevron.right")
-                .font(.body.weight(.semibold))
-                .foregroundColor(Color(white: 0.7))
+        
+        Button {
+            Task { await action() }
+        } label: {
+            HStack(spacing: 16) {
+                Image(systemName: systemImage)
+                    .font(.title2.weight(.medium))
+                    .foregroundColor(.blue)
+                    .frame(width: 30)
+                
+                Text(title)
+                    .font(.headline)
+                    .foregroundColor(.white)
+                
+                Spacer()
+                
+                Image(systemName: "chevron.right")
+                    .font(.body.weight(.semibold))
+                    .foregroundColor(Color(white: 0.7))
+            }
         }
         .contentShape(Rectangle())
-        .onTapGesture { Task { await action() } }
         .padding(.all, 8)
         .listRowBackground(
             RoundedRectangle(cornerRadius: 12)
@@ -106,18 +109,15 @@ struct NavigationActionListView: View {
     
     @ViewBuilder
     private func toolbarContent() -> some View {
-        if isPresented && viewModel.showFinishButton() {
-            Button {
-                Task { await viewModel.finish() }
-            } label: {
-                Text("Finish flow")
-                    .font(.headline)
-                    .foregroundColor(.white)
-            }
+        Button {
+            Task { await coordinator.finish() }
+        } label: {
+            Text("Finish flow")
+                .font(.headline)
         }
     }
 }
 
 #Preview {
-    NavigationActionListView(viewModel: .init(coordinator: .init()))
+    NavigationActionListView()
 }

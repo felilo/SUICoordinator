@@ -85,23 +85,13 @@ public class Router<Route: RouteType>: ObservableObject, RouterType {
     ///
     /// This property affects all navigation operations performed by the router.
     /// When `true`, transitions are animated; when `false`, they occur immediately.
-    @Published public var animated: Bool = true
+    public var animated: Bool = true
     
     /// Thread-safe item manager for navigation stack operations.
     ///
     /// This actor-based manager ensures safe concurrent access to the navigation items,
     /// preventing race conditions during navigation operations.
     private let itemManager = ItemManager<Route>()
-    
-    // --------------------------------------------------------------------
-    // MARK: Properties
-    // --------------------------------------------------------------------
-    
-    /// Indicates whether this router is associated with an tab-coordinable coordinator.
-    ///
-    /// This flag affects how the router handles navigation operations, particularly
-    /// for coordinators that manage tab-based interfaces.
-    public var isTabCoordinable: Bool = false
     
     // --------------------------------------------------------------------
     // MARK: Constructor
@@ -158,7 +148,7 @@ public class Router<Route: RouteType>: ObservableObject, RouterType {
     ///   - animated: A boolean value indicating whether to animate the presentation.
     ///
     /// - Note: If the presentation style is `.push`, this method delegates to `navigate(toRoute:)`.
-    @MainActor public func present(_ view: Route, presentationStyle: TransitionPresentationStyle? = .sheet, animated: Bool = true) async -> Void {
+    @MainActor public func present(_ view: Route, presentationStyle: TransitionPresentationStyle? = nil, animated: Bool = true) async -> Void {
         self.animated = animated
         
         if (presentationStyle ?? view.presentationStyle) == .push {
@@ -296,9 +286,11 @@ public class Router<Route: RouteType>: ObservableObject, RouterType {
     /// item manager state, triggering UI updates when the navigation stack changes.
     @MainActor
     func updateItems() async {
-        try? await Task.sleep(for: .milliseconds(20))
+        let itemsManager = await itemManager.getAllItems()
         
-        self.items = await self.itemManager.getAllItems()
+        guard items != itemsManager else { return }
+        
+        items = itemsManager
     }
     
     /// Synchronizes the router's items array with the internal item manager state.

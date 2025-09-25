@@ -110,7 +110,7 @@ open class Coordinator<Route: RouteType>: ObservableObject, CoordinatorType {
     /// This property establishes the hierarchical relationship between coordinators.
     /// Child coordinators hold a reference to their parent, enabling proper cleanup
     /// and navigation delegation when needed.
-    public var parent: (any CoordinatorType)!
+    public var parent: (any CoordinatorType)?
     
     /// The array of children coordinators associated with the coordinator.
     ///
@@ -146,8 +146,6 @@ open class Coordinator<Route: RouteType>: ObservableObject, CoordinatorType {
     public init() {
         self.router = .init()
         self.uuid = "\(NSStringFromClass(type(of: self))) - \(UUID().uuidString)"
-        
-        router.isTabCoordinable = false
     }
     
     // --------------------------------------------------------------------

@@ -26,33 +26,27 @@ import Foundation
 
 public extension CoordinatorType {
     
-    /// Retrieves the top coordinator in the hierarchy, optionally starting from a specified coordinator.
+    /// Returns the coordinator that is currently visible to the user.
     ///
-    /// This method traverses the coordinator hierarchy to find the deepest active coordinator,
-    /// which is typically the one currently handling user interactions. It's useful for
-    /// determining where new navigation operations should be performed.
+    /// The method first resolves the **top-most coordinator** in the hierarchy
+    /// (starting from `customRootCoordinator` when provided, otherwise from
+    /// `self`).  
+    /// If that coordinator is embedded in a `TabCoordinatable`, the function
+    /// asks the tab container which child coordinator is **selected** and
+    /// returns it; otherwise it simply returns the discovered top coordinator.
     ///
-    /// - Parameters:
-    ///   - pCoodinator: The optional starting point for finding the top coordinator.
-    ///                  If `nil`, starts from the last child of the current coordinator.
-    ///
-    /// - Returns: The top coordinator in the hierarchy, or `nil` if none is found.
-    /// - Throws: An error if the top coordinator retrieval fails due to hierarchy issues.
-    ///
-    /// ## Example Usage
-    /// ```swift
-    /// if let topCoordinator = try coordinator.topCoordinator() {
-    ///     await topCoordinator.navigate(to: newCoordinator, presentationStyle: .sheet)
-    /// }
-    /// ```
-    func topCoordinator(pCoordinator: AnyCoordinatorType? = nil) throws -> AnyCoordinatorType? {
-        if let tabCoordinator = getTabCoordinable(self) {
+    /// - Parameter customRootCoordinator: Optional starting point for the
+    ///   traversal. Pass `nil` to start the search from `self`.
+    /// - Returns: The `AnyCoordinatorType` that represents the screen currently
+    ///   being presented, or `nil` when no coordinator could be found.
+    /// - Throws: Propagates errors thrown by `topCoordinator(pCoordinator:)`,
+    ///   usually indicating an invalid or missing hierarchy.
+    func getCoordinatorPresented(customRootCoordinator: AnyCoordinatorType? = nil) throws -> AnyCoordinatorType? {
+        let topCoordinator = try topCoordinator(pCoordinator: customRootCoordinator)
+        if let tabCoordinator = topCoordinator?.parent as? (any TabCoordinatable) {
             return try tabCoordinator.getCoordinatorSelected()
         }
-        
-        guard children.last != nil else { return self }
-        var auxCoordinator = pCoordinator ?? self.children.last
-        return try getDeepCoordinator(from: &auxCoordinator)
+        return topCoordinator
     }
     
     /// Navigates to a new coordinator with a specified presentation style.
@@ -87,6 +81,36 @@ public extension CoordinatorType {
         
         await swipedAway(coordinator: coordinator)
         await router.presentSheet(item: item)
+    }
+    
+    
+    /// Navigates to a destination described by a `Route`.
+    ///
+    /// This overload is handy when you only need to push or present a view and
+    /// do not require the overhead of instantiating a dedicated coordinator.
+    /// The call is forwarded to the underlying `router`, which will decide how
+    /// to display the destination based on the supplied `presentationStyle`.
+    ///
+    /// - Parameters:
+    ///   - route: The destination route to display.
+    ///   - presentationStyle: Optionally override the router’s default
+    ///     presentation style (e.g., `.push`, `.sheet`, `.fullScreenCover`).
+    ///     Pass `nil` to let the router decide.
+    ///   - animated: `true` to animate the transition. Defaults to `true`.
+    ///
+    /// ## Example
+    /// ```swift
+    /// await coordinator.navigate(
+    ///     toRoute: ProfileRoute.details(userID: id),
+    ///     presentationStyle: .sheet
+    /// )
+    /// ```
+    func navigate(
+        toRoute route: Route,
+        presentationStyle: TransitionPresentationStyle? = nil,
+        animated: Bool = true
+    ) async -> Void {
+        await router.navigate(toRoute: route, presentationStyle: presentationStyle, animated: animated)
     }
     
     /// Finishes the flow of the coordinator.
@@ -143,7 +167,7 @@ public extension CoordinatorType {
     ///               Defaults to `true`.
     ///   - presentationStyle: The transition presentation style for the forced presentation.
     ///                        Defaults to `.sheet`.
-    ///   - mainCoordinator: The main coordinator from which to find the top coordinator.
+    ///   - rootCoordinator: The main coordinator from which to find the top coordinator.
     ///                      If `nil`, the operation may fail if no proper hierarchy exists.
     ///
     /// - Throws: An error if the presentation cannot be forced due to hierarchy issues
@@ -154,15 +178,15 @@ public extension CoordinatorType {
     /// try await emergencyCoordinator.forcePresentation(
     ///     animated: true,
     ///     presentationStyle: .fullScreenCover,
-    ///     mainCoordinator: appCoordinator
+    ///     rootCoordinator: appCoordinator
     /// )
     /// ```
     func forcePresentation(
         animated: Bool = true,
         presentationStyle: TransitionPresentationStyle = .sheet,
-        mainCoordinator: (any CoordinatorType)? = nil
+        rootCoordinator: (any CoordinatorType)? = nil
     ) async throws {
-        let topCoordinator = try mainCoordinator?.topCoordinator()
+        let topCoordinator = try rootCoordinator?.topCoordinator()
         await topCoordinator?.navigate(to: self, presentationStyle: presentationStyle)
     }
     
@@ -182,5 +206,16 @@ public extension CoordinatorType {
     /// - Useful for logout scenarios or major state changes
     func restart(animated: Bool = true) async {
         await router.restart(animated: animated)
+    }
+    
+    /// Closes the current screen.
+    ///
+    /// The underlying `router` determines whether to dismiss a modal
+    /// presentation or pop the current view from a navigation stack,
+    /// depending on the active presentation context.
+    ///
+    /// - Parameter animated: `true` to animate the transition. Defaults to `true`.
+    func close(animated: Bool = true) async {
+        await router.close(animated: animated)
     }
 }

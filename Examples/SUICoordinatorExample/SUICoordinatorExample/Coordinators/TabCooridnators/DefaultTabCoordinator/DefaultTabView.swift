@@ -63,16 +63,6 @@ public struct DefaultTabView<DataSource: TabCoordinatorType>: View where DataSou
     /// This array maintains the badge values for each tab, synchronized with the pages array.
     @State var badges = [BadgeItem]()
     
-    /// The current array of pages to display as tabs.
-    ///
-    /// This array is synchronized with the data source's pages and updates when pages change.
-    @State var pages = [Page]()
-    
-    /// The currently selected page.
-    ///
-    /// This value is bound to the TabView's selection and synchronized with the data source.
-    @State var currentPage: Page
-    
     /// Initializes a new tab view coordinator.
     ///
     /// - Parameters:
@@ -80,7 +70,6 @@ public struct DefaultTabView<DataSource: TabCoordinatorType>: View where DataSou
     ///   - currentPage: The initial page to select. Should match the data source's current page.
     public init(dataSource: DataSource) {
         self._dataSource = .init(wrappedValue: dataSource)
-        self.currentPage = dataSource.currentPage
     }
     
     // ---------------------------------------------------------------------
@@ -92,48 +81,64 @@ public struct DefaultTabView<DataSource: TabCoordinatorType>: View where DataSou
     /// This view creates a SwiftUI `TabView` with tabs generated from the pages array.
     /// It handles automatic updates when pages change and manages badge synchronization.
     public var body: some View {
-        TabView(selection: $currentPage){
-            ForEach(pages, id: \.id, content: tabBarItem)
+        ZStack {
+            if #available(iOS 18, *) {
+                modernTabContainerView()
+            } else {
+                legacyTabContainerView()
+            }
         }
         .onChange(of: dataSource.pages) { pages in
-            self.pages = pages
             badges = pages.map { (nil, $0) }
         }
-        .onChange(of: dataSource.currentPage) { page in
-            currentPage = page
-        }
-        .onReceive(dataSource.setBadge) { (value, page) in
+        .onReceive(dataSource.badge) { (value, page) in
             guard let index = getBadgeIndex(page: page) else { return }
             badges[index].value = value
         }
         .task {
-            pages = dataSource.pages
-            badges = pages.map { (nil, $0) }
+            badges = dataSource.pages.map { (nil, $0) }
         }
     }
     
     // ---------------------------------------------------------------------
     // MARK: Helper funcs
     // ---------------------------------------------------------------------
-    
-    /// Creates a tab bar item for a specific page.
-    ///
-    /// This method creates a complete tab item including the content view, tab item label,
-    /// badge (if applicable), and proper tagging for selection management.
-    ///
-    /// - Parameter page: The page to create a tab item for.
-    /// - Returns: A SwiftUI view representing the complete tab item.
+   
     @ViewBuilder
-    func tabBarItem(with page: Page) -> some View {
-        if let item = dataSource.getCoordinator(with: page.position) {
-            item.getView().asAnyView()
-                .tabItem {
-                    Label(
-                        title: { page.dataSource.title },
-                        icon: { page.dataSource.icon } )
+    private func legacyTabContainerView() -> some View {
+        TabView(selection: $dataSource.currentPage){
+            ForEach(dataSource.pages, id: \.id) { page in
+                if let item = dataSource.getCoordinator(with: page) {
+                    item.viewAsAnyView()
+                        .tabItem { Label(
+                            title: { page.dataSource.title },
+                            icon: { page.dataSource.icon }
+                        )}
+                        .badge(badge(of: page))
+                        .tag(page)
                 }
-                .badge(badge(of: page)?.value)
-                .tag(page)
+            }
+        }
+    }
+
+    @available(iOS 18, *)
+    @ViewBuilder
+    private func modernTabContainerView() -> some View {
+        TabView(selection: $dataSource.currentPage) {
+            ForEach(dataSource.pages, id: \.id) { page in
+                if let coordinator = dataSource.getCoordinator(with: page) {
+                    Tab(value: page) {
+                        coordinator.viewAsAnyView()
+                    } label: {
+                        Label(
+                            title: { page.dataSource.title },
+                            icon: { page.dataSource.icon }
+                        )
+                    }
+                    .badge(badge(of: page))
+                    .customizationID(page.id)
+                }
+            }
         }
     }
     
@@ -141,11 +146,11 @@ public struct DefaultTabView<DataSource: TabCoordinatorType>: View where DataSou
     ///
     /// - Parameter page: The page to get badge information for.
     /// - Returns: The badge item for the page, or `nil` if no badge is set or the page is not found.
-    private func badge(of page: Page) -> BadgeItem? {
-        guard let index = getBadgeIndex(page: page) else {
-            return nil
+    private func badge(of page: Page) -> Int {
+        guard let index = getBadgeIndex(page: page), let number = Int(badges[index].value ?? "") else {
+            return 0
         }
-        return badges[index]
+        return number
     }
     
     /// Gets the index of a page in the badges array.
