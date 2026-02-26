@@ -26,76 +26,80 @@ import Foundation
 
 /// An actor that manages a collection of items of generic type `T`.
 /// It provides thread-safe CRUD (Create, Read, Update, Delete) operations.
-actor ItemManager<T> {
-    
+public actor ItemManager<T> {
+
     private var items: [T] = []
-    
+
+    public init(items: [T] = []) {
+        self.items = items
+    }
+
     // ---------------------------------------------------------
     // MARK: Create
     // ---------------------------------------------------------
-    
+
     /// Adds an item to the end of the collection.
     /// - Parameter item: The item of type `T` to add.
-    func addItem(_ item: T) {
+    public func addItem(_ item: T) {
         items.append(item)
     }
-    
-    func setItems(_ items: [T]) {
+
+    public func setItems(_ items: [T]) {
         self.items = items
     }
-    
+
     /// The index of the last item in the collection (count - 1). Returns 0 if empty.
-    var totalItems: Int {
+    public var totalItems: Int {
         guard !items.isEmpty else {
             return 0
         }
         return items.count - 1
     }
-    
+
     // ---------------------------------------------------------
     // MARK: Read
     // ---------------------------------------------------------
-    
+
     /// Returns all items in the collection.
     /// - Returns: An array of items of type `T`.
-    func getAllItems() -> [T] {
+    public func getAllItems() -> [T] {
         return items
     }
-    
+
     /// Checks if the collection of items is empty.
     /// - Returns: `true` if the collection is empty, `false` otherwise.
-    func areItemsEmpty() -> Bool {
+    public func areItemsEmpty() -> Bool {
         return items.isEmpty
     }
-    
+
     /// Checks if the given index is a valid index for the collection.
     /// - Parameter index: The index to check.
     /// - Returns: `true` if the index is valid, `false` otherwise.
-    func isValid(index: Int) -> Bool {
+    public func isValid(index: Int) -> Bool {
         items.indices.contains(index)
     }
-    
+
     // ---------------------------------------------------------
     // MARK: Delete
     // ---------------------------------------------------------
-    
+
     /// Removes an item at a specific index.
     /// - Parameter index: The index of the item to remove.
     /// - Returns: The removed item, or `nil` if the index was out of bounds.
     @discardableResult
-    func removeItem(at index: Int) -> T? {
+    public func removeItem(at index: Int) -> T? {
         guard isValid(index: index) else { return nil }
         return items.remove(at: index)
     }
-        
+
     /// Removes and returns the last item in the collection.
     /// - Returns: The last item, or `nil` if the collection was empty.
     @discardableResult
-    func removeLastItem() -> T? {
+    public func removeLastItem() -> T? {
         return items.popLast()
     }
-    
-    func removeAll() {
+
+    public func removeAll() {
         guard !areItemsEmpty() else { return }
         return items.removeAll()
     }
@@ -103,7 +107,7 @@ actor ItemManager<T> {
 
 /// Protocol to identify types that are inherently optional.
 /// This is used to provide specialized behavior for `ItemSheetManager` when `T` is an `Optional`.
-protocol OptionalType {
+public protocol OptionalType {
     associatedtype Wrapped
     /// Attempts to unwrap the optional value.
     /// - Returns: The wrapped value if non-nil, otherwise `nil`.
@@ -113,43 +117,43 @@ protocol OptionalType {
 }
 
 extension Optional: OptionalType {
-    func unwrap() -> Wrapped? {
+    public func unwrap() -> Wrapped? {
         return self
     }
-    static func from(nilLiteral: ()) -> Self {
+    public static func from(nilLiteral: ()) -> Self {
         return nil
     }
 }
 
 /// Extension for `ItemSheetManager` providing specialized methods when its generic type `T` is an `Optional`.
 extension ItemManager where T: OptionalType {
-    
+
     /// Retrieves an item at a specific index and attempts to unwrap it.
     /// If `T` is `Optional<Wrapped>`, this returns `Wrapped?`.
     /// - Parameter index: The index of the item to retrieve and unwrap.
     /// - Returns: The unwrapped value if the item at the index is non-nil and contains a value, otherwise `nil`.
-    func getItem(at index: Int) -> T.Wrapped? {
+    public func getItem(at index: Int) -> T.Wrapped? {
         guard items.indices.contains(index) else { return nil }
         return items[index].unwrap()
     }
 
     /// Sets the items at the specified indices to their `nil` representation.
     /// - Parameter indexes: An array of indices for items to be set to `nil`.
-    func makeItemsNil(at indexes: [Int]) {
+    public func makeItemsNil(at indexes: [Int]) {
         for index in indexes {
             guard isValid(index: index) else { continue }
             items[index] = T.from(nilLiteral: ())
         }
     }
-    
+
     /// Sets the items at the specified variadic indices to their `nil` representation.
     /// - Parameter indexes: A variadic list of indices for items to be set to `nil`.
-    func makeItemsNil(at indexes: Int...) {
+    public func makeItemsNil(at indexes: Int...) {
         makeItemsNil(at: indexes)
     }
 
     /// Removes all items from the collection where the wrapped value of the `Optional` `T` is `nil`.
-    func removeAllNilItems() {
+    public func removeAllNilItems() {
         items.removeAll(where: { $0.unwrap() == nil })
     }
 }

@@ -58,7 +58,7 @@ import Combine
 ///     func getPresentationStyle() -> TransitionPresentationStyle { style }
 /// }
 /// ```
-protocol SheetItemType: SCEquatable {
+public protocol SheetItemType: SCEquatable {
     
     /// A string that uniquely identifies the sheet item.
     ///

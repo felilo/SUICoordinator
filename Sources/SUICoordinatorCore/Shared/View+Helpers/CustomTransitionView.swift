@@ -24,7 +24,7 @@
 
 import SwiftUI
 
-struct CustomTransitionView<Item: SheetItemType, Content: View>: View {
+public struct CustomTransitionView<Item: SheetItemType, Content: View>: View {
     
     // ---------------------------------------------------------
     // MARK: Wrapper properties
@@ -49,7 +49,7 @@ struct CustomTransitionView<Item: SheetItemType, Content: View>: View {
     // MARK: Constructor
     // ---------------------------------------------------------
     
-    init(
+    public init(
         item: Binding<Item?>,
         transition: AnyTransition,
         animation: Animation?,
@@ -76,7 +76,7 @@ struct CustomTransitionView<Item: SheetItemType, Content: View>: View {
     // MARK: View
     // ---------------------------------------------------------
     
-    var body: some View {
+    public var body: some View {
         ZStack {
             if !animated {
                 contentItem

@@ -24,9 +24,9 @@
 
 import SwiftUI
 
-struct SheetView<Content: View, T: SheetItemType>: View {
+public struct SheetView<Content: View, T: SheetItemType>: View {
     
-    typealias Item = T
+    public typealias Item = T
     
     // ---------------------------------------------------------
     // MARK: Wrapper properties
@@ -49,7 +49,7 @@ struct SheetView<Content: View, T: SheetItemType>: View {
     // MARK: Constructor
     // ---------------------------------------------------------
     
-    init(
+    public init(
         index: Int,
         items: Binding<[Item?]>,
         transitionStyle: TransitionPresentationStyle?,
@@ -71,7 +71,7 @@ struct SheetView<Content: View, T: SheetItemType>: View {
     // MARK: View
     // ---------------------------------------------------------
     
-    var body: some View {
+    public var body: some View {
         Group {
             if let index = $items.indices.firstIndex(of: index) {
                 let item = $items[index]
