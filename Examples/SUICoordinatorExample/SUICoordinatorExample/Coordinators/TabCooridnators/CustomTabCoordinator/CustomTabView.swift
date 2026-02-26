@@ -41,8 +41,13 @@ struct CustomTabView<DataSource: TabCoordinatorType>: View where DataSource.Data
     // ---------------------------------------------------------------------
     
     
-    @StateObject private var dataSource: DataSource
+    @State private var dataSource: DataSource
     @State private var badges = [BadgeItem]()
+    
+    private var badgeKey: String {
+        guard let (value, page) = dataSource.badge else { return "" }
+        return "\(page.id)_\(value ?? "nil")"
+    }
     
     private let widthIcon: CGFloat = 22
     
@@ -53,7 +58,7 @@ struct CustomTabView<DataSource: TabCoordinatorType>: View where DataSource.Data
     
     
     init(dataSource: DataSource) {
-        self._dataSource = .init(wrappedValue: dataSource)
+        self.dataSource = dataSource
     }
     
     
@@ -79,13 +84,15 @@ struct CustomTabView<DataSource: TabCoordinatorType>: View where DataSource.Data
             .padding(.horizontal, 16)
         }
         .ignoresSafeArea(.all, edges: [.leading, .trailing, .top])
-        .onChange(of: dataSource.pages) { pages in
+        .onChange(of: dataSource.pages) { _, pages in
             badges = pages.map { (nil, $0) }
         }
-        .onReceive(dataSource.badge) { (value, page) in
-            guard let index = getBadgeIndex(page: page) else { return }
+        .onChange(of: badgeKey) { _, _ in
+            guard let (value, page) = dataSource.badge,
+                  let index = getBadgeIndex(page: page) else { return }
             badges[index].value = value
-        }.task {
+        }
+        .task {
             badges = dataSource.pages.map { (nil, $0) }
         }
     }

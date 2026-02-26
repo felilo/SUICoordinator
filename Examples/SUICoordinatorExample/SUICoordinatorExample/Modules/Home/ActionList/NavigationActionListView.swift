@@ -26,7 +26,7 @@ import SwiftUI
 
 struct NavigationActionListView: View {
     
-    @EnvironmentObject var coordinator: HomeCoordinator
+    @Environment(HomeCoordinator.self) var coordinator
     
     var body: some View {
         ZStack {
@@ -120,4 +120,5 @@ struct NavigationActionListView: View {
 
 #Preview {
     NavigationActionListView()
+        .environment(HomeCoordinator())
 }

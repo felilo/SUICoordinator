@@ -15,11 +15,12 @@
 		D95389232B643BAD000E3357 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D95389222B643BAD000E3357 /* ContentView.swift */; };
 		D95389252B643BAE000E3357 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D95389242B643BAE000E3357 /* Assets.xcassets */; };
 		D95389282B643BAE000E3357 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D95389272B643BAE000E3357 /* Preview Assets.xcassets */; };
-		D95389792B643C70000E3357 /* SUICoordinator in Frameworks */ = {isa = PBXBuildFile; productRef = D95389782B643C70000E3357 /* SUICoordinator */; };
 		D95959E72DF791CE00E8CE28 /* CustomTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D95959E52DF791CE00E8CE28 /* CustomTabView.swift */; };
 		D95959E82DF791CE00E8CE28 /* CustomTabCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = D95959E42DF791CE00E8CE28 /* CustomTabCoordinator.swift */; };
 		D9630FFD2DE6B6EB00796C0C /* CoordinatorActionListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9630FFC2DE6B6EB00796C0C /* CoordinatorActionListViewModel.swift */; };
 		D9630FFF2DE6B73800796C0C /* CoordinatorActionListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9630FFE2DE6B73800796C0C /* CoordinatorActionListView.swift */; };
+		D9857C352F50C08200354EB0 /* SUICoordinator in Frameworks */ = {isa = PBXBuildFile; productRef = D9857C342F50C08200354EB0 /* SUICoordinator */; };
+		D9857C372F50C08200354EB0 /* SUICoordinator16 in Frameworks */ = {isa = PBXBuildFile; productRef = D9857C362F50C08200354EB0 /* SUICoordinator16 */; };
 		D9A4D2162DE65AC900FBAF4E /* NavigationHubCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9A4D2152DE65AC900FBAF4E /* NavigationHubCoordinator.swift */; };
 		D9A4D2182DE65AF600FBAF4E /* MyTabPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9A4D2172DE65AF600FBAF4E /* MyTabPage.swift */; };
 		D9A4D21A2DE65F4700FBAF4E /* DefaultTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9A4D2192DE65F4700FBAF4E /* DefaultTabView.swift */; };
@@ -60,7 +61,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D95389792B643C70000E3357 /* SUICoordinator in Frameworks */,
+				D9857C372F50C08200354EB0 /* SUICoordinator16 in Frameworks */,
+				D9857C352F50C08200354EB0 /* SUICoordinator in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -256,7 +258,8 @@
 			);
 			name = SUICoordinatorExample;
 			packageProductDependencies = (
-				D95389782B643C70000E3357 /* SUICoordinator */,
+				D9857C342F50C08200354EB0 /* SUICoordinator */,
+				D9857C362F50C08200354EB0 /* SUICoordinator16 */,
 			);
 			productName = SUICoordinatorExample;
 			productReference = D953891D2B643BAD000E3357 /* SUICoordinatorExample.app */;
@@ -287,7 +290,7 @@
 			);
 			mainGroup = D95389142B643BAD000E3357;
 			packageReferences = (
-				D95389772B643C70000E3357 /* XCLocalSwiftPackageReference "../.." */,
+				D9857C332F50C08200354EB0 /* XCLocalSwiftPackageReference "../../../SUICoordinator" */,
 			);
 			productRefGroup = D953891E2B643BAD000E3357 /* Products */;
 			projectDirPath = "";
@@ -391,7 +394,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
@@ -449,7 +452,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
@@ -479,7 +482,7 @@
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -516,7 +519,7 @@
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -560,16 +563,20 @@
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
-		D95389772B643C70000E3357 /* XCLocalSwiftPackageReference "../.." */ = {
+		D9857C332F50C08200354EB0 /* XCLocalSwiftPackageReference "../../../SUICoordinator" */ = {
 			isa = XCLocalSwiftPackageReference;
-			relativePath = ../..;
+			relativePath = ../../../SUICoordinator;
 		};
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		D95389782B643C70000E3357 /* SUICoordinator */ = {
+		D9857C342F50C08200354EB0 /* SUICoordinator */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = SUICoordinator;
+		};
+		D9857C362F50C08200354EB0 /* SUICoordinator16 */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = SUICoordinator16;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

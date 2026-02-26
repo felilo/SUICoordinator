@@ -28,7 +28,7 @@ struct CoordinatorActionListView: View {
     
     @Environment(\.isPresented) private var isPresented
     @StateObject var viewModel: CoordinatorActionListViewModel
-    @EnvironmentObject var coordinator: NavigationHubCoordinator
+    @Environment(NavigationHubCoordinator.self) var coordinator
     
     var body: some View {
         ZStack {
@@ -109,5 +109,7 @@ struct CoordinatorActionListView: View {
 }
 
 #Preview {
-    CoordinatorActionListView(viewModel: .init(coordinator: .init()))
+    let coordinator = NavigationHubCoordinator()
+    CoordinatorActionListView(viewModel: .init(coordinator: coordinator))
+        .environment(coordinator)
 }
