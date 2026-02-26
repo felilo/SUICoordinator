@@ -23,6 +23,7 @@
 //
 
 import Foundation
+import Observation
 
 /// A class representing a coordinator for managing and presenting sheets in a coordinator-based architecture.
 ///
@@ -51,28 +52,30 @@ import Foundation
 ///
 /// await sheetCoordinator.presentSheet(viewItem)
 /// ```
-final public class SheetCoordinator<T>: ObservableObject {
-    
+@available(iOS 17.0, *)
+@Observable
+final public class SheetCoordinator<T> {
+
     // ---------------------------------------------------------
     // MARK: typealias
     // ---------------------------------------------------------
-    
+
     /// A type alias representing the sheet item containing a view conforming to the generic type `T`.
     ///
     /// This type alias provides a cleaner way to reference sheet items throughout the coordinator.
     public typealias Item = SheetItem<T>
-    
+
     // ---------------------------------------------------------
     // MARK: Properties
     // ---------------------------------------------------------
-    
+
     /// The stack of sheet items managed by the coordinator.
     ///
     /// Each item in the stack is an optional `SheetItem`. This allows handling cases where
     /// certain items might need to be removed or temporarily set to `nil` during dismissal.
     /// The array maintains the order of presentation, with the first item being the bottom-most sheet.
-    @Published var items: [Item?]
-    
+    var items: [Item?]
+
     /// Thread-safe item manager for coordinating access to sheet items.
     ///
     /// This actor-based manager ensures safe concurrent access to the sheet items,
@@ -84,19 +87,19 @@ final public class SheetCoordinator<T>: ObservableObject {
     /// This property is updated whenever a new sheet is presented. It reflects the most recent
     /// `TransitionPresentationStyle` used in the presentation and helps coordinate dismissal behavior.
     public private(set) var lastPresentationStyle: TransitionPresentationStyle?
-    
+
     /// A boolean value indicating whether the last sheet presentation was animated.
     ///
     /// This property is updated whenever a new sheet is presented, capturing whether
     /// the transition to the presented sheet was animated or not.
     public private(set) var animated: Bool?
-    
+
     /// A backup dictionary storing item-related metadata for cleanup purposes.
     ///
     /// The key is an `Int` identifier representing the item's position, and the value is a `String`
     /// representing the sheet item's identifier. This is used for proper cleanup when items are removed.
     private var backUpItems: [Int: String]
-    
+
     /// A closure that is invoked when a sheet item is removed from the stack.
     ///
     /// The closure receives a `String` value representing the identifier of the removed item.
@@ -105,11 +108,11 @@ final public class SheetCoordinator<T>: ObservableObject {
     ///
     /// - Parameter identifier: The identifier of the removed sheet item.
     var onRemoveItem: ((String) async -> Void)?
-    
+
     // ---------------------------------------------------------
     // MARK: Constructor
     // ---------------------------------------------------------
-    
+
     /// Initializes a new instance of `SheetCoordinator`.
     ///
     /// Creates an empty sheet coordinator ready to manage modal presentations.
@@ -128,11 +131,11 @@ final public class SheetCoordinator<T>: ObservableObject {
         self.backUpItems = backUpItems
         self.onRemoveItem = onRemoveItem
     }
-    
+
     // ---------------------------------------------------------
     // MARK: Computed vars
     // ---------------------------------------------------------
-    
+
     /// The total number of sheet items currently in the stack.
     ///
     /// This computed property provides thread-safe access to the current count of managed sheet items.
@@ -141,18 +144,18 @@ final public class SheetCoordinator<T>: ObservableObject {
     private var totalItems: Int {
         get async { await itemManager.totalItems }
     }
-    
+
     /// A boolean value indicating whether the items stack is empty.
     ///
     /// This computed property provides thread-safe access to check if any sheets are currently managed.
     var areEmptyItems: Bool {
         get async { await itemManager.areItemsEmpty() }
     }
-    
+
     // ---------------------------------------------------------
     // MARK: Helper funcs
     // ---------------------------------------------------------
-    
+
     /// Presents a sheet with the specified item.
     ///
     /// This method adds the sheet item to the managed stack and handles the presentation
@@ -167,12 +170,12 @@ final public class SheetCoordinator<T>: ObservableObject {
     @MainActor public func presentSheet(_ sheet: Item) async -> Void {
         animated = sheet.animated
         lastPresentationStyle = sheet.presentationStyle
-        
+
         await itemManager.addItem(sheet)
         await backUpItems[totalItems] = sheet.id
         await updateItems()
     }
-    
+
     /// Removes the last presented sheet from the stack.
     ///
     /// This method dismisses the most recently presented sheet and handles proper cleanup.
@@ -183,21 +186,21 @@ final public class SheetCoordinator<T>: ObservableObject {
     ///   - animated: A boolean value indicating whether to animate the removal.
     @MainActor func removeLastSheet(animated: Bool) async -> Void {
         guard !(await areEmptyItems) else { return await updateItems() }
-        
+
         self.animated = animated
         let totalItems = await totalItems
-        
+
         await updateLastPresentationStyle()
-        
+
         if lastPresentationStyle?.isCustom == true {
             await itemManager.getItem(at: totalItems)?.willDismiss.send()
         } else {
             await itemManager.makeItemsNil(at: totalItems)
         }
-        
+
         await updateItems()
     }
-    
+
     /// Removes sheets at the specified indices.
     ///
     /// This method allows for bulk removal of sheets at specific positions in the stack.
@@ -208,12 +211,12 @@ final public class SheetCoordinator<T>: ObservableObject {
     ///   - animated: A boolean value indicating whether to animate the removal.
     func removeSheet(at index: [Int], animated: Bool) async -> Void {
         self.animated = animated
-        
+
         await updateLastPresentationStyle()
         await itemManager.makeItemsNil(at: index)
         await updateItems()
     }
-    
+
     /// Removes the item at the specified string index.
     ///
     /// This method handles the removal of a specific sheet item by its string identifier.
@@ -225,22 +228,28 @@ final public class SheetCoordinator<T>: ObservableObject {
         guard let index = Int(index),
               (await itemManager.isValid(index: index))
         else { return await updateItems() }
-        
+
         if let id = backUpItems[index] {
             await onRemoveItem?(id)
             backUpItems.removeValue(forKey: index)
         }
-        
-        guard (await itemManager.removeItem(at: index)) != nil else {
+
+        guard (await itemManager.getItem(at: index)) != nil else {
             await updateLastPresentationStyle()
             return await updateItems()
         }
-        
+
+        await itemManager.makeItemsNil(at: index)
         await handleRemove(index: index - 1)
         await updateLastPresentationStyle()
+        await updateItems()
+
+        // Delay physical compaction so SwiftUI can finish dismissing views
+        // that still hold index-based @Binding references before the array shrinks.
+        try? await Task.sleep(for: .seconds(0.5))
         await removeAllNilItems()
     }
-    
+
     /// Cleans up the sheet coordinator, optionally animating the cleanup process.
     ///
     /// This method provides intelligent cleanup that handles different presentation styles appropriately.
@@ -252,18 +261,18 @@ final public class SheetCoordinator<T>: ObservableObject {
     @MainActor func clean(animated: Bool = true) async -> Void {
         let items = await itemManager.getAllItems()
         var indexes = [0]
-        
+
         if let firstFSIndex = items.firstIndex(where: { $0?.presentationStyle == .fullScreenCover }) {
             indexes = [firstFSIndex]
             if let firstSheetIndex = items.firstIndex(where: { $0 != nil && $0?.presentationStyle != .fullScreenCover }) {
                 indexes.append(firstSheetIndex)
             }
         }
-        
+
         await removeSheet(at: indexes, animated: animated)
         try? await Task.sleep(for: .seconds(animated ? 0.1 : 0))
     }
-    
+
     /// Returns the next index based on the given index.
     ///
     /// This utility method provides a simple way to calculate the next position in the stack.
@@ -283,14 +292,14 @@ final public class SheetCoordinator<T>: ObservableObject {
     ///           or if the items array is empty.
     @MainActor func isLastIndex(_ index: Int) -> Bool {
         let totalItems = items.count - 1
-        
+
         return items.isEmpty || index == totalItems
     }
-    
+
     // ---------------------------------------------------------
     // MARK: Private helper funcs
     // ---------------------------------------------------------
-    
+
     /// Removes all `nil` items from the items array.
     ///
     /// This cleanup method ensures the items array doesn't accumulate nil values,
@@ -299,10 +308,10 @@ final public class SheetCoordinator<T>: ObservableObject {
         await itemManager.removeAllNilItems()
         await updateItems()
     }
-    
-    /// Updates the `items` published property with the current state from the `itemManager`.
+
+    /// Updates the `items` property with the current state from the `itemManager`.
     ///
-    /// This method synchronizes the published items array with the internal item manager state,
+    /// This method synchronizes the tracked items array with the internal item manager state,
     /// triggering UI updates when the sheet stack changes.
     ///
     /// - Important: This function must be called on the main actor to ensure thread safety.
@@ -310,7 +319,7 @@ final public class SheetCoordinator<T>: ObservableObject {
     func updateItems() async {
         items = await itemManager.getAllItems()
     }
-    
+
     /// Updates the `lastPresentationStyle` property based on the last non-nil item in the `itemManager`.
     ///
     /// This method ensures the presentation style tracking remains accurate by finding the
@@ -321,12 +330,12 @@ final public class SheetCoordinator<T>: ObservableObject {
         let presentationStyle = await itemManager.getAllItems().last(where: {
             $0?.presentationStyle != nil
         })??.presentationStyle
-        
+
         guard presentationStyle != lastPresentationStyle else { return }
-        
+
         lastPresentationStyle = presentationStyle
     }
-    
+
     /// Handles the removal of coordinator items from the backup and invokes `onRemoveItem` for each.
     ///
     /// This method is called after an item is removed to clean up associated coordinator data.
@@ -335,10 +344,10 @@ final public class SheetCoordinator<T>: ObservableObject {
     /// - Parameter index: The index from which to start checking for coordinator items to remove.
     private func handleRemove(index: Int) async {
         guard (await itemManager.isValid(index: index)) else { return }
-        
+
         let items = await itemManager.getAllItems()
         let range = index..<items.count
-        
+
         for i in range {
             if let item = items[i],
                item.isCoordinator == true,
@@ -349,7 +358,7 @@ final public class SheetCoordinator<T>: ObservableObject {
             }
         }
     }
-    
+
     /// Retrieves a backup item entry by its identifier value.
     ///
     /// This utility method searches the backup items dictionary to find an entry
