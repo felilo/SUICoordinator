@@ -22,8 +22,8 @@
 //  THE SOFTWARE.
 //
 
-import Combine
 import Foundation
+import Observation
 
 /// A coordinator class for managing tab-based navigation in SwiftUI applications.
 ///
@@ -58,7 +58,7 @@ import Foundation
 /// ```swift
 /// enum MyPage: TabPage {
 ///     case home, profile, settings
-///     
+///
 ///     func coordinator() -> any CoordinatorType {
 ///         switch self {
 ///         case .home: return HomeCoordinator()
@@ -71,86 +71,89 @@ import Foundation
 ///
 /// ## Badge Management
 ///
-/// Set badges on tabs using the `setBadge` publisher:
+/// Set badges on tabs using the `setBadge` method:
 ///
 /// ```swift
-/// tabCoordinator.setBadge.send(("3", .profile)) // Show badge with "3"
-/// tabCoordinator.setBadge.send((nil, .profile)) // Remove badge
+/// tabCoordinator.setBadge(for: .profile, with: "3") // Show badge with "3"
+/// tabCoordinator.setBadge(for: .profile, with: nil)  // Remove badge
 /// ```
+@available(iOS 17.0, *)
+@Observable
 open class TabCoordinator<Page: TabPage>: TabCoordinatable {
-    
+
     // --------------------------------------------------------------------
-    // MARK: Wrapper properties
+    // MARK: Properties
     // --------------------------------------------------------------------
-    
-    /// The published router associated with the tab coordinator.
+
+    /// The router associated with the tab coordinator.
     ///
     /// This router handles the presentation and navigation logic for the tab coordinator itself.
-    @Published public var router: Router<DefaultRoute>
-    
-    /// The array of published pages associated with the tab coordinator.
+    public var router: Router<DefaultRoute>
+
+    /// The array of pages associated with the tab coordinator.
     ///
     /// This array contains all the available tabs that can be displayed in the tab interface.
     /// Changes to this array will automatically update the tab interface.
-    @Published public var pages: [Page] = []
-    
-    /// The published current page associated with the tab coordinator.
+    public var pages: [Page] = []
+
+    /// The current page associated with the tab coordinator.
     ///
     /// This property tracks which tab is currently selected and active. Updates to this
     /// property will trigger tab selection changes in the interface.
-    @Published public var currentPage: Page
-    
+    public var currentPage: Page
+
     // --------------------------------------------------------------------
     // MARK: CoordinatorType properties
     // --------------------------------------------------------------------
-    
+
     /// The unique identifier for the coordinator.
     public var uuid: String
-    
+
     /// The parent coordinator associated with the coordinator.
     ///
     /// This represents the coordinator that presented or contains this tab coordinator.
     public var parent: (any CoordinatorType)?
-    
+
     /// The array of children coordinators associated with the coordinator.
     ///
     /// Each child coordinator corresponds to a tab and manages the navigation flow for that tab.
     /// The `tagId` of each child coordinator matches the position of its corresponding page.
     public var children: [(any CoordinatorType)] = []
-    
+
     /// The tag identifier associated with the coordinator.
     ///
     /// This identifier is used to uniquely identify the coordinator within its parent's children array.
     public var tagId: String?
-    
+
     // --------------------------------------------------------------------
     // MARK: TabCoordinatorType properties
     // --------------------------------------------------------------------
-    
+
     /// The presentation style for the tab coordinator itself.
     ///
     /// This defines how the tab coordinator is presented when started (e.g., as a sheet,
     /// full screen cover, etc.). This is different from the navigation within individual tabs.
     private var presentationStyle: TransitionPresentationStyle
-    
-    /// A subject for setting badge values on specific tabs.
+
+    /// The most recent badge update for a tab.
     ///
-    /// Use this subject to asynchronously update badge values for individual tabs.
-    /// Send a tuple containing the badge value (or nil to remove) and the target page.
-    public let badge: PassthroughSubject<(String?, Page), Never>
-    
+    /// This tracked property replaces the Combine PassthroughSubject. Views observing
+    /// the coordinator automatically react when this value changes, updating the badge UI.
+    /// The tuple contains the badge value (or `nil` to remove) and the target page.
+    public var badge: (String?, Page)?
+
     /// A closure that provides the custom view container for the tab interface.
     ///
     /// This closure receives the `TabCoordinator` instance and returns a view that implements
     /// the tab interface. If you want to use the default tab view, provide `TabViewCoordinator`.
     /// For custom tab interfaces, implement your own view that conforms to the expected interface.
     public var viewContainer: (TabCoordinator<Page>) -> (Page.View)
-    
-    
+
+
     // ---------------------------------------------------------
     // MARK: Constructor
     // ---------------------------------------------------------
-    
+
     /// Initializes a new instance of `TabCoordinator`.
     ///
     /// - Parameters:
@@ -175,20 +178,20 @@ open class TabCoordinator<Page: TabPage>: TabCoordinatable {
         viewContainer: @escaping (TabCoordinator<Page>) -> Page.View
     ) {
         defer { Task { [weak self] in await self?.start() } }
-        
+
         self.router = .init()
         self.uuid = "\(NSStringFromClass(type(of: self))) - \(UUID().uuidString)"
         self.presentationStyle = presentationStyle
         self.currentPage = currentPage
         self.viewContainer = viewContainer
         self.pages = pages
-        self.badge = .init()
+        self.badge = nil
     }
-    
+
     // ---------------------------------------------------------
     // MARK: Coordinator
     // --------------------------------------------------------
-    
+
     /// Starts the tab coordinator and presents the tab interface.
     ///
     /// This method initializes all child coordinators for the provided pages, sets up
@@ -200,10 +203,10 @@ open class TabCoordinator<Page: TabPage>: TabCoordinatable {
     ///              Defaults to `true`.
     open func start() async {
         guard !isRunning else { return }
-        
+
         await setupPages(pages, currentPage: currentPage)
         let cView = viewContainer
-        
+
         await startFlow(
             route: .init(
                 presentationStyle: presentationStyle,
@@ -211,11 +214,11 @@ open class TabCoordinator<Page: TabPage>: TabCoordinatable {
             )
         )
     }
-    
+
     // ---------------------------------------------------------
     // MARK: Helper funcs
     // ---------------------------------------------------------
-    
+
     /// Retrieves the coordinator at a specific position within the tab coordinator.
     ///
     /// This method searches through the child coordinators to find one with a `tagId`
@@ -228,7 +231,7 @@ open class TabCoordinator<Page: TabPage>: TabCoordinatable {
     public func getCoordinator(with page: Page) -> AnyCoordinatorType? {
         children.first { $0.tagId == page.id }
     }
-    
+
     /// Retrieves the currently selected coordinator within the tab coordinator.
     ///
     /// This method finds the child coordinator that corresponds to the currently active tab
@@ -243,11 +246,19 @@ open class TabCoordinator<Page: TabPage>: TabCoordinatable {
         else { throw TabCoordinatorError.coordinatorSelected }
         return children[index]
     }
-    
+
+    /// Sets a badge value for the specified tab page.
+    ///
+    /// Updating this property triggers automatic observation updates in any view
+    /// observing the coordinator, causing the badge UI to refresh.
+    ///
+    /// - Parameters:
+    ///   - page: The tab page to set the badge on.
+    ///   - value: The badge string value, or `nil` to remove the badge.
     public func setBadge(for page: Page, with value: String?) {
-        badge.send((value, page))
+        badge = (value, page)
     }
-    
+
     /// Performs cleanup operations for the tab coordinator.
     ///
     /// This method clears all pages, cleans up the router, and releases resources.

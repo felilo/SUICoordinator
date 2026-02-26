@@ -23,7 +23,6 @@
 //
 
 import Foundation
-import Combine
 
 /// A protocol defining the interface for managing and coordinating tab-based navigation.
 ///
@@ -47,63 +46,63 @@ import Combine
 ///     // Implementation details...
 /// }
 /// ```
+@available(iOS 17.0, *)
 @MainActor
-public protocol TabCoordinatorType: ObservableObject {
-    
+public protocol TabCoordinatorType: AnyObject {
+
     // ---------------------------------------------------------
     // MARK: Associated Type
     // ---------------------------------------------------------
-    
+
     /// The associated type representing the page used by the tab coordinator.
     ///
     /// This must conform to the `TabPage` protocol to ensure the page has the necessary
     /// properties and behavior for tab navigation, including title, icon, position, and
     /// coordinator creation methods.
     associatedtype Page: TabPage
-    
+
     /// A typealias representing a badge item.
     ///
     /// A badge item is a tuple containing an optional `value` (typically a string representing
     /// a notification count or status) and the associated `page` to which the badge belongs.
     /// The value can be `nil` to indicate no badge should be displayed.
     typealias BadgeItem = (value: String?, page: Page)
-    
+
     /// A typealias representing the data source page type.
     ///
     /// This provides a convenient reference to the data source associated with the page type,
     /// which contains the visual representation and configuration data for tabs.
     typealias DataSourcePage = Page.DataSource
-    
-    
+
+
     // ---------------------------------------------------------
     // MARK: Properties
     // ---------------------------------------------------------
-    
+
     /// The currently selected page in the tab coordinator.
     ///
     /// This property tracks the active tab and should be updated when the user switches tabs.
     /// Changes to this property should trigger UI updates in the tab interface.
     var currentPage: Page { get set }
-    
-    /// A publisher for setting badge values on specific pages.
+
+    /// The most recent badge update for a tab.
     ///
-    /// Send badge updates through this subject using a tuple containing the badge value
-    /// (or `nil` to remove the badge) and the target page. The tab interface will
-    /// automatically update to reflect the new badge state.
+    /// When this property changes, views observing the coordinator automatically update the badge UI.
+    /// The tuple contains the badge value (or `nil` to remove) and the target page.
     ///
     /// Example usage:
     /// ```swift
-    /// setBadge.send(("5", myPage)) // Set badge to "5"
-    /// setBadge.send((nil, myPage)) // Remove badge
+    /// tabCoordinator.setBadge(for: myPage, with: "5") // Set badge to "5"
+    /// tabCoordinator.setBadge(for: myPage, with: nil)  // Remove badge
     /// ```
-    var badge: PassthroughSubject<(String?, Page), Never> { get }
-    
+    var badge: (String?, Page)? { get set }
+
     /// An array containing all pages managed by the tab coordinator.
     ///
     /// This array represents the complete list of available tabs. Changes to this array
     /// should trigger updates in the tab interface to add, remove, or reorder tabs.
     var pages: [Page] { get set }
-    
+
     /// A closure that provides the custom view container for the tab interface.
     ///
     /// This closure receives the `TabCoordinator` instance and returns a custom view
@@ -117,12 +116,12 @@ public protocol TabCoordinatorType: ObservableObject {
     /// }
     /// ```
     var viewContainer: (TabCoordinator<Page>) -> (Page.View) { get set }
-    
-    
+
+
     // ---------------------------------------------------------
     // MARK: Functions
     // ---------------------------------------------------------
-    
+
     /// Retrieves the coordinator at a specified position in the tab coordinator.
     ///
     /// This method allows you to access child coordinators by their position in the tab bar,
@@ -139,7 +138,7 @@ public protocol TabCoordinatorType: ObservableObject {
     /// }
     /// ```
     func getCoordinator(with page: Page) -> AnyCoordinatorType?
-    
+
     /// Retrieves the currently selected coordinator within the tab coordinator.
     ///
     /// This method returns the child coordinator that corresponds to the currently
@@ -158,7 +157,7 @@ public protocol TabCoordinatorType: ObservableObject {
     /// }
     /// ```
     func getCoordinatorSelected() throws -> (any CoordinatorType)
-    
+
     /// Performs cleanup operations for the coordinator.
     ///
     /// This method should be called to release resources, clear state, and properly
@@ -168,7 +167,6 @@ public protocol TabCoordinatorType: ObservableObject {
     /// The cleanup process typically includes:
     /// - Releasing child coordinators
     /// - Clearing cached data
-    /// - Canceling active subscriptions
     /// - Resetting internal state
     ///
     /// ## Example Usage
@@ -176,7 +174,7 @@ public protocol TabCoordinatorType: ObservableObject {
     /// await tabCoordinator.clean()
     /// ```
     @MainActor func clean() async
-    
+
     func setBadge(for page: Page, with value: String?)
 }
 
@@ -184,4 +182,5 @@ public protocol TabCoordinatorType: ObservableObject {
 ///
 /// This convenience type alias represents coordinators that can function both as regular
 /// coordinators and as tab coordinators, providing the full functionality of both protocols.
+@available(iOS 17.0, *)
 public typealias TabCoordinatable = CoordinatorType & TabCoordinatorType

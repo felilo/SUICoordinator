@@ -39,7 +39,8 @@ import SwiftUI
 /// - Automatic cleanup and memory management
 /// - Animation control for sheet transitions
 /// - Support for both views and coordinators as sheet content
-public protocol SheetCoordinatorType: ObservableObject {
+@available(iOS 17.0, *)
+public protocol SheetCoordinatorType: AnyObject {
     
     // ---------------------------------------------------------
     // MARK: Type Aliases

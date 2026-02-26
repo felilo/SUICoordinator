@@ -25,13 +25,16 @@
 import SwiftUI
 
 
+@available(iOS 17.0, *)
 public struct CoordinatorView<DataSource: CoordinatorType>: View {
     
     // --------------------------------------------------------------------
     // MARK: Wrapper properties
     // --------------------------------------------------------------------
     
-    @StateObject var dataSource: DataSource
+    // @Observable coordinators are tracked automatically by @State.
+    // No reference-counting wrapper (StateObject) is needed for iOS 17+.
+    @State var dataSource: DataSource
     
     // --------------------------------------------------------------------
     // MARK: Constructor

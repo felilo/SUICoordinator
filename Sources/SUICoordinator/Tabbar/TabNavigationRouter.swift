@@ -32,6 +32,7 @@ import Foundation
 ///
 /// Types conforming to this protocol are responsible for creating and returning
 /// the appropriate coordinator that will handle the navigation logic for a specific tab.
+@available(iOS 17.0, *)
 public protocol TabNavigationRouter: Sendable {
     
     // ---------------------------------------------------------

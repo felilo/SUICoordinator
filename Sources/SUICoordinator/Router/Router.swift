@@ -22,8 +22,8 @@
 //  THE SOFTWARE.
 //
 
-import Combine
 import Foundation
+import Observation
 
 /// A class representing a router in the coordinator pattern.
 ///
@@ -56,57 +56,59 @@ import Foundation
 /// // Pop back
 /// await router.pop(animated: true)
 /// ```
-public class Router<Route: RouteType>: ObservableObject, RouterType {
-    
+@available(iOS 17.0, *)
+@Observable
+public class Router<Route: RouteType>: RouterType {
+
     // --------------------------------------------------------------------
-    // MARK: Wrapper Properties
+    // MARK: Properties
     // --------------------------------------------------------------------
-    
+
     /// The first view in the navigation flow.
     ///
     /// This represents the root view of the navigation hierarchy. When set, it becomes
     /// the base view from which all other navigation operations occur.
-    @Published public var mainView: Route?
-    
+    public var mainView: Route?
+
     /// The array of routes managed by the navigation router.
     ///
     /// This array represents the current navigation stack. Each route in the array
     /// corresponds to a view in the navigation hierarchy, with the last item being
     /// the currently visible view.
-    @Published public var items: [Route] = []
-    
+    public var items: [Route] = []
+
     /// The sheet coordinator for presenting sheets.
     ///
     /// This coordinator manages all modal presentations (sheets, full-screen covers, etc.)
     /// and provides a unified interface for modal navigation operations.
-    @Published public var sheetCoordinator: SheetCoordinator<AnyViewAlias> = .init()
-    
+    public var sheetCoordinator: SheetCoordinator<AnyViewAlias> = .init()
+
     /// Controls whether navigation operations should be animated.
     ///
     /// This property affects all navigation operations performed by the router.
     /// When `true`, transitions are animated; when `false`, they occur immediately.
     public var animated: Bool = true
-    
+
     /// Thread-safe item manager for navigation stack operations.
     ///
     /// This actor-based manager ensures safe concurrent access to the navigation items,
     /// preventing race conditions during navigation operations.
     private let itemManager = ItemManager<Route>()
-    
+
     // --------------------------------------------------------------------
     // MARK: Constructor
     // --------------------------------------------------------------------
-    
+
     /// Creates a new instance of the navigation router.
     ///
     /// Initializes an empty router ready to handle navigation operations.
     /// The router starts with no navigation stack and no presented sheets.
     public init() { }
-    
+
     // --------------------------------------------------------------------
     // MARK: RouterType
     // --------------------------------------------------------------------
-    
+
     /// Navigates to a specified route with optional presentation style and animation.
     ///
     /// This method handles navigation to a new route, automatically determining whether
@@ -135,7 +137,7 @@ public class Router<Route: RouteType>: ObservableObject, RouterType {
             presentationStyle: presentationStyle,
             animated: animated)
     }
-    
+
     /// Presents a view or coordinator with optional presentation style and animation.
     ///
     /// This method handles modal presentation of routes, creating sheet items and
@@ -150,24 +152,24 @@ public class Router<Route: RouteType>: ObservableObject, RouterType {
     /// - Note: If the presentation style is `.push`, this method delegates to `navigate(toRoute:)`.
     @MainActor public func present(_ view: Route, presentationStyle: TransitionPresentationStyle? = nil, animated: Bool = true) async -> Void {
         self.animated = animated
-        
+
         if (presentationStyle ?? view.presentationStyle) == .push {
             return await navigate(
                 toRoute: view,
                 presentationStyle: presentationStyle,
                 animated: animated)
         }
-        
+
         let item = SheetItem(
             id: "\(view.id) - \(UUID())",
             animated: animated,
             presentationStyle: presentationStyle ?? view.presentationStyle,
             view: { view as AnyViewAlias }
         )
-        
+
         await presentSheet(item: item)
     }
-    
+
     /// Pops the top view or coordinator from the navigation stack.
     ///
     /// This method removes the most recent item from the navigation stack,
@@ -182,7 +184,7 @@ public class Router<Route: RouteType>: ObservableObject, RouterType {
         await self.handlePopAction()
         await self.updateItems()
     }
-    
+
     /// Pops to the root of the navigation stack.
     ///
     /// This method removes all items from the navigation stack, returning to
@@ -192,7 +194,7 @@ public class Router<Route: RouteType>: ObservableObject, RouterType {
     ///   - animated: A boolean value indicating whether to animate the pop action.
     @MainActor public func popToRoot(animated: Bool = true) async -> Void {
         self.animated = animated
-        
+
         await itemManager.removeAll()
         await updateItems()
     }
@@ -209,7 +211,7 @@ public class Router<Route: RouteType>: ObservableObject, RouterType {
     @MainActor public func dismiss(animated: Bool = true) async -> Void {
         await sheetCoordinator.removeLastSheet(animated: animated)
     }
-    
+
     /// Closes the current view or coordinator.
     ///
     /// - Parameters:
@@ -217,7 +219,7 @@ public class Router<Route: RouteType>: ObservableObject, RouterType {
     @MainActor public func close(animated: Bool = true) async -> Void {
         await close(animated: animated, finishFlow: false)
     }
-    
+
     /// Cleans up the current view or coordinator, optionally preserving the main view.
     ///
     /// This method performs a complete cleanup of the router state, removing all
@@ -230,10 +232,10 @@ public class Router<Route: RouteType>: ObservableObject, RouterType {
     @MainActor public func clean(animated: Bool, withMainView: Bool = true) async -> Void {
         await popToRoot(animated: false)
         sheetCoordinator = .init()
-        
+
         if withMainView { mainView = nil }
     }
-    
+
     /// Restarts the current view or coordinator, optionally animating the restart.
     ///
     /// This method provides a complete restart of the navigation state, cleaning up
@@ -245,20 +247,14 @@ public class Router<Route: RouteType>: ObservableObject, RouterType {
         if sheetCoordinator.items.isEmpty {
             await popToRoot(animated: animated)
         } else {
-            if #available(iOS 17.0, *) {
-                await popToRoot(animated: false)
-            } else {
-                async let  _ =  await popToRoot(animated: true)
-                try? await Task.sleep(for: .seconds(0.2))
-            }
-            
+            await popToRoot(animated: false)
             await sheetCoordinator.clean(animated: animated)
             self.animated = animated
-            
+
             sheetCoordinator = .init()
         }
     }
-    
+
     /// Presents a sheet with a specified item.
     ///
     /// This internal method handles the actual presentation of sheet items
@@ -269,17 +265,17 @@ public class Router<Route: RouteType>: ObservableObject, RouterType {
     @MainActor func presentSheet(item: SheetItem<AnyViewAlias>) async -> Void {
         await sheetCoordinator.presentSheet(item)
     }
-    
+
     /// Handles the pop action by updating the navigation stack.
     ///
     /// This private method performs the actual removal of the last item
     /// from the navigation stack during pop operations.
     private func handlePopAction() async {
         guard !(await itemManager.areItemsEmpty()) else { return }
-        
+
         await itemManager.removeLastItem()
     }
-    
+
     /// Updates the published items array with the current navigation stack state.
     ///
     /// This method synchronizes the published items array with the internal
@@ -287,12 +283,12 @@ public class Router<Route: RouteType>: ObservableObject, RouterType {
     @MainActor
     func updateItems() async {
         let itemsManager = await itemManager.getAllItems()
-        
+
         guard items != itemsManager else { return }
-        
+
         items = itemsManager
     }
-    
+
     /// Synchronizes the router's items array with the internal item manager state.
     ///
     /// This method ensures consistency between the published items array and the internal
@@ -310,13 +306,13 @@ public class Router<Route: RouteType>: ObservableObject, RouterType {
     public func syncItems() async {
         let counterManagerItems = await itemManager.getAllItems().count
         let counterItems = items.count
-        
+
         if counterItems != counterManagerItems {
             await itemManager.setItems(items)
             await updateItems()
         }
     }
-    
+
     /// Closes the current view or sheet, optionally finishing the associated flow.
     ///
     /// This method intelligently determines whether to dismiss a modal presentation
@@ -332,7 +328,7 @@ public class Router<Route: RouteType>: ObservableObject, RouterType {
             if finishFlow {
                 try? await Task.sleep(for: .milliseconds(animated ? 600 : 100))
             }
-            
+
         } else if !(await itemManager.areItemsEmpty()) {
             await pop(animated: animated)
         }

@@ -22,6 +22,7 @@
 //  THE SOFTWARE.
 //
 
+@available(iOS 17.0, *)
 extension TabCoordinatorType {
     
     /// Sets the current page for the tab coordinator based on a child coordinator.

@@ -23,36 +23,32 @@
 //
 
 import SwiftUI
-import Combine
 
+@available(iOS 17.0, *)
 struct SheetCoordinatorView: ViewModifier {
-    
+
     // ---------------------------------------------------------
     // MARK: typealias
     // ---------------------------------------------------------
-    
+
     typealias Action = ((String) -> Void)
     typealias Value = AnyViewAlias
-    
-    // ---------------------------------------------------------
-    // MARK: Wrapper Properties
-    // ---------------------------------------------------------
-    
-    @ObservedObject var coordinator: SheetCoordinator<Value>
-    @State var index = 0
-    
+
     // ---------------------------------------------------------
     // MARK: Properties
     // ---------------------------------------------------------
-    
-    public var isLast: Bool
-    public var onDissmis: ActionClosure?
-    public var onDidLoad: ActionClosure?
-    
+
+    // @Bindable enables two-way binding to @Observable objects.
+    @Bindable var coordinator: SheetCoordinator<Value>
+    @State var index: Int
+    var isLast: Bool
+    var onDissmis: ActionClosure?
+    var onDidLoad: ActionClosure?
+
     // ---------------------------------------------------------
     // MARK: ViewModifier
     // ---------------------------------------------------------
-    
+
     @ViewBuilder
     func body(content: Content) -> some View {
         content
@@ -71,16 +67,8 @@ struct SheetCoordinatorView: ViewModifier {
                 }
             }
     }
-    
-    // ---------------------------------------------------------
-    // MARK: Helper Views
-    // ---------------------------------------------------------
-    
-    
-    private func buildContent(
-        with index: Int,
-        item: SheetItem<Value>
-    ) -> some View {
+
+    private func buildContent(with index: Int, item: SheetItem<AnyViewAlias>) -> some View {
         let view = item.view()?.asAnyView()
             .sheetCoordinator(
                 coordinator: coordinator,
@@ -89,15 +77,11 @@ struct SheetCoordinatorView: ViewModifier {
                 onDissmis: onDissmis,
                 onDidLoad: onDidLoad
             )
-            
         return addSheet(to: view, with: item.presentationStyle)
     }
-    
+
     @ViewBuilder
-    private func addSheet(
-        to content: some View,
-        with presentationStyle: TransitionPresentationStyle
-    ) -> some View {
+    private func addSheet(to content: some View, with presentationStyle: TransitionPresentationStyle) -> some View {
         switch presentationStyle {
             case .detents(let data): content.presentationDetents(data)
             default: content

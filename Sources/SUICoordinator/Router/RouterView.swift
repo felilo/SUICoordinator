@@ -23,61 +23,65 @@
 //
 
 import SwiftUI
-import Combine
 
+@available(iOS 17.0, *)
 struct RouterView<C: CoordinatorType>: View {
-    
+
     // --------------------------------------------------------------------
     // MARK: Properties
     // --------------------------------------------------------------------
-    
-    @StateObject private var viewModel: Router<C.Route>
-    private  let coordinator: C
-    
+
+    // Router is @Observable — @State provides the view graph subscription.
+    @State private var viewModel: Router<C.Route>
+    private let coordinator: C
+
     // --------------------------------------------------------------------
     // MARK: Constructor
     // --------------------------------------------------------------------
-    
+
     public init(coordinator: C) {
         self._viewModel = .init(wrappedValue: coordinator.router)
         self.coordinator = coordinator
     }
-    
+
     // --------------------------------------------------------------------
     // MARK: View
     // --------------------------------------------------------------------
-    
+
     var body: some View {
         ZStack { buildBody() }
             .clearModalBackground(coordinator.isTabCoordinable)
     }
-    
+
     // --------------------------------------------------------------------
     // MARK: View helper functions
     // --------------------------------------------------------------------
-    
-    
+
     @ViewBuilder
     private func buildBody() -> some View {
         Group {
             if coordinator.isTabCoordinable {
                 viewModel.mainView
-            } else if let mainView = viewModel.mainView  {
+            } else if let mainView = viewModel.mainView {
                 let view = NavigationStack(
                     path: $viewModel.items,
                     root: { mainView.navigationDestination(for: C.Route.self) { $0 } }
                 )
                 .transaction { $0.disablesAnimations = !viewModel.animated }
-                .onChange(of: viewModel.items, perform: onChangeItems)
-                
+                .onChange(of: viewModel.items) { _, _ in
+                    Task { await viewModel.syncItems() }
+                }
+
                 addSheetTo(view: view)
             }
         }
     }
-    
+
     @ViewBuilder
     private func addSheetTo(view: (some View)?) -> some View {
-        view.environmentObject(coordinator)
+        // .environment(_:) is used instead of .environmentObject(_:) because
+        // @Observable classes use the value-based environment system on iOS 17+.
+        view.environment(coordinator)
             .sheetCoordinator(
             coordinator: viewModel.sheetCoordinator,
             onDissmis: { index in Task(priority: .high) { @MainActor [weak viewModel] in
@@ -85,13 +89,5 @@ struct RouterView<C: CoordinatorType>: View {
             }},
             onDidLoad: nil
         )
-    }
-    
-    // --------------------------------------------------------------------
-    // MARK: Helper functions
-    // --------------------------------------------------------------------
-    
-    private func onChangeItems(_ value: [C.Route]) {
-        Task { await viewModel.syncItems() }
     }
 }

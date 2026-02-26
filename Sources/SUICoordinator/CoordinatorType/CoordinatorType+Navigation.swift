@@ -24,6 +24,7 @@
 
 import Foundation
 
+@available(iOS 17.0, *)
 public extension CoordinatorType {
     
     /// Returns the coordinator that is currently visible to the user.

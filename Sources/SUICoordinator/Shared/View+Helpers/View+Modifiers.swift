@@ -25,7 +25,8 @@
 import SwiftUI
 
 extension View {
-    
+
+    @available(iOS 17.0, *)
     func sheetCoordinator(
         coordinator: SheetCoordinator<AnyViewAlias>,
         index: Int = 0,
@@ -43,12 +44,12 @@ extension View {
             )
         )
     }
-    
+
     func onViewDidLoad(perform action: (() -> Void)? = nil) -> some View {
         self.modifier(ViewDidLoadModifier(action: action))
     }
-    
-    func clearModalBackground(_ condition: Bool = true)->some View {
+
+    func clearModalBackground(_ condition: Bool = true) -> some View {
         self.modifier(ClearBackgroundViewModifier(condition: condition))
     }
 }

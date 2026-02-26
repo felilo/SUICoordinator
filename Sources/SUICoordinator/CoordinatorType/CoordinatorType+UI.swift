@@ -29,6 +29,7 @@ import SwiftUI
 /// This extension bridges the gap between coordinators and SwiftUI by providing
 /// methods to convert coordinators into SwiftUI views that can be integrated
 /// into the view hierarchy.
+@available(iOS 17.0, *)
 public extension CoordinatorType {
     
     /// Creates and returns a SwiftUI view representation of the coordinator.

@@ -30,7 +30,8 @@ import Combine
 ///
 /// Routers are responsible for the actual navigation and presentation of
 /// views or coordinators within a coordinator-based architecture.
-public protocol RouterType: ObservableObject {
+@available(iOS 17.0, *)
+public protocol RouterType: AnyObject {
     
     // --------------------------------------------------------------------
     // MARK: Associated Type

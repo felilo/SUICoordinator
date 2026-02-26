@@ -23,6 +23,7 @@
 //
 
 import Foundation
+import Observation
 
 /// A protocol representing a coordinator in the coordinator pattern.
 ///
@@ -30,8 +31,9 @@ import Foundation
 /// of a specific module or feature in an application.
 ///
 /// - Important: Adopt this protocol in your custom coordinator implementations.
+@available(iOS 17.0, *)
 @MainActor
-public protocol CoordinatorType: SCHashable, ObservableObject {
+public protocol CoordinatorType: SCHashable, AnyObject, Observable {
     
     // ---------------------------------------------------------
     // MARK: Associated Type
