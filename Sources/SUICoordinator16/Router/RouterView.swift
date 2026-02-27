@@ -32,7 +32,7 @@ struct RouterView<C: CoordinatorType>: View {
     // --------------------------------------------------------------------
     
     @StateObject private var viewModel: Router<C.Route>
-    private  let coordinator: C
+    private let coordinator: C
     
     // --------------------------------------------------------------------
     // MARK: Constructor
@@ -56,13 +56,12 @@ struct RouterView<C: CoordinatorType>: View {
     // MARK: View helper functions
     // --------------------------------------------------------------------
     
-    
     @ViewBuilder
     private func buildBody() -> some View {
         Group {
             if coordinator.isTabCoordinable {
                 viewModel.mainView
-            } else if let mainView = viewModel.mainView  {
+            } else if let mainView = viewModel.mainView {
                 let view = NavigationStack(
                     path: $viewModel.items,
                     root: { mainView.navigationDestination(for: C.Route.self) { $0 } }

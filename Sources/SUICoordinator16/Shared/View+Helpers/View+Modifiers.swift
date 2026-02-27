@@ -1,5 +1,5 @@
 //
-//  ViewDidLoadModifier.swift
+//  View+Modifiers.swift
 //
 //  Copyright (c) Andres F. Lozano
 //
@@ -25,7 +25,7 @@
 import SwiftUI
 
 extension View {
-    
+
     func sheetCoordinator(
         coordinator: SheetCoordinator<AnyViewAlias>,
         index: Int = 0,
@@ -36,11 +36,11 @@ extension View {
         modifier(
             SheetCoordinatorView(
                 coordinator: coordinator,
+                index: index,
                 isLast: isLast,
                 onDissmis: onDissmis,
                 onDidLoad: onDidLoad
             )
         )
     }
-    
 }

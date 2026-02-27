@@ -1,5 +1,5 @@
 //
-//  SheetCoordinating.swift
+//  SheetCoordinatorView.swift
 //
 //  Copyright (c) Andres F. Lozano
 //
@@ -26,63 +26,19 @@ import SwiftUI
 import Combine
 
 struct SheetCoordinatorView: ViewModifier {
-
-    // ---------------------------------------------------------
-    // MARK: typealias
-    // ---------------------------------------------------------
-
+    
     typealias Action = ((String) -> Void)
     typealias Value = AnyViewAlias
-
-    // ---------------------------------------------------------
-    // MARK: Properties
-    // ---------------------------------------------------------
-
-    let coordinator: SheetCoordinator<Value>
-    var isLast: Bool
-    var onDissmis: ActionClosure?
-    var onDidLoad: ActionClosure?
-
-    // ---------------------------------------------------------
-    // MARK: ViewModifier
-    // ---------------------------------------------------------
-
+    
+    @ObservedObject var coordinator: SheetCoordinator<Value>
+    @State var index = 0
+    
+    public var isLast: Bool
+    public var onDissmis: ActionClosure?
+    public var onDidLoad: ActionClosure?
+    
     @ViewBuilder
     func body(content: Content) -> some View {
-        if #available(iOS 17.0, *) {
-            NewSheetContainer(
-                coordinator: coordinator,
-                isLast: isLast,
-                onDissmis: onDissmis,
-                onDidLoad: onDidLoad,
-                content: content
-            )
-        } else {
-            OldSheetContainer(
-                coordinator: coordinator,
-                isLast: isLast,
-                onDissmis: onDissmis,
-                onDidLoad: onDidLoad,
-                content: content
-            )
-        }
-    }
-}
-
-
-// iOS 17+ Container
-// When SheetCoordinator adopts @Observable, replace @ObservedObject with @Bindable here.
-@available(iOS 17.0, *)
-private struct NewSheetContainer<Content: View>: View {
-
-    @ObservedObject var coordinator: SheetCoordinator<AnyViewAlias>
-    @State var index = 0
-    var isLast: Bool
-    var onDissmis: ActionClosure?
-    var onDidLoad: ActionClosure?
-    let content: Content
-
-    var body: some View {
         content
             .overlay {
                 VStack {
@@ -99,8 +55,11 @@ private struct NewSheetContainer<Content: View>: View {
                 }
             }
     }
-
-    private func buildContent(with index: Int, item: SheetItem<AnyViewAlias>) -> some View {
+    
+    private func buildContent(
+        with index: Int,
+        item: SheetItem<Value>
+    ) -> some View {
         let view = item.view()?.asAnyView()
             .sheetCoordinator(
                 coordinator: coordinator,
@@ -111,66 +70,18 @@ private struct NewSheetContainer<Content: View>: View {
             )
         return addSheet(to: view, with: item.presentationStyle)
     }
-
+    
     @ViewBuilder
-    private func addSheet(to content: some View, with presentationStyle: TransitionPresentationStyle) -> some View {
+    private func addSheet(
+        to content: some View,
+        with presentationStyle: TransitionPresentationStyle
+    ) -> some View {
         switch presentationStyle {
             case .detents(let data): content.presentationDetents(data)
             default: content
         }
     }
 }
-
-
-// iOS 16 Container
-private struct OldSheetContainer<Content: View>: View {
-
-    @ObservedObject var coordinator: SheetCoordinator<AnyViewAlias>
-    @State var index = 0
-    var isLast: Bool
-    var onDissmis: ActionClosure?
-    var onDidLoad: ActionClosure?
-    let content: Content
-
-    var body: some View {
-        content
-            .overlay {
-                VStack {
-                    SheetView(
-                        index: index,
-                        items: $coordinator.items,
-                        transitionStyle: coordinator.lastPresentationStyle,
-                        animated: coordinator.animated ?? true,
-                        content: buildContent,
-                        onDismiss: onDissmis,
-                        onDidLoad: onDidLoad
-                    )
-                    .hidden($coordinator.items.isEmpty || isLast)
-                }
-            }
-    }
-
-    private func buildContent(with index: Int, item: SheetItem<AnyViewAlias>) -> some View {
-        let view = item.view()?.asAnyView()
-            .sheetCoordinator(
-                coordinator: coordinator,
-                index: coordinator.getNextIndex(index),
-                isLast: coordinator.isLastIndex(index),
-                onDissmis: onDissmis,
-                onDidLoad: onDidLoad
-            )
-        return addSheet(to: view, with: item.presentationStyle)
-    }
-
-    @ViewBuilder
-    private func addSheet(to content: some View, with presentationStyle: TransitionPresentationStyle) -> some View {
-        switch presentationStyle {
-            case .detents(let data): content.presentationDetents(data)
-            default: content
-        }
-    }
-}
-
 
 extension View {
     func hidden(_ isHidden: Bool) -> some View {

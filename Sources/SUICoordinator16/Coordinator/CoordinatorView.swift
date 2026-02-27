@@ -24,7 +24,6 @@
 
 import SwiftUI
 
-
 public struct CoordinatorView<DataSource: CoordinatorType>: View {
     
     // --------------------------------------------------------------------
