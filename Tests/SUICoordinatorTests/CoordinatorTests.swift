@@ -26,6 +26,7 @@ import XCTest
 import Combine
 @testable import SUICoordinator
 
+@available(iOS 17.0, *)
 final class CoordinatorTests: XCTestCase {
     
     private let animated: Bool = false

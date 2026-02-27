@@ -34,6 +34,7 @@ extension XCTestCase {
         }
     }
     
+    @available(iOS 17.0, *)
     @MainActor func navigateToCoordinator(
         _ nextCoordinator: (any CoordinatorType),
         in coordinator: (any CoordinatorType),
@@ -48,6 +49,7 @@ extension XCTestCase {
         await nextCoordinator.start()
     }
     
+    @available(iOS 17.0, *)
     @MainActor func finishFlow(sut: (any CoordinatorType), animated: Bool = false) async {
         await sut.finishFlow(animated: animated)
     }

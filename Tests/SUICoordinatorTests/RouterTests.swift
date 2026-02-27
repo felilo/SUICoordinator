@@ -26,6 +26,7 @@ import XCTest
 @testable import SUICoordinator
 
 
+@available(iOS 17.0, *)
 final class RouterTests: XCTestCase {
     
     @MainActor func test_navigationStack_pushToRoute() async throws {
