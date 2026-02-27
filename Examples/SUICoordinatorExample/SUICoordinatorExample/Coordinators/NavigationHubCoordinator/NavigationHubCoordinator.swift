@@ -32,11 +32,9 @@ class NavigationHubCoordinator: Coordinator<DefaultRoute> {
     // ---------------------------------------------------------------------
     
     override func start() async {
-        let viewModel = CoordinatorActionListViewModel(coordinator: self)
-        
         let route = DefaultRoute(
             presentationStyle: .push,
-            content: { CoordinatorActionListView(viewModel: viewModel) }
+            content: { CoordinatorActionListView() }
         )
         
         await startFlow(route: route )

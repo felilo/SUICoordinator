@@ -21,6 +21,7 @@
 		D9630FFF2DE6B73800796C0C /* CoordinatorActionListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9630FFE2DE6B73800796C0C /* CoordinatorActionListView.swift */; };
 		D9857C352F50C08200354EB0 /* SUICoordinator in Frameworks */ = {isa = PBXBuildFile; productRef = D9857C342F50C08200354EB0 /* SUICoordinator */; };
 		D9857C3C2F51E98B00354EB0 /* SUICoordinator in Frameworks */ = {isa = PBXBuildFile; productRef = D9857C3B2F51E98B00354EB0 /* SUICoordinator */; };
+		D9857C3F2F523EF100354EB0 /* SUICoordinator16 in Frameworks */ = {isa = PBXBuildFile; productRef = D9857C3E2F523EF100354EB0 /* SUICoordinator16 */; };
 		D9A4D2162DE65AC900FBAF4E /* NavigationHubCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9A4D2152DE65AC900FBAF4E /* NavigationHubCoordinator.swift */; };
 		D9A4D2182DE65AF600FBAF4E /* MyTabPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9A4D2172DE65AF600FBAF4E /* MyTabPage.swift */; };
 		D9A4D21A2DE65F4700FBAF4E /* DefaultTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9A4D2192DE65F4700FBAF4E /* DefaultTabView.swift */; };
@@ -64,6 +65,7 @@
 			files = (
 				D9857C3C2F51E98B00354EB0 /* SUICoordinator in Frameworks */,
 				D9857C352F50C08200354EB0 /* SUICoordinator in Frameworks */,
+				D9857C3F2F523EF100354EB0 /* SUICoordinator16 in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -84,6 +86,7 @@
 				D953891F2B643BAD000E3357 /* SUICoordinatorExample */,
 				D953891E2B643BAD000E3357 /* Products */,
 				D9857C382F50ECA200354EB0 /* SUICoordinatorExampleUITests */,
+				D9857C3D2F523EF100354EB0 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -161,6 +164,13 @@
 				D9857C392F50ECB600354EB0 /* SheetDismissalUITests.swift */,
 			);
 			path = SUICoordinatorExampleUITests;
+			sourceTree = "<group>";
+		};
+		D9857C3D2F523EF100354EB0 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 		D9B455CE2B643FBD004DD03A /* App */ = {
@@ -270,6 +280,7 @@
 			packageProductDependencies = (
 				D9857C342F50C08200354EB0 /* SUICoordinator */,
 				D9857C3B2F51E98B00354EB0 /* SUICoordinator */,
+				D9857C3E2F523EF100354EB0 /* SUICoordinator16 */,
 			);
 			productName = SUICoordinatorExample;
 			productReference = D953891D2B643BAD000E3357 /* SUICoordinatorExample.app */;
@@ -479,7 +490,6 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_IDENTITY = "Apple Development";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"SUICoordinatorExample/Preview Content\"";
@@ -587,6 +597,11 @@
 		D9857C3B2F51E98B00354EB0 /* SUICoordinator */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = SUICoordinator;
+		};
+		D9857C3E2F523EF100354EB0 /* SUICoordinator16 */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D9857C3A2F51E98B00354EB0 /* XCLocalSwiftPackageReference "../../../SUICoordinator" */;
+			productName = SUICoordinator16;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

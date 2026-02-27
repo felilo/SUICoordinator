@@ -27,7 +27,6 @@ import SwiftUI
 struct CoordinatorActionListView: View {
     
     @Environment(\.isPresented) private var isPresented
-    @StateObject var viewModel: CoordinatorActionListViewModel
     @Environment(NavigationHubCoordinator.self) var coordinator
     
     var body: some View {
@@ -54,7 +53,7 @@ struct CoordinatorActionListView: View {
             }
             .toolbar {
                 Button {
-                    Task { await viewModel.finsh() }
+                    Task { await coordinator.finishFlow() }
                 } label: {
                     Text("Finish flow")
                 }
@@ -110,6 +109,6 @@ struct CoordinatorActionListView: View {
 
 #Preview {
     let coordinator = NavigationHubCoordinator()
-    CoordinatorActionListView(viewModel: .init(coordinator: coordinator))
+    CoordinatorActionListView()
         .environment(coordinator)
 }
