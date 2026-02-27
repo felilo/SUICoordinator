@@ -46,11 +46,13 @@ struct NavigationActionListDetailView: View {
             List {
                 actionRowButton(title: "Navigate To PushView") { await viewModel.navigateToPushView() }
                 actionRowButton(title: "Presents SheetView") { await viewModel.presentSheet() }
+                    .accessibilityIdentifier("btn_presentsSheetView")
                 actionRowButton(title: "Presents FullscreenView") { await viewModel.presentFullscreen() }
                 actionRowButton(title: "Presents DetentsView") { await viewModel.presentDetentsView() }
                 actionRowButton(title: "Presents View With Custom Presentation") { await viewModel.presentViewWithCustomPresentation() }
                 actionRowButton(title: "Restart Coordinator") { await viewModel.restartCoordinator() }
                 actionRowButton(title: "Close View") { await viewModel.close() }
+                    .accessibilityIdentifier("btn_closeView")
                 actionRowButton(title: "Finish Coordinator") { await viewModel.finish() }
             }
             .scrollContentBackground(.hidden)

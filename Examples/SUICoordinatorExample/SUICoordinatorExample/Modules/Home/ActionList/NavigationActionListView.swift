@@ -36,10 +36,12 @@ struct NavigationActionListView: View {
                 actionRowButton(title: "Push NavigationView", systemImage: "arrow.forward.square.fill") {
                     await coordinator.navigateToPushView()
                 }
-                
+                .accessibilityIdentifier("btn_pushNavigationView")
+
                 actionRowButton(title: "Presents SheetView", systemImage: "rectangle.bottomthird.inset.fill") {
                     await coordinator.presentSheet()
                 }
+                .accessibilityIdentifier("btn_presentsSheetView")
                 
                 actionRowButton(title: "Presents FullscreenView", systemImage: "rectangle.fill.on.rectangle.fill") {
                     await coordinator.presentFullscreen()

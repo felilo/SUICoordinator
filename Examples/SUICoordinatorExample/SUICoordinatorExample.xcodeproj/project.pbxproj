@@ -20,7 +20,7 @@
 		D9630FFD2DE6B6EB00796C0C /* CoordinatorActionListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9630FFC2DE6B6EB00796C0C /* CoordinatorActionListViewModel.swift */; };
 		D9630FFF2DE6B73800796C0C /* CoordinatorActionListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9630FFE2DE6B73800796C0C /* CoordinatorActionListView.swift */; };
 		D9857C352F50C08200354EB0 /* SUICoordinator in Frameworks */ = {isa = PBXBuildFile; productRef = D9857C342F50C08200354EB0 /* SUICoordinator */; };
-		D9857C372F50C08200354EB0 /* SUICoordinator16 in Frameworks */ = {isa = PBXBuildFile; productRef = D9857C362F50C08200354EB0 /* SUICoordinator16 */; };
+		D9857C3C2F51E98B00354EB0 /* SUICoordinator in Frameworks */ = {isa = PBXBuildFile; productRef = D9857C3B2F51E98B00354EB0 /* SUICoordinator */; };
 		D9A4D2162DE65AC900FBAF4E /* NavigationHubCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9A4D2152DE65AC900FBAF4E /* NavigationHubCoordinator.swift */; };
 		D9A4D2182DE65AF600FBAF4E /* MyTabPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9A4D2172DE65AF600FBAF4E /* MyTabPage.swift */; };
 		D9A4D21A2DE65F4700FBAF4E /* DefaultTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9A4D2192DE65F4700FBAF4E /* DefaultTabView.swift */; };
@@ -46,6 +46,7 @@
 		D95959E52DF791CE00E8CE28 /* CustomTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTabView.swift; sourceTree = "<group>"; };
 		D9630FFC2DE6B6EB00796C0C /* CoordinatorActionListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoordinatorActionListViewModel.swift; sourceTree = "<group>"; };
 		D9630FFE2DE6B73800796C0C /* CoordinatorActionListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoordinatorActionListView.swift; sourceTree = "<group>"; };
+		D9857C392F50ECB600354EB0 /* SheetDismissalUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SheetDismissalUITests.swift; sourceTree = "<group>"; };
 		D9A4D2152DE65AC900FBAF4E /* NavigationHubCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationHubCoordinator.swift; sourceTree = "<group>"; };
 		D9A4D2172DE65AF600FBAF4E /* MyTabPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyTabPage.swift; sourceTree = "<group>"; };
 		D9A4D2192DE65F4700FBAF4E /* DefaultTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultTabView.swift; sourceTree = "<group>"; };
@@ -61,7 +62,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D9857C372F50C08200354EB0 /* SUICoordinator16 in Frameworks */,
+				D9857C3C2F51E98B00354EB0 /* SUICoordinator in Frameworks */,
 				D9857C352F50C08200354EB0 /* SUICoordinator in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -82,6 +83,7 @@
 			children = (
 				D953891F2B643BAD000E3357 /* SUICoordinatorExample */,
 				D953891E2B643BAD000E3357 /* Products */,
+				D9857C382F50ECA200354EB0 /* SUICoordinatorExampleUITests */,
 			);
 			sourceTree = "<group>";
 		};
@@ -151,6 +153,14 @@
 				D9204C0B2DE661EC004D632D /* MyTabPageDataSource.swift */,
 			);
 			path = Shared;
+			sourceTree = "<group>";
+		};
+		D9857C382F50ECA200354EB0 /* SUICoordinatorExampleUITests */ = {
+			isa = PBXGroup;
+			children = (
+				D9857C392F50ECB600354EB0 /* SheetDismissalUITests.swift */,
+			);
+			path = SUICoordinatorExampleUITests;
 			sourceTree = "<group>";
 		};
 		D9B455CE2B643FBD004DD03A /* App */ = {
@@ -259,7 +269,7 @@
 			name = SUICoordinatorExample;
 			packageProductDependencies = (
 				D9857C342F50C08200354EB0 /* SUICoordinator */,
-				D9857C362F50C08200354EB0 /* SUICoordinator16 */,
+				D9857C3B2F51E98B00354EB0 /* SUICoordinator */,
 			);
 			productName = SUICoordinatorExample;
 			productReference = D953891D2B643BAD000E3357 /* SUICoordinatorExample.app */;
@@ -290,7 +300,7 @@
 			);
 			mainGroup = D95389142B643BAD000E3357;
 			packageReferences = (
-				D9857C332F50C08200354EB0 /* XCLocalSwiftPackageReference "../../../SUICoordinator" */,
+				D9857C3A2F51E98B00354EB0 /* XCLocalSwiftPackageReference "../../../SUICoordinator" */,
 			);
 			productRefGroup = D953891E2B643BAD000E3357 /* Products */;
 			projectDirPath = "";
@@ -563,7 +573,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
-		D9857C332F50C08200354EB0 /* XCLocalSwiftPackageReference "../../../SUICoordinator" */ = {
+		D9857C3A2F51E98B00354EB0 /* XCLocalSwiftPackageReference "../../../SUICoordinator" */ = {
 			isa = XCLocalSwiftPackageReference;
 			relativePath = ../../../SUICoordinator;
 		};
@@ -574,9 +584,9 @@
 			isa = XCSwiftPackageProductDependency;
 			productName = SUICoordinator;
 		};
-		D9857C362F50C08200354EB0 /* SUICoordinator16 */ = {
+		D9857C3B2F51E98B00354EB0 /* SUICoordinator */ = {
 			isa = XCSwiftPackageProductDependency;
-			productName = SUICoordinator16;
+			productName = SUICoordinator;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
