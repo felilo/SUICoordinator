@@ -73,9 +73,9 @@ public struct SheetView<Content: View, T: SheetItemType>: View {
     
     public var body: some View {
         Group {
-            if let index = $items.indices.firstIndex(of: index) {
-                let item = $items[index]
-                
+            if items.indices.contains(index) {
+                let item = safeBinding(at: index)
+
                 switch getTransitionStyle(from: index) {
                 case .fullScreenCover:
                     fullScreenView(
@@ -220,7 +220,19 @@ public struct SheetView<Content: View, T: SheetItemType>: View {
     // ---------------------------------------------------------
     // MARK: Helper Functions
     // ---------------------------------------------------------
-    
+
+    /// Returns a Binding<Item?> that safely returns nil when the index is out of range,
+    /// preventing crashes when the items array is compacted while a view is still mounted.
+    private func safeBinding(at index: Int) -> Binding<Item?> {
+        Binding(
+            get: { items.indices.contains(index) ? items[index] : nil },
+            set: { newValue in
+                guard items.indices.contains(index) else { return }
+                items[index] = newValue
+            }
+        )
+    }
+
     private func getTransitionStyle(from index: Int) -> TransitionPresentationStyle? {
         guard items.indices.contains(index) else {
             return transitionStyle
