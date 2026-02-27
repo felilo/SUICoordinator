@@ -1,5 +1,5 @@
 //
-//  SheetCoordinating.swift
+//  SheetCoordinatorView.swift
 //
 //  Copyright (c) Andres F. Lozano
 //
@@ -26,29 +26,17 @@ import SwiftUI
 
 @available(iOS 17.0, *)
 struct SheetCoordinatorView: ViewModifier {
-
-    // ---------------------------------------------------------
-    // MARK: typealias
-    // ---------------------------------------------------------
-
+    
     typealias Action = ((String) -> Void)
     typealias Value = AnyViewAlias
-
-    // ---------------------------------------------------------
-    // MARK: Properties
-    // ---------------------------------------------------------
-
-    // @Bindable enables two-way binding to @Observable objects.
+    
     @Bindable var coordinator: SheetCoordinator<Value>
-    @State var index: Int
-    var isLast: Bool
-    var onDissmis: ActionClosure?
-    var onDidLoad: ActionClosure?
-
-    // ---------------------------------------------------------
-    // MARK: ViewModifier
-    // ---------------------------------------------------------
-
+    @State var index = 0
+    
+    public var isLast: Bool
+    public var onDissmis: ActionClosure?
+    public var onDidLoad: ActionClosure?
+    
     @ViewBuilder
     func body(content: Content) -> some View {
         content
@@ -67,8 +55,11 @@ struct SheetCoordinatorView: ViewModifier {
                 }
             }
     }
-
-    private func buildContent(with index: Int, item: SheetItem<AnyViewAlias>) -> some View {
+    
+    private func buildContent(
+        with index: Int,
+        item: SheetItem<Value>
+    ) -> some View {
         let view = item.view()?.asAnyView()
             .sheetCoordinator(
                 coordinator: coordinator,
@@ -79,9 +70,12 @@ struct SheetCoordinatorView: ViewModifier {
             )
         return addSheet(to: view, with: item.presentationStyle)
     }
-
+    
     @ViewBuilder
-    private func addSheet(to content: some View, with presentationStyle: TransitionPresentationStyle) -> some View {
+    private func addSheet(
+        to content: some View,
+        with presentationStyle: TransitionPresentationStyle
+    ) -> some View {
         switch presentationStyle {
             case .detents(let data): content.presentationDetents(data)
             default: content
@@ -89,7 +83,7 @@ struct SheetCoordinatorView: ViewModifier {
     }
 }
 
-
+@available(iOS 17.0, *)
 extension View {
     func hidden(_ isHidden: Bool) -> some View {
         self.frame(maxHeight: !isHidden ? .infinity : 0)

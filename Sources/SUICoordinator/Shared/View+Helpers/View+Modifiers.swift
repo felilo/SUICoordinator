@@ -1,5 +1,5 @@
 //
-//  ViewDidLoadModifier.swift
+//  View+Modifiers.swift
 //
 //  Copyright (c) Andres F. Lozano
 //
@@ -24,9 +24,9 @@
 
 import SwiftUI
 
+@available(iOS 17.0, *)
 extension View {
-
-    @available(iOS 17.0, *)
+    
     func sheetCoordinator(
         coordinator: SheetCoordinator<AnyViewAlias>,
         index: Int = 0,

@@ -26,37 +26,36 @@ import SwiftUI
 
 @available(iOS 17.0, *)
 struct RouterView<C: CoordinatorType>: View {
-
+    
     // --------------------------------------------------------------------
     // MARK: Properties
     // --------------------------------------------------------------------
-
-    // Router is @Observable — @State provides the view graph subscription.
+    
     @State private var viewModel: Router<C.Route>
     private let coordinator: C
-
+    
     // --------------------------------------------------------------------
     // MARK: Constructor
     // --------------------------------------------------------------------
-
+    
     public init(coordinator: C) {
         self._viewModel = .init(wrappedValue: coordinator.router)
         self.coordinator = coordinator
     }
-
+    
     // --------------------------------------------------------------------
     // MARK: View
     // --------------------------------------------------------------------
-
+    
     var body: some View {
         ZStack { buildBody() }
             .clearModalBackground(coordinator.isTabCoordinable)
     }
-
+    
     // --------------------------------------------------------------------
     // MARK: View helper functions
     // --------------------------------------------------------------------
-
+    
     @ViewBuilder
     private func buildBody() -> some View {
         Group {
@@ -68,19 +67,15 @@ struct RouterView<C: CoordinatorType>: View {
                     root: { mainView.navigationDestination(for: C.Route.self) { $0 } }
                 )
                 .transaction { $0.disablesAnimations = !viewModel.animated }
-                .onChange(of: viewModel.items) { _, _ in
-                    Task { await viewModel.syncItems() }
-                }
-
+                .onChange(of: viewModel.items) { _, _ in onChangeItems() }
+                
                 addSheetTo(view: view)
             }
         }
     }
-
+    
     @ViewBuilder
     private func addSheetTo(view: (some View)?) -> some View {
-        // .environment(_:) is used instead of .environmentObject(_:) because
-        // @Observable classes use the value-based environment system on iOS 17+.
         view.environment(coordinator)
             .sheetCoordinator(
             coordinator: viewModel.sheetCoordinator,
@@ -89,5 +84,13 @@ struct RouterView<C: CoordinatorType>: View {
             }},
             onDidLoad: nil
         )
+    }
+    
+    // --------------------------------------------------------------------
+    // MARK: Helper functions
+    // --------------------------------------------------------------------
+    
+    private func onChangeItems() {
+        Task { await viewModel.syncItems() }
     }
 }

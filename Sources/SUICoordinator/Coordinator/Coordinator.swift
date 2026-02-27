@@ -23,35 +23,35 @@
 //
 
 import Foundation
-import Observation
 
+/// An open class representing a coordinator in a coordinator-based architecture.
 @available(iOS 17.0, *)
 @Observable
 open class Coordinator<Route: RouteType>: CoordinatorType {
-
+    
     // --------------------------------------------------------------------
     // MARK: Properties
     // --------------------------------------------------------------------
-
+    
     public var router: Router<Route>
     public var uuid: String
     public var parent: (any CoordinatorType)?
     public var children: [(any CoordinatorType)] = []
     public var tagId: String?
-
+    
     // --------------------------------------------------------------------
     // MARK: Constructor
     // --------------------------------------------------------------------
-
+    
     public init() {
         self.router = .init()
         self.uuid = "\(NSStringFromClass(type(of: self))) - \(UUID().uuidString)"
     }
-
+    
     // --------------------------------------------------------------------
     // MARK: Helper funcs
     // --------------------------------------------------------------------
-
+    
     open func start() async {
         fatalError("This method must be overwritten")
     }

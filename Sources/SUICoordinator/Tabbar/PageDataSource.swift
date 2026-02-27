@@ -26,12 +26,7 @@ import SwiftUI
 
 /// A type alias representing a complete tab page definition for the iOS 17+ layer.
 ///
-/// `TabPage` combines the essential protocols for a fully functional tab page:
-/// - `PageDataSource`: Provides the visual representation and positioning (from SUICoordinatorCore)
-/// - `TabNavigationRouter`: Provides the coordinator creation functionality
-/// - `SCHashable`: Provides equality, hashing, and identification (subsumes SCEquatable)
-///
-/// Note: `SCHashable` already inherits `SCIdentifiable` and `Hashable` (which implies `Equatable`),
-/// so `SCEquatable` is intentionally excluded to avoid ambiguous protocol witnesses across modules.
+/// `TabPage` combines `PageDataSource` (visual representation + positioning),
+/// `TabNavigationRouter` (coordinator creation), and `SCHashable` (identity/hashing).
 @available(iOS 17.0, *)
 public typealias TabPage = PageDataSource & TabNavigationRouter & SCHashable
