@@ -160,17 +160,102 @@ final class RouterTests: XCTestCase {
         XCTAssertEqual(sut.sheetCoordinator.items.count, 0)
     }
     
+    // MARK: - dismiss
+
+    @MainActor func test_dismiss_removesTopSheet() async throws {
+        let sut = makeSUT()
+        await sut.navigate(toRoute: .sheetStep, animated: false)
+        XCTAssertEqual(sut.sheetCoordinator.items.count, 1)
+
+        await sut.dismiss(animated: false)
+        await sut.sheetCoordinator.removeAllNilItems()
+        XCTAssertEqual(sut.sheetCoordinator.items.count, 0)
+    }
+
+    // MARK: - present with detents
+
+    @MainActor func test_present_detents_addsToSheetCoordinator() async throws {
+        let sut = makeSUT()
+        await sut.present(.detentsStep, presentationStyle: .detents([.medium]), animated: false)
+        XCTAssertEqual(sut.sheetCoordinator.items.count, 1)
+        XCTAssertEqual(sut.sheetCoordinator.items.first??.getPresentationStyle(), .detents([.medium]))
+    }
+
+    // MARK: - present with fullScreenCover
+
+    @MainActor func test_present_fullScreenCover_addsToSheetCoordinator() async throws {
+        let sut = makeSUT()
+        await sut.present(.fullScreenStep, presentationStyle: .fullScreenCover, animated: false)
+        XCTAssertEqual(sut.sheetCoordinator.items.count, 1)
+    }
+
+    // MARK: - present with custom transition
+
+    @MainActor func test_present_customTransition_addsToSheetCoordinator() async throws {
+        let sut = makeSUT()
+        await sut.present(.customTransition(fullScreen: false), animated: false)
+        XCTAssertEqual(sut.sheetCoordinator.items.count, 1)
+        XCTAssertTrue(sut.sheetCoordinator.items.first??.getPresentationStyle().isCustom == true)
+    }
+
+    // MARK: - syncItems edge cases
+
+    @MainActor func test_syncItems_emptyItems_doesNotCrash() async throws {
+        let sut = makeSUT()
+        await sut.syncItems() // no items, should not crash
+        XCTAssertEqual(sut.items.count, 0)
+    }
+
+    @MainActor func test_syncItems_reflectsManualRemoval() async throws {
+        let sut = makeSUT()
+        await sut.navigate(toRoute: .pushStep(1), animated: false)
+        await sut.navigate(toRoute: .pushStep2, animated: false)
+        XCTAssertEqual(sut.items.count, 2)
+
+        sut.items.remove(at: 0)
+        await sut.syncItems()
+        XCTAssertEqual(sut.items.count, 1)
+    }
+
+    // MARK: - multiple sheets stacked then clean
+
+    @MainActor func test_multipleSheets_cleanRemovesAll() async throws {
+        let sut = makeSUT()
+        await sut.navigate(toRoute: .sheetStep, animated: false)
+        await sut.navigate(toRoute: .fullScreenStep, animated: false)
+        XCTAssertEqual(sut.sheetCoordinator.items.count, 2)
+
+        await sut.clean(animated: false)
+        await sut.restart(animated: false)
+        XCTAssertEqual(sut.sheetCoordinator.items.count, 0)
+    }
+
+    // MARK: - pop on empty stack does not crash
+
+    @MainActor func test_pop_onEmptyStack_doesNotCrash() async throws {
+        let sut = makeSUT()
+        await sut.pop(animated: false) // nothing to pop
+        XCTAssertEqual(sut.items.count, 0)
+    }
+
+    // MARK: - animated flag
+
+    @MainActor func test_animated_defaultsToTrue() {
+        let sut = makeSUT()
+        XCTAssertTrue(sut.animated)
+    }
+
     // --------------------------------------------------------------------
     // MARK: Helpers
     // --------------------------------------------------------------------
-    
+
     @MainActor private func makeSUT(file: StaticString = #filePath, line: UInt = #line) -> Router<AnyEnumRoute> {
         let router = Router<AnyEnumRoute>()
         router.mainView = .pushStep(1)
         trackForMemoryLeaks(router, file: file, line: line)
         return router
     }
-    
+
     @MainActor private func makeSheetItem(_ item: any RouteType, animated: Bool = true) -> SheetItem<any RouteType> {
         .init(id: UUID().uuidString, animated: animated, presentationStyle: item.presentationStyle, view: { item })
     }
