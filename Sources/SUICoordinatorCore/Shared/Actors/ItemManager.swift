@@ -30,9 +30,7 @@ public actor ItemManager<T> {
 
     private var items: [T] = []
 
-    public init(items: [T] = []) {
-        self.items = items
-    }
+    public init() {}
 
     // ---------------------------------------------------------
     // MARK: Create

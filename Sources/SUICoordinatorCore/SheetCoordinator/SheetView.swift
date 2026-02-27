@@ -27,28 +27,28 @@ import SwiftUI
 public struct SheetView<Content: View, T: SheetItemType>: View {
     
     public typealias Item = T
-    
+
     // ---------------------------------------------------------
     // MARK: Wrapper properties
     // ---------------------------------------------------------
-    
-    @Binding var items: [Item?]
-    
+
+    @Binding public var items: [Item?]
+
     // ---------------------------------------------------------
     // MARK: Properties
     // ---------------------------------------------------------
-    
-    let index: Int
-    let content: ( (Int, (Item)) -> Content)
-    let onDismiss: ActionClosure?
-    let onDidLoad: ActionClosure?
-    let transitionStyle: TransitionPresentationStyle?
-    let animated: Bool
-    
+
+    public let index: Int
+    public let content: ( (Int, (Item)) -> Content)
+    public let onDismiss: ActionClosure?
+    public let onDidLoad: ActionClosure?
+    public let transitionStyle: TransitionPresentationStyle?
+    public let animated: Bool
+
     // ---------------------------------------------------------
     // MARK: Constructor
     // ---------------------------------------------------------
-    
+
     public init(
         index: Int,
         items: Binding<[Item?]>,

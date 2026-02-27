@@ -58,25 +58,25 @@ public struct SheetItem<T>:SCEquatable, SheetItemType {
     ///
     /// - Returns: The view or coordinator to present, or `nil` if creation fails.
     public let view: () -> T?
-
+    
     /// A boolean value indicating whether to animate the presentation.
     ///
     /// When `true`, the sheet will be presented with animation.
     /// When `false`, the presentation will occur without animation.
     public let animated: Bool
-
+    
     /// The transition presentation style for presenting the sheet item.
     ///
     /// This determines how the sheet is presented (e.g., `.sheet`, `.fullScreenCover`, etc.).
     /// The presentation style affects the visual appearance and behavior of the modal presentation.
     public let presentationStyle: TransitionPresentationStyle
-
+    
     /// A subject that emits when the sheet is about to be dismissed.
     ///
     /// This publisher allows observers to react to sheet dismissal events,
     /// enabling cleanup operations or state updates before the sheet disappears.
     public let willDismiss: PassthroughSubject<Void, Never> = .init()
-
+    
     /// A boolean value indicating whether the sheet item contains a coordinator.
     ///
     /// This flag helps the sheet management system determine how to handle the content,
@@ -125,7 +125,7 @@ public struct SheetItem<T>:SCEquatable, SheetItemType {
     public func getPresentationStyle() -> TransitionPresentationStyle {
         presentationStyle
     }
-
+    
     /// Returns whether the sheet presentation should be animated.
     ///
     /// This method provides access to the animation preference in a consistent way

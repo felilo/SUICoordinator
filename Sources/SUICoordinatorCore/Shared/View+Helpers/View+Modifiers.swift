@@ -1,5 +1,5 @@
 //
-//  ViewDidLoadModifier.swift
+//  View+Modifiers.swift
 //
 //  Copyright (c) Andres F. Lozano
 //
@@ -24,13 +24,21 @@
 
 import SwiftUI
 
-extension View {
-
-    public func onViewDidLoad(perform action: (() -> Void)? = nil) -> some View {
-        self.modifier(ViewDidLoadModifier(action: action))
+public extension View {
+    
+    /// Adds a view did load action to the view.
+    ///
+    /// - Parameter action: The action to perform when the view loads.
+    /// - Returns: A view that performs the specified action on load.
+    func onViewDidLoad(perform action: (() -> Void)? = nil) -> some View {
+        modifier(ViewDidLoadModifier(action: action))
     }
-
-    public func clearModalBackground(_ condition: Bool = true) -> some View {
-        self.modifier(ClearBackgroundViewModifier(condition: condition))
+    
+    /// Clears the modal background for the view when applicable.
+    ///
+    /// - Parameter isEnabled: Whether to apply the clear background effect.
+    /// - Returns: A view with an optionally cleared modal background.
+    func clearModalBackground(_ isEnabled: Bool = true) -> some View {
+        modifier(ClearBackgroundViewModifier(condition: isEnabled))
     }
 }

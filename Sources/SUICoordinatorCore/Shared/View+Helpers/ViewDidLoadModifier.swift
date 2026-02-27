@@ -24,7 +24,7 @@
 
 import SwiftUI
 
-public struct ViewDidLoadModifier: ViewModifier {
+struct ViewDidLoadModifier: ViewModifier {
     @State private var viewDidLoad = false
     public let action: (() -> Void)?
     

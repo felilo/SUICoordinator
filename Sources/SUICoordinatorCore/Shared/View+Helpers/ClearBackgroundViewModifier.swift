@@ -24,22 +24,22 @@
 
 import SwiftUI
 
-public struct ClearBackgroundView: UIViewRepresentable {
-    public func makeUIView(context: Context) -> some UIView {
+struct ClearBackgroundView: UIViewRepresentable {
+    func makeUIView(context: Context) -> some UIView {
         let view = UIView()
         DispatchQueue.main.async {
             view.superview?.superview?.backgroundColor = .clear
         }
         return view
     }
-    public func updateUIView(_ uiView: UIViewType, context: Context) { }
+    func updateUIView(_ uiView: UIViewType, context: Context) { }
 }
 
-public struct ClearBackgroundViewModifier: ViewModifier {
+struct ClearBackgroundViewModifier: ViewModifier {
     
-    public let condition: Bool
+    let condition: Bool
     
-    public func body(content: Content) -> some View {
+    func body(content: Content) -> some View {
         if condition {
             if #available(iOS 16.4, *) {
                 content
