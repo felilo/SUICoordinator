@@ -24,6 +24,7 @@
 
 import Foundation
 
+@MainActor
 class CoordinatorActionListViewModel: ObservableObject {
     
     let coordinator: NavigationHubCoordinator

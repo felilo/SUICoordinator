@@ -120,7 +120,7 @@ struct NavigationActionListView: View {
     }
 }
 
-#Preview {
-    NavigationActionListView()
-        .environment(HomeCoordinator())
-}
+//#Preview {
+//    NavigationActionListView()
+//        .environment(HomeCoordinator())
+//}

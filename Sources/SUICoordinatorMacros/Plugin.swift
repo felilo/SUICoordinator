@@ -1,5 +1,5 @@
 //
-//  ClearBackgroundViewModifier.swift
+//  Plugin.swift
 //
 //  Copyright (c) Andres F. Lozano
 //
@@ -22,40 +22,12 @@
 //  THE SOFTWARE.
 //
 
-import SwiftUI
+import SwiftCompilerPlugin
+import SwiftSyntaxMacros
 
-#if canImport(UIKit)
-struct ClearBackgroundView: UIViewRepresentable {
-    func makeUIView(context: Context) -> some UIView {
-        let view = UIView()
-        DispatchQueue.main.async {
-            view.superview?.superview?.backgroundColor = .clear
-        }
-        return view
-    }
-    func updateUIView(_ uiView: UIViewType, context: Context) { }
-}
-#endif
-
-struct ClearBackgroundViewModifier: ViewModifier {
-
-    let condition: Bool
-
-    func body(content: Content) -> some View {
-        if condition {
-#if canImport(UIKit)
-            if #available(iOS 16.4, *) {
-                content
-                    .presentationBackground(.clear)
-            } else {
-                content
-                    .background(ClearBackgroundView())
-            }
-#else
-            content
-#endif
-        } else {
-            content
-        }
-    }
+@main
+struct SUICoordinatorMacroPlugin: CompilerPlugin {
+    let providingMacros: [Macro.Type] = [
+        CoordinatorMacro.self,
+    ]
 }

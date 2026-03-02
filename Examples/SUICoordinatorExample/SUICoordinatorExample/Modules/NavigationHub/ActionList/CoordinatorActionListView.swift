@@ -107,8 +107,8 @@ struct CoordinatorActionListView: View {
     }
 }
 
-#Preview {
-    let coordinator = NavigationHubCoordinator()
-    CoordinatorActionListView()
-        .environment(coordinator)
-}
+//#Preview {
+//    let coordinator = NavigationHubCoordinator()
+//    CoordinatorActionListView()
+//        .environment(coordinator)
+//}

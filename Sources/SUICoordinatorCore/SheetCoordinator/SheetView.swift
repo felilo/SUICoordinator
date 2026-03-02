@@ -187,6 +187,7 @@ public struct SheetView<Content: View, T: SheetItemType>: View {
         onDismiss: ActionClosure? = nil,
         @ViewBuilder content: @escaping (Item) -> some View
     ) -> some View {
+#if !os(macOS)
         defaultView
             .fullScreenCover(
                 item: item,
@@ -194,6 +195,9 @@ public struct SheetView<Content: View, T: SheetItemType>: View {
                 content: { content($0).onViewDidLoad { onDidLoad?(String(index)) } }
             )
             .transaction { $0.disablesAnimations = !(animated) }
+#else
+        defaultView
+#endif
     }
     
     @ViewBuilder
