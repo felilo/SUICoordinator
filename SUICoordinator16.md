@@ -1,31 +1,24 @@
 # SUICoordinator16 — iOS 16 Support
 
-`SUICoordinator16` is the iOS 16-compatible target of SUICoordinator. It exposes the same public API as `SUICoordinator` but uses `ObservableObject` + Combine instead of `@Observable`.
+`SUICoordinator16` exposes the same public API as `SUICoordinator` but uses `ObservableObject` + Combine instead of `@Observable`. Use it when your deployment target is iOS 16.
 
 ---
 
-## When to Use
+## Key Differences
 
-Use `SUICoordinator16` when your app must support **iOS 16**. If your deployment target is iOS 17+, prefer `SUICoordinator`.
+| | `SUICoordinator` (iOS 17+) | `SUICoordinator16` (iOS 16+) |
+|---|---|---|
+| Observation | `@Observable` | `ObservableObject` + `@Published` |
+| View injection | `@Environment(CoordinatorType.self)` | `@EnvironmentObject var coordinator: CoordinatorType` |
+| `@Coordinator` macro | Available | Not available — subclass `Coordinator<Route>` instead |
 
----
-
-## Installation
-
-Add `SUICoordinator16` (instead of `SUICoordinator`) when configuring the package in Xcode:
-
-1. Open Xcode and your project
-2. Go to `File` → `Add Package Dependencies...`
-3. Enter the repository URL: `https://github.com/felilo/SUICoordinator`
-4. Select **`SUICoordinator16`** as the package product
+All navigation methods (`navigate`, `startFlow`, `finishFlow`, `forcePresentation`, `close`, `restart`, etc.) are identical between both targets.
 
 ---
 
-## Basic Usage
+## Usage
 
 ### 1. Define Your Routes
-
-Routes are identical to `SUICoordinator` — `RouteType` is shared:
 
 ```swift
 import SwiftUI
@@ -120,15 +113,3 @@ struct MyExampleApp: App {
     }
 }
 ```
-
----
-
-## Key Differences from `SUICoordinator`
-
-| | `SUICoordinator` (iOS 17+) | `SUICoordinator16` (iOS 16+) |
-|---|---|---|
-| Observation | `@Observable` | `ObservableObject` + `@Published` |
-| View injection | `@Environment(CoordinatorType.self)` | `@EnvironmentObject var coordinator: CoordinatorType` |
-| Coordinator macro | `@Coordinator` (available) | Not available |
-
-All navigation methods (`navigate`, `startFlow`, `finishFlow`, `forcePresentation`, `close`, `restart`, etc.) are identical between both targets.

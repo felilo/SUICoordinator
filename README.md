@@ -1,6 +1,6 @@
 # SUICoordinator
 
-A SwiftUI coordinator pattern library that provides clean navigation management and tab-based coordination for iOS applications. SUICoordinator separates navigation logic from view presentation, making your SwiftUI apps more maintainable and scalable.
+Coordinator-pattern navigation for SwiftUI. Keep navigation logic out of your views — type-safe routes, async/await, and full iOS 16+ support.
 
 [![Swift 6.0](https://img.shields.io/badge/Swift-6.0-orange.svg)](https://swift.org)
 [![iOS 16.0+](https://img.shields.io/badge/iOS-16.0+-blue.svg)](https://developer.apple.com/ios/)
@@ -11,14 +11,13 @@ _____
 
 ## Key Features
 
-- **Pure SwiftUI**: No UIKit dependencies — built entirely with SwiftUI
-- **Coordinator Pattern**: Clean separation of navigation logic from views
-- **Dual iOS Support**: `SUICoordinator` (iOS 17+, `@Observable`) and `SUICoordinator16` (iOS 16+, `ObservableObject`) — same API, pick the right target for your deployment
-- **`@Coordinator` Macro**: Optional Swift macro for a lighter, composition-based coordinator syntax (iOS 17+)
+- **Pure SwiftUI**: No UIKit — no `UINavigationController`, no view representables
+- **Type-Safe Routes**: Route enums own both the presentation style and the view they render
+- **`@Coordinator` Macro**: Composition-based syntax with zero boilerplate (iOS 17+)
 - **Flexible Presentations**: Push, sheet, fullscreen, detents, and custom transitions
-- **Tab Coordination**: Advanced tab-based navigation with `TabCoordinator`, custom views, and badges
-- **Deep Linking**: Force presentation capabilities for push notifications and external triggers
-- **Async Navigation**: Full async/await support for smooth navigation flows
+- **Tab Coordination**: `TabCoordinator` with per-tab navigation stacks, custom tab views, and badges
+- **Deep Linking**: `forcePresentation` navigates to any coordinator from push notifications or universal links
+- **Dual iOS Support**: `SUICoordinator` (iOS 17+, `@Observable`) and `SUICoordinator16` (iOS 16+, `ObservableObject`)
 
 _____
 
