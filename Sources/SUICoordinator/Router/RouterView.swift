@@ -23,16 +23,16 @@
 //
 
 import SwiftUI
-import Combine
 
+@available(iOS 17.0, *)
 struct RouterView<C: CoordinatorType>: View {
     
     // --------------------------------------------------------------------
     // MARK: Properties
     // --------------------------------------------------------------------
     
-    @StateObject private var viewModel: Router<C.Route>
-    private  let coordinator: C
+    @State private var viewModel: Router<C.Route>
+    private let coordinator: C
     
     // --------------------------------------------------------------------
     // MARK: Constructor
@@ -56,19 +56,18 @@ struct RouterView<C: CoordinatorType>: View {
     // MARK: View helper functions
     // --------------------------------------------------------------------
     
-    
     @ViewBuilder
     private func buildBody() -> some View {
         Group {
             if coordinator.isTabCoordinable {
                 viewModel.mainView
-            } else if let mainView = viewModel.mainView  {
+            } else if let mainView = viewModel.mainView {
                 let view = NavigationStack(
                     path: $viewModel.items,
                     root: { mainView.navigationDestination(for: C.Route.self) { $0 } }
                 )
                 .transaction { $0.disablesAnimations = !viewModel.animated }
-                .onChange(of: viewModel.items, perform: onChangeItems)
+                .onChange(of: viewModel.items) { _, _ in onChangeItems() }
                 
                 addSheetTo(view: view)
             }
@@ -77,10 +76,10 @@ struct RouterView<C: CoordinatorType>: View {
     
     @ViewBuilder
     private func addSheetTo(view: (some View)?) -> some View {
-        view.environmentObject(coordinator)
+        view.environment(coordinator)
             .sheetCoordinator(
             coordinator: viewModel.sheetCoordinator,
-            onDissmis: { index in Task(priority: .high) { @MainActor [weak viewModel] in
+            onDissmis: { index in Task(priority: .high) { [weak viewModel] in
                 await viewModel?.removeItemFromSheetCoordinator(at: index)
             }},
             onDidLoad: nil
@@ -91,7 +90,7 @@ struct RouterView<C: CoordinatorType>: View {
     // MARK: Helper functions
     // --------------------------------------------------------------------
     
-    private func onChangeItems(_ value: [C.Route]) {
+    private func onChangeItems() {
         Task { await viewModel.syncItems() }
     }
 }

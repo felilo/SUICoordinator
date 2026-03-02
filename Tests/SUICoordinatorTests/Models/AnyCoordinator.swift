@@ -25,12 +25,14 @@
 import SwiftUI
 @testable import SUICoordinator
 
+@available(iOS 17.0, *)
 class AnyCoordinator: Coordinator<AnyEnumRoute> {
     override func start() async {
         await startFlow(route: .pushStep(1))
     }
 }
 
+@available(iOS 17.0, *)
 class OtherCoordinator: Coordinator<DefaultRoute> { 
     override func start() async {
         let page = AnyEnumRoute.pushStep(1)
@@ -38,6 +40,7 @@ class OtherCoordinator: Coordinator<DefaultRoute> {
     }
 }
 
+@available(iOS 17.0, *)
 class ThirdCoordinator: Coordinator<DefaultRoute> {
     override func start() async {
         let page = AnyEnumRoute.pushStep(1)

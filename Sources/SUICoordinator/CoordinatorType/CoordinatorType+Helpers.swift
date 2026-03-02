@@ -24,6 +24,7 @@
 
 import Foundation
 
+@available(iOS 17.0, *)
 extension CoordinatorType {
     
     /// A Boolean value indicating whether the coordinator has been started and has a main view.

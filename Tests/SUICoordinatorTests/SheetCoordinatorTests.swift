@@ -25,6 +25,7 @@
 import XCTest
 @testable import SUICoordinator
 
+@available(iOS 17.0, *)
 final class SheetCoordinatorTests: XCTestCase {
     
     @MainActor func test_presentRoute() async throws {

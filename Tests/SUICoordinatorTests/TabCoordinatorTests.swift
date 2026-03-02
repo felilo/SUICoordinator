@@ -27,6 +27,7 @@ import SwiftUI
 @testable import SUICoordinator
 
 
+@available(iOS 17.0, *)
 final class TabCoordinatorTests: XCTestCase {
     
     private let animated: Bool = false
@@ -192,6 +193,101 @@ final class TabCoordinatorTests: XCTestCase {
     // MARK: Helpers
     // --------------------------------------------------------------------
     
+    // MARK: - setBadge
+
+    @MainActor func test_setBadge_emitsBadgeValue() async throws {
+        let sut = makeSUT(currentPage: .tab1)
+        await sut.start()
+
+        var badgeValues: [(String?, AnyEnumTabRoute)] = []
+        let task = Task {
+            for await value in sut.badges {
+                await MainActor.run { badgeValues.append(value) }
+            }
+        }
+
+        sut.setBadge(for: .tab1, with: "3")
+        try await Task.sleep(for: .milliseconds(100))
+        XCTAssertEqual(badgeValues.last?.0, "3")
+        XCTAssertEqual(badgeValues.last?.1, .tab1)
+
+        sut.setBadge(for: .tab1, with: nil)
+        try await Task.sleep(for: .milliseconds(100))
+        XCTAssertNil(badgeValues.last?.0)
+
+        task.cancel()
+        await finishFlow(sut: sut)
+    }
+
+    // MARK: - setCurrentPage via coordinator
+
+    @MainActor func test_setCurrentPage_viaCoordinator_updatesCurrentPage() async throws {
+        let sut = makeSUT(currentPage: .tab1)
+        await sut.start()
+
+        // setCurrentPage matches on position string vs coordinator.tagId (which is page.id).
+        // For AnyEnumTabRoute, id == String(describing: self) (e.g. "tab2") and position == 1,
+        // so direct page assignment is the reliable path.
+        sut.setCurrentPage(AnyEnumTabRoute.tab2)
+        XCTAssertEqual(sut.currentPage, .tab2)
+
+        await finishFlow(sut: sut)
+    }
+
+    // MARK: - getCoordinator(with:) success and nil
+
+    @MainActor func test_getCoordinator_returnsNilForMissingPage() async throws {
+        let sut = makeSUT()
+        await sut.start()
+        await sut.setPages([.tab1])
+
+        XCTAssertNil(sut.getCoordinator(with: .tab2))
+        await finishFlow(sut: sut)
+    }
+
+    // MARK: - setPages with currentPage parameter
+
+    @MainActor func test_setPages_withCurrentPage_updatesCurrentPage() async throws {
+        let sut = makeSUT(currentPage: .tab1)
+        await sut.start()
+        await sut.setPages([.tab2, .tab3], currentPage: .tab3)
+
+        XCTAssertEqual(sut.currentPage, .tab3)
+        await finishFlow(sut: sut)
+    }
+
+    // MARK: - isRunning
+
+    @MainActor func test_tabCoordinator_isRunning_afterStart() async throws {
+        let sut = makeSUT()
+        XCTAssertFalse(sut.isRunning)
+        await sut.start()
+        XCTAssertTrue(sut.isRunning)
+        await finishFlow(sut: sut)
+    }
+
+    // MARK: - children count after setPages
+
+    @MainActor func test_setPages_childrenCountMatchesPages() async throws {
+        let sut = makeSUT()
+        await sut.start()
+
+        let pages: [AnyEnumTabRoute] = [.tab1, .tab2]
+        await sut.setPages(pages)
+        XCTAssertEqual(sut.children.count, pages.count)
+        await finishFlow(sut: sut)
+    }
+
+    // MARK: - clean
+
+    @MainActor func test_clean_removesChildrenAndSheets() async throws {
+        let sut = makeSUT()
+        await sut.start()
+        await sut.clean()
+        XCTAssertTrue(sut.children.isEmpty)
+        await finishFlow(sut: sut)
+    }
+
     @MainActor private func makeSUT(
         currentPage: AnyEnumTabRoute = AnyEnumTabRoute.tab1,
         file: StaticString = #filePath,

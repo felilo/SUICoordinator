@@ -56,7 +56,7 @@ struct SUICoordinatorExampleApp: App {
                     // For demonstration, let's assume `object.object` contains the URL string
                     guard let urlString = object.object as? String,
                           let path = DeepLinkPath(rawValue: urlString) else { return }
-                    Task {
+                    Task { @MainActor in
                         try? await handlePushNotificationDeepLink(path: path, rootCoordinator: mainCoordinator)
                     }
                 }

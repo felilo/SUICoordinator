@@ -1,5 +1,5 @@
 //
-//  ClearBackgroundViewModifier.swift
+//  TabCoordinatorType.swift
 //
 //  Copyright (c) Andres F. Lozano
 //
@@ -22,34 +22,25 @@
 //  THE SOFTWARE.
 //
 
-import SwiftUI
+import Foundation
 
-struct ClearBackgroundView: UIViewRepresentable {
-    func makeUIView(context: Context) -> some UIView {
-        let view = UIView()
-        DispatchQueue.main.async {
-            view.superview?.superview?.backgroundColor = .clear
-        }
-        return view
-    }
-    func updateUIView(_ uiView: UIViewType, context: Context) { }
+@MainActor
+public protocol TabCoordinatorType: ObservableObject {
+    
+    associatedtype Page: TabPage
+    typealias BadgeItem = (value: String?, page: Page)
+    typealias DataSourcePage = Page.DataSource
+    
+    var currentPage: Page { get set }
+    var badges: AsyncStream<(String?, Page)> { get }
+    var pages: [Page] { get set }
+    var viewContainer: (TabCoordinator<Page>) -> (Page.View) { get set }
+    
+    func getCoordinator(with page: Page) -> AnyCoordinatorType?
+    func getCoordinatorSelected() throws -> (any CoordinatorType)
+    func clean() async
+    func setBadge(for page: Page, with value: String?)
 }
 
-struct ClearBackgroundViewModifier: ViewModifier {
-    
-    let condition: Bool
-    
-    func body(content: Content) -> some View {
-        if condition {
-            if #available(iOS 16.4, *) {
-                content
-                    .presentationBackground(.clear)
-            } else {
-                content
-                    .background(ClearBackgroundView())
-            }
-        } else {
-            content
-        }
-    }
-}
+/// A type alias representing a coordinator that conforms to both `CoordinatorType` and `TabCoordinatorType`.
+public typealias TabCoordinatable = CoordinatorType & TabCoordinatorType

@@ -24,14 +24,14 @@
 
 import SwiftUI
 
-
+@available(iOS 17.0, *)
 public struct CoordinatorView<DataSource: CoordinatorType>: View {
     
     // --------------------------------------------------------------------
     // MARK: Wrapper properties
     // --------------------------------------------------------------------
     
-    @StateObject var dataSource: DataSource
+    @State var dataSource: DataSource
     
     // --------------------------------------------------------------------
     // MARK: Constructor

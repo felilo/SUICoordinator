@@ -25,15 +25,16 @@
 import SUICoordinator
 import Foundation
 
-class HomeCoordinator: Coordinator<HomeRoute> {
-    
-    private let animated: Bool  = true
-    
+@Coordinator(HomeRoute.self)
+class HomeCoordinator {
+
+    private let animated: Bool = true
+
     // ---------------------------------------------------------------------
-    // MARK: Coordinator
+    // MARK: CoordinatorType
     // ---------------------------------------------------------------------
-    
-    override func start() async {
+
+    func start() async {
         await startFlow(route: .actionListView)
     }
     
