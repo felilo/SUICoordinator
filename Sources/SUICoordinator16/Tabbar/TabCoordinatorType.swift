@@ -23,7 +23,6 @@
 //
 
 import Foundation
-import Combine
 
 @MainActor
 public protocol TabCoordinatorType: ObservableObject {
@@ -33,7 +32,7 @@ public protocol TabCoordinatorType: ObservableObject {
     typealias DataSourcePage = Page.DataSource
     
     var currentPage: Page { get set }
-    var badge: PassthroughSubject<(String?, Page), Never> { get }
+    var badges: AsyncStream<(String?, Page)> { get }
     var pages: [Page] { get set }
     var viewContainer: (TabCoordinator<Page>) -> (Page.View) { get set }
     

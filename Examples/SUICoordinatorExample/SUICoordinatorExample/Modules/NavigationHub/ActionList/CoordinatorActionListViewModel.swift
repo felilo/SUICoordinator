@@ -32,19 +32,19 @@ class CoordinatorActionListViewModel: ObservableObject {
         self.coordinator = coordinator
     }
     
-    @MainActor func presentDefaultTabCoordinator() async {
+    func presentDefaultTabCoordinator() async {
         await coordinator.presentDefaultTabCoordinator()
     }
     
-    @MainActor func presentCustomTabCoordinator() async {
+    func presentCustomTabCoordinator() async {
         await coordinator.presentCustomTabCoordinator()
     }
     
-    @MainActor func presentHomeCoordinator() async {
+    func presentHomeCoordinator() async {
         await coordinator.presentHomeCoordinator()
     }
     
-    @MainActor func finsh() async {
+    func finsh() async {
         await coordinator.finishFlow()
     }
 }

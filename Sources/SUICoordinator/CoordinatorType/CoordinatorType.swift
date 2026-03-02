@@ -28,14 +28,14 @@ import Foundation
 @available(iOS 17.0, *)
 @MainActor
 public protocol CoordinatorType: SCHashable, Observable, AnyObject {
-    
+
     associatedtype Route: RouteType
-    
+
     var uuid: String { get set }
     var tagId: String? { get set }
     var parent: AnyCoordinatorType? { get set }
     var children: [AnyCoordinatorType] { get set }
     var router: Router<Route> { get set }
-    
+
     func start() async -> Void
 }

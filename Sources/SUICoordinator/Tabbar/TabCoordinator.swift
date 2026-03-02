@@ -47,13 +47,15 @@ open class TabCoordinator<Page: TabPage>: TabCoordinatable {
     // --------------------------------------------------------------------
     
     private var presentationStyle: TransitionPresentationStyle
-    public let badge: PassthroughSubject<(String?, Page), Never>
+    public var badges: AsyncStream<(String?, Page)> { stream }
     public var viewContainer: (TabCoordinator<Page>) -> (Page.View)
     
+    private let (stream, continuation) = AsyncStream.makeStream(of: (String?, Page).self)
+
     // ---------------------------------------------------------
     // MARK: Constructor
     // ---------------------------------------------------------
-    
+
     public init(
         pages: [Page],
         currentPage: Page,
@@ -68,7 +70,6 @@ open class TabCoordinator<Page: TabPage>: TabCoordinatable {
         self.currentPage = currentPage
         self.viewContainer = viewContainer
         self.pages = pages
-        self.badge = .init()
     }
     
     // ---------------------------------------------------------
@@ -102,10 +103,10 @@ open class TabCoordinator<Page: TabPage>: TabCoordinatable {
     }
     
     public func setBadge(for page: Page, with value: String?) {
-        badge.send((value, page))
+        continuation.yield((value, page))
     }
     
-    @MainActor public func clean() async {
+    public func clean() async {
         await setPages([], currentPage: nil)
         await router.clean(animated: false)
     }

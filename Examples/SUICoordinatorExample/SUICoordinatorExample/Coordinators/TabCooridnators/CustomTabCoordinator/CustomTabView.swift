@@ -44,12 +44,6 @@ struct CustomTabView<DataSource: TabCoordinatorType>: View where DataSource.Data
     @State private var dataSource: DataSource
     @State private var badges = [BadgeItem]()
     
-    private var badgeKey: String {
-//        guard let (value, page) = dataSource.badge else { return "" }
-//        return "\(page.id)_\(value ?? "nil")"
-        ""
-    }
-    
     private let widthIcon: CGFloat = 22
     
     
@@ -70,8 +64,15 @@ struct CustomTabView<DataSource: TabCoordinatorType>: View where DataSource.Data
     
     var body: some View {
         ZStack(alignment: .bottomLeading) {
-            TabView(selection: $dataSource.currentPage) {
-                ForEach(dataSource.pages, id: \.id, content: tabBarItem)
+            if #available(iOS 26.0, *) {
+                TabView(selection: $dataSource.currentPage) {
+                    ForEach(dataSource.pages, id: \.id, content: tabBarItem)
+                }
+                .tabBarMinimizeBehavior(.onScrollDown)
+            } else {
+                TabView(selection: $dataSource.currentPage) {
+                    ForEach(dataSource.pages, id: \.id, content: tabBarItem)
+                }
             }
             
             VStack() {
@@ -88,13 +89,15 @@ struct CustomTabView<DataSource: TabCoordinatorType>: View where DataSource.Data
         .onChange(of: dataSource.pages) { _, pages in
             badges = pages.map { (nil, $0) }
         }
-        .onChange(of: badgeKey) { _, _ in
-//            guard let (value, page) = dataSource.badge,
-//                  let index = getBadgeIndex(page: page) else { return }
-//            badges[index].value = value
-        }
         .task {
             badges = dataSource.pages.map { (nil, $0) }
+            
+            for await badge in dataSource.badges {
+                guard let index = getBadgeIndex(page: badge.1)
+                else { return }
+                
+                badges[index].value = badge.0
+            }
         }
     }
     
@@ -107,9 +110,15 @@ struct CustomTabView<DataSource: TabCoordinatorType>: View where DataSource.Data
     @ViewBuilder
     func tabBarItem(page: Page) -> some View {
         if let item = dataSource.getCoordinator(with: page) {
-            item.getView().asAnyView()
-                .toolbar(.hidden, for: .tabBar)
-                .tag(page)
+            if #available(iOS 18.0, *) {
+                item.getView().asAnyView()
+                    .toolbarVisibility(.hidden, for: .tabBar)
+                    .tag(page)
+            } else {
+                item.getView().asAnyView()
+                    .toolbar(.hidden, for: .tabBar)
+                    .tag(page)
+            }
         }
     }
     

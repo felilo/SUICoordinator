@@ -59,7 +59,7 @@ import SwiftUI
 ///
 /// Use `RouteType` when you want to describe stack-based or modal navigation with clear ownership of both view and presentation.
 ///
-public typealias RouteType = RoutePresentationType & View
+public typealias RouteType = RoutePresentationType & View & Sendable
 
 /// Protocol that supplies presentation and identity requirements for `RouteType`.
 ///

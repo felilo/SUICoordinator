@@ -23,7 +23,6 @@
 //
 
 import Foundation
-import Combine
 
 @available(iOS 17.0, *)
 @MainActor
@@ -34,13 +33,14 @@ public protocol TabCoordinatorType: Observable, AnyObject {
     typealias DataSourcePage = Page.DataSource
     
     var currentPage: Page { get set }
-    var badge: PassthroughSubject<(String?, Page), Never> { get }
+    var badges: AsyncStream<(String?, Page)> { get }
+    
     var pages: [Page] { get set }
     var viewContainer: (TabCoordinator<Page>) -> (Page.View) { get set }
     
     func getCoordinator(with page: Page) -> AnyCoordinatorType?
     func getCoordinatorSelected() throws -> (any CoordinatorType)
-    @MainActor func clean() async
+    func clean() async
     func setBadge(for page: Page, with value: String?)
 }
 

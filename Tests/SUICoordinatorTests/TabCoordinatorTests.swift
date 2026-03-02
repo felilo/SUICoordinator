@@ -200,16 +200,22 @@ final class TabCoordinatorTests: XCTestCase {
         await sut.start()
 
         var badgeValues: [(String?, AnyEnumTabRoute)] = []
-        let cancellable = sut.badge.sink { badgeValues.append($0) }
+        let task = Task {
+            for await value in sut.badges {
+                await MainActor.run { badgeValues.append(value) }
+            }
+        }
 
         sut.setBadge(for: .tab1, with: "3")
+        try await Task.sleep(for: .milliseconds(100))
         XCTAssertEqual(badgeValues.last?.0, "3")
         XCTAssertEqual(badgeValues.last?.1, .tab1)
 
         sut.setBadge(for: .tab1, with: nil)
+        try await Task.sleep(for: .milliseconds(100))
         XCTAssertNil(badgeValues.last?.0)
 
-        cancellable.cancel()
+        task.cancel()
         await finishFlow(sut: sut)
     }
 

@@ -63,13 +63,6 @@ public struct DefaultTabView<DataSource: TabCoordinatorType>: View where DataSou
     /// This array maintains the badge values for each tab, synchronized with the pages array.
     @State var badges = [BadgeItem]()
     
-    /// A stable string derived from the current badge state, used to trigger onChange.
-    private var badgeKey: String {
-//        guard let (value, page) = dataSource.badge else { return "" }
-//        return "\(page.id)_\(value ?? "nil")"
-        ""
-    }
-    
     /// Initializes a new tab view coordinator.
     ///
     /// - Parameters:
@@ -98,13 +91,15 @@ public struct DefaultTabView<DataSource: TabCoordinatorType>: View where DataSou
         .onChange(of: dataSource.pages) { _, pages in
             badges = pages.map { (nil, $0) }
         }
-        .onChange(of: badgeKey) { _, _ in
-//            guard let (value, page) = dataSource.badge,
-//                  let index = getBadgeIndex(page: page) else { return }
-//            badges[index].value = value
-        }
         .task {
             badges = dataSource.pages.map { (nil, $0) }
+            
+            for await badge in dataSource.badges {
+                guard let index = getBadgeIndex(page: badge.1)
+                else { return }
+                
+                badges[index].value = badge.0
+            }
         }
     }
     

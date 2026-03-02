@@ -27,6 +27,7 @@
 /// This extension adds convenience methods to types that conform to both `TabCoordinatorType`
 /// and `TabCoordinatable`, simplifying common operations like page management and coordinator setup.
 @available(iOS 17.0, *)
+@MainActor
 extension TabCoordinatorType where Self : TabCoordinatable {
     
     /// Sets the array of pages for the tab coordinator.
