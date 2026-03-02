@@ -27,20 +27,21 @@ import SUICoordinatorCore
 
 /// A class representing a coordinator for managing and presenting sheets.
 @available(iOS 17.0, *)
+@MainActor
 @Observable
 final public class SheetCoordinator<T> {
-    
+
     public typealias Item = SheetItem<T>
-    
+
     var items: [Item?]
-    
+
     private let itemManager = ItemManager<Item?>()
-    
+
     public private(set) var lastPresentationStyle: TransitionPresentationStyle?
     public private(set) var animated: Bool?
     private var backUpItems: [Int: String]
     var onRemoveItem: ((String) async -> Void)?
-    
+
     init(
         items: [Item?] = [],
         lastPresentationStyle: TransitionPresentationStyle? = nil,
@@ -54,25 +55,24 @@ final public class SheetCoordinator<T> {
         self.backUpItems = backUpItems
         self.onRemoveItem = onRemoveItem
     }
-    
-    @MainActor
+
     private var totalItems: Int {
         get async { await itemManager.totalItems }
     }
-    
+
     var areEmptyItems: Bool {
         get async { await itemManager.areItemsEmpty() }
     }
-    
-    @MainActor public func presentSheet(_ sheet: Item) async -> Void {
+
+    public func presentSheet(_ sheet: Item) async -> Void {
         animated = sheet.animated
         lastPresentationStyle = sheet.presentationStyle
         await itemManager.addItem(sheet)
         await backUpItems[totalItems] = sheet.id
         await updateItems()
     }
-    
-    @MainActor func removeLastSheet(animated: Bool) async -> Void {
+
+    func removeLastSheet(animated: Bool) async -> Void {
         guard !(await areEmptyItems) else { return await updateItems() }
         self.animated = animated
         let totalItems = await totalItems
@@ -84,68 +84,67 @@ final public class SheetCoordinator<T> {
         }
         await updateItems()
     }
-    
+
     func removeSheet(at index: [Int], animated: Bool) async -> Void {
         self.animated = animated
         await updateLastPresentationStyle()
         await itemManager.makeItemsNil(at: index)
         await updateItems()
     }
-    
-    @MainActor func remove(at index: String) async {
+
+    func remove(at index: String) async {
         guard let index = Int(index),
               (await itemManager.isValid(index: index))
         else { return await updateItems() }
-        
+
         if let id = backUpItems[index] {
             await onRemoveItem?(id)
             backUpItems.removeValue(forKey: index)
         }
-        
+
         guard (await itemManager.removeItem(at: index)) != nil else {
             await updateLastPresentationStyle()
             return await updateItems()
         }
-        
+
         await handleRemove(index: index - 1)
         await updateLastPresentationStyle()
         await removeAllNilItems()
     }
-    
-    @MainActor func clean(animated: Bool = true) async -> Void {
+
+    func clean(animated: Bool = true) async -> Void {
         let items = await itemManager.getAllItems()
         var indexes = [0]
-        
+
         if let firstFSIndex = items.firstIndex(where: { $0?.presentationStyle == .fullScreenCover }) {
             indexes = [firstFSIndex]
             if let firstSheetIndex = items.firstIndex(where: { $0 != nil && $0?.presentationStyle != .fullScreenCover }) {
                 indexes.append(firstSheetIndex)
             }
         }
-        
+
         await removeSheet(at: indexes, animated: animated)
         try? await Task.sleep(for: .seconds(animated ? 0.1 : 0))
     }
-    
+
     func getNextIndex(_ index: Int) -> Int {
         index + 1
     }
-    
-    @MainActor func isLastIndex(_ index: Int) -> Bool {
+
+    func isLastIndex(_ index: Int) -> Bool {
         let totalItems = items.count - 1
         return items.isEmpty || index == totalItems
     }
-    
+
     func removeAllNilItems() async {
         await itemManager.removeAllNilItems()
         await updateItems()
     }
-    
-    @MainActor
+
     func updateItems() async {
         items = await itemManager.getAllItems()
     }
-    
+
     private func updateLastPresentationStyle() async {
         let presentationStyle = await itemManager.getAllItems().last(where: {
             $0?.presentationStyle != nil
@@ -153,7 +152,7 @@ final public class SheetCoordinator<T> {
         guard presentationStyle != lastPresentationStyle else { return }
         lastPresentationStyle = presentationStyle
     }
-    
+
     private func handleRemove(index: Int) async {
         guard (await itemManager.isValid(index: index)) else { return }
         let items = await itemManager.getAllItems()
@@ -168,7 +167,7 @@ final public class SheetCoordinator<T> {
             }
         }
     }
-    
+
     private func getBackupItemIndex(by value: String) -> Dictionary<Int, String>.Element? {
         backUpItems.first(where: { $0.value == value })
     }

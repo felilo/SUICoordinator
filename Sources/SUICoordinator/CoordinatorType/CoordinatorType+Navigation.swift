@@ -153,7 +153,7 @@ public extension CoordinatorType {
     /// )
     /// ```
     
-    @MainActor func startFlow(route: Route) async -> Void {
+    func startFlow(route: Route) async -> Void {
         if !isRunning { router.mainView = route }
     }
     

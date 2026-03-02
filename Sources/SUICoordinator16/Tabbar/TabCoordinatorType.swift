@@ -38,7 +38,7 @@ public protocol TabCoordinatorType: ObservableObject {
     
     func getCoordinator(with page: Page) -> AnyCoordinatorType?
     func getCoordinatorSelected() throws -> (any CoordinatorType)
-    @MainActor func clean() async
+    func clean() async
     func setBadge(for page: Page, with value: String?)
 }
 

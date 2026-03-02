@@ -32,7 +32,7 @@ extension TabCoordinatorType {
     /// - Parameters:
     ///   - coordinator: The child coordinator whose corresponding page should be set as current.
     ///                  The coordinator's `tagId` should match the string representation of a page's position.
-    @MainActor func setCurrentPage(with coordinator: any CoordinatorType) {
+    func setCurrentPage(with coordinator: any CoordinatorType) {
         let page = pages.first(where: { "\($0.position)" == coordinator.tagId })
         
         setCurrentPage(page)
@@ -47,7 +47,7 @@ extension TabCoordinatorType {
     /// - Parameters:
     ///   - value: The optional page to set as current. If `nil`, no change will be made.
     ///            The page must exist in the `pages` array and be different from the current page.
-    @MainActor public func setCurrentPage(_ value: (any TabPage)?) {
+    public func setCurrentPage(_ value: (any TabPage)?) {
         guard let value, value.position != currentPage.position,
               let item = pages.first(where: { $0.position == value.position })
         else { return  }
@@ -62,7 +62,7 @@ extension TabCoordinatorType {
     ///
     /// - Note: This method will attempt to get the currently selected coordinator and pop to its root.
     ///         If the selected coordinator cannot be determined, the operation will fail silently.
-    @MainActor public func popToRoot() async {
+    public func popToRoot() async {
         try? await getCoordinatorSelected().root.popToRoot(animated: true)
     }
 }

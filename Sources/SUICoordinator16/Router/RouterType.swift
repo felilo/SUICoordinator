@@ -26,42 +26,43 @@ import Foundation
 import Combine
 
 /// A protocol representing a router in the coordinator pattern.
+@MainActor
 public protocol RouterType: ObservableObject {
-    
+
     // --------------------------------------------------------------------
     // MARK: Associated Type
     // --------------------------------------------------------------------
-    
+
     /// The associated type representing the route associated with the router.
     associatedtype Route: RouteType
-    
+
     // --------------------------------------------------------------------
     // MARK: Properties
     // --------------------------------------------------------------------
-    
+
     /// An array of route items associated with the router.
     var items: [Route] { get set }
-    
+
     /// The sheet coordinator associated with the router.
     var sheetCoordinator: SheetCoordinator<AnyViewAlias> { get }
-    
+
     /// The main view associated with the router.
     var mainView: Route? { get }
-    
+
     /// The main view associated with the router.
     var animated: Bool { get }
-    
+
     // --------------------------------------------------------------------
     // MARK: Functions
     // --------------------------------------------------------------------
-    
-    @MainActor func navigate(toRoute route: Route, presentationStyle: TransitionPresentationStyle?, animated: Bool) async
-    @MainActor func present(_ view: Route, presentationStyle: TransitionPresentationStyle?, animated: Bool) async
-    @MainActor func pop(animated: Bool) async
-    @MainActor func popToRoot(animated: Bool) async
-    @MainActor func dismiss(animated: Bool) async
+
+    func navigate(toRoute route: Route, presentationStyle: TransitionPresentationStyle?, animated: Bool) async
+    func present(_ view: Route, presentationStyle: TransitionPresentationStyle?, animated: Bool) async
+    func pop(animated: Bool) async
+    func popToRoot(animated: Bool) async
+    func dismiss(animated: Bool) async
     func clean(animated: Bool, withMainView: Bool) async -> Void
-    @MainActor func close(animated: Bool) async -> Void
+    func close(animated: Bool) async -> Void
     func restart(animated: Bool) async -> Void
     func syncItems() async -> Void
 }

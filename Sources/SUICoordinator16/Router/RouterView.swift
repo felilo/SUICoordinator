@@ -79,7 +79,7 @@ struct RouterView<C: CoordinatorType>: View {
         view.environmentObject(coordinator)
             .sheetCoordinator(
             coordinator: viewModel.sheetCoordinator,
-            onDissmis: { index in Task(priority: .high) { @MainActor [weak viewModel] in
+            onDissmis: { index in Task(priority: .high) { [weak viewModel] in
                 await viewModel?.removeItemFromSheetCoordinator(at: index)
             }},
             onDidLoad: nil

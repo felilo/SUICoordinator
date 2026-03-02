@@ -65,7 +65,7 @@ final class CoordinatorMacroTests: XCTestCase {
 
                 public var tagId: String?
 
-                public init() {
+                @MainActor public init() {
                     self.router = .init()
                     self.uuid = "\\(NSStringFromClass(type(of: self))) - \\(UUID().uuidString)"
                 }
@@ -182,7 +182,7 @@ final class CoordinatorMacroTests: XCTestCase {
 
                 public var tagId: String?
 
-                public init() {
+                @MainActor public init() {
                     self.router = .init()
                     self.uuid = "\\(NSStringFromClass(type(of: self))) - \\(UUID().uuidString)"
                 }
@@ -268,7 +268,7 @@ final class CoordinatorMacroTests: XCTestCase {
 
                 public var tagId: String?
 
-                public init() {
+                @MainActor public init() {
                     self.router = .init()
                     self.uuid = "\\(NSStringFromClass(type(of: self))) - \\(UUID().uuidString)"
                 }

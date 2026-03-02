@@ -78,7 +78,7 @@ extension CoordinatorMacro: MemberMacro {
         if !existingMemberNames.contains("init") {
             members.append(
                 """
-                public init() {
+                @MainActor public init() {
                     self.router = .init()
                     self.uuid = "\\(NSStringFromClass(type(of: self))) - \\(UUID().uuidString)"
                 }
