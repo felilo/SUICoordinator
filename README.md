@@ -14,6 +14,7 @@ _____
 - **Pure SwiftUI**: No UIKit dependencies — built entirely with SwiftUI
 - **Coordinator Pattern**: Clean separation of navigation logic from views
 - **Dual iOS Support**: `SUICoordinator` (iOS 17+, `@Observable`) and `SUICoordinator16` (iOS 16+, `ObservableObject`) — same API, pick the right target for your deployment
+- **`@Coordinator` Macro**: Optional Swift macro for a lighter, composition-based coordinator syntax (iOS 17+)
 - **Flexible Presentations**: Push, sheet, fullscreen, detents, and custom transitions
 - **Tab Coordination**: Advanced tab-based navigation with `TabCoordinator`, custom views, and badges
 - **Deep Linking**: Force presentation capabilities for push notifications and external triggers
@@ -23,12 +24,10 @@ _____
 
 ## Targets
 
-SUICoordinator ships two importable products. Pick the one that matches your deployment target — both expose the same public API:
+SUICoordinator ships two importable products that expose the same public API:
 
-| Product | Minimum iOS | How observation works | When to use |
-|---------|-------------|-----------------------|-------------|
-| `SUICoordinator` | **17+** | `@Observable` macro | New projects or apps that already require iOS 17+ |
-| `SUICoordinator16` | **16+** | `ObservableObject` + Combine | Apps that must support iOS 16 |
+- **`SUICoordinator`** (iOS 17+) — uses `@Observable`. Recommended for new projects.
+- **`SUICoordinator16`** (iOS 16+) — uses `ObservableObject` + Combine. See [SUICoordinator16.md](SUICoordinator16.md) for the full guide.
 
 _____
 
@@ -80,14 +79,13 @@ enum HomeRoute: RouteType {
 
 ### 2. Create Your Coordinator
 
-Subclass `Coordinator<YourRouteType>` and implement `start()` to define the initial view of the flow.
-
 ```swift
 import SUICoordinator
 
-class HomeCoordinator: Coordinator<HomeRoute> {
+@Coordinator(HomeRoute.self)
+class HomeCoordinator {
 
-    override func start() async {
+    func start() async {
         let dependencies = HomeViewDependencies()
         await startFlow(route: .homeView(dependencies: dependencies))
     }
@@ -101,53 +99,24 @@ class HomeCoordinator: Coordinator<HomeRoute> {
         await navigate(toRoute: .sheetView(coordinator: self))
     }
 
-    // Override the default presentation style for a route
-    func presentSheetAsDetents() async {
-        await navigate(toRoute: .sheetView(coordinator: self), presentationStyle: .detents([.medium, .large]))
-    }
-
-    // Navigate to another coordinator
-    func presentDefaultTabs() async {
-        let coordinator = DefaultTabCoordinator()
-        await navigate(to: coordinator, presentationStyle: .sheet)
-    }
-
     func endThisCoordinator() async {
         await finishFlow()
     }
 }
 ```
 
+> **iOS 16 support**: If your deployment target is iOS 16, use `SUICoordinator16` instead. See [SUICoordinator16.md](SUICoordinator16.md) for the complete guide.
+
 ### 3. Define Views
 
-How a view receives its coordinator depends on which target you imported.
+Use `@Environment` to access the coordinator from your views:
 
-**iOS 17+ (`SUICoordinator`) — `@Observable`:**
 ```swift
 import SwiftUI
 import SUICoordinator
 
 struct HomeView: View {
     @Environment(HomeCoordinator.self) var coordinator
-
-    var body: some View {
-        List {
-            Button("Push Example View") { Task { await coordinator.navigateToPushView() } }
-            Button("Present Sheet Example") { Task { await coordinator.presentSheet() } }
-            Button("Present Tab Coordinator") { Task { await coordinator.presentDefaultTabs() } }
-        }
-        .navigationTitle("Coordinator Actions")
-    }
-}
-```
-
-**iOS 16+ (`SUICoordinator16`) — `ObservableObject`:**
-```swift
-import SwiftUI
-import SUICoordinator16
-
-struct HomeView: View {
-    @EnvironmentObject var coordinator: HomeCoordinator
 
     var body: some View {
         List {
@@ -340,18 +309,48 @@ _____
 
 ## API Reference
 
+A `Coordinator` owns a `Router`, which drives both the navigation stack and modal presentations. Routes (`RouteType`) are the unit of navigation — each one declares how it should be presented (`presentationStyle`) and what it renders (`body`). You never interact with the `Router` directly in most cases; the `Coordinator` exposes convenience methods that delegate to it.
+
+```mermaid
+sequenceDiagram
+    participant C as Coordinator
+    participant R as Router
+    participant NS as NavigationStack
+    participant ML as Modal Layer
+
+    C->>R: startFlow(route:)
+
+    Note over C,R: Push
+    C->>R: navigate(toRoute: .push)
+    R->>NS: push view
+
+    Note over C,ML: Modal
+    C->>R: navigate(toRoute: .sheet / .fullScreenCover / .detents / .custom)
+    R->>ML: present view
+
+    Note over C,R: Dismiss / pop
+    C->>R: close() / pop() / dismiss()
+    R-->>NS: pop view
+    R-->>ML: dismiss view
+```
+
+_____
+
 ### RouteType
 
 Every route enum must conform to `RouteType`. Two requirements:
 
-1. **`presentationStyle: TransitionPresentationStyle`** — how the view is shown:
-    - `.push` — navigation stack
-    - `.sheet` — standard modal sheet
-    - `.fullScreenCover` — modal covering the entire screen
-    - `.detents(Set<PresentationDetent>)` — sheet that rests at specific heights (e.g., `.detents([.medium, .large])`)
-    - `.custom(transition: AnyTransition, animation: Animation?, fullScreen: Bool)` — custom SwiftUI transition
+- **`var presentationStyle: TransitionPresentationStyle`** — how the view is presented:
 
-2. **`var body: some View`** — the SwiftUI view for the route case
+| Style | Description |
+|-------|-------------|
+| `.push` | Pushes onto the navigation stack |
+| `.sheet` | Standard modal sheet |
+| `.fullScreenCover` | Modal covering the entire screen |
+| `.detents([...])` | Sheet that rests at specific heights (e.g., `.detents([.medium, .large])`) |
+| `.custom(transition:animation:fullScreen:)` | Custom SwiftUI transition |
+
+- **`var body: some View`** — the SwiftUI view rendered for that route case
 
 ```swift
 import SwiftUI
@@ -391,223 +390,59 @@ enum AppRoute: RouteType {
 
 > You can also use `DefaultRoute` for generic views when you don't need a typed route enum — as demonstrated in the [NavigationHubCoordinator example](https://github.com/felilo/SUICoordinator/blob/main/Examples/SUICoordinatorExample/SUICoordinatorExample/Coordinators/NavigationHubCoordinator/NavigationHubCoordinator.swift).
 
-<br>
-
-### Router
-
-The `Router` (available as `coordinator.router`) manages the navigation stack and modal presentations for a single coordinator.
-
-<br>
-<table>
-  <thead>
-    <tr>
-      <th>Method</th>
-      <th>Parameters</th>
-      <th>Description</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td><code>navigate(toRoute:presentationStyle:animated:)</code></td>
-      <td>
-        <ul>
-          <li><b>toRoute:</b> <code>Route</code></li>
-          <li><b>presentationStyle:</b> <code>TransitionPresentationStyle?</code> — default: <code>nil</code> (uses route's default)</li>
-          <li><b>animated:</b> <code>Bool</code> — default: <code>true</code></li>
-        </ul>
-      </td>
-      <td>Navigates to the given route. <code>.push</code> pushes onto the navigation stack; everything else presents modally.</td>
-    </tr>
-    <tr>
-      <td><code>present(_:presentationStyle:animated:)</code></td>
-      <td>
-        <ul>
-          <li><b>_ view:</b> <code>Route</code></li>
-          <li><b>presentationStyle:</b> <code>TransitionPresentationStyle?</code> — default: <code>.sheet</code></li>
-          <li><b>animated:</b> <code>Bool</code> — default: <code>true</code></li>
-        </ul>
-      </td>
-      <td>Presents a view modally. If the style is <code>.push</code>, delegates to <code>navigate(toRoute:)</code>.</td>
-    </tr>
-    <tr>
-      <td><code>pop(animated:)</code></td>
-      <td><b>animated:</b> <code>Bool</code> — default: <code>true</code></td>
-      <td>Pops the top view from the navigation stack.</td>
-    </tr>
-    <tr>
-      <td><code>popToRoot(animated:)</code></td>
-      <td><b>animated:</b> <code>Bool</code> — default: <code>true</code></td>
-      <td>Pops all views except the root from the navigation stack.</td>
-    </tr>
-    <tr>
-      <td><code>dismiss(animated:)</code></td>
-      <td><b>animated:</b> <code>Bool</code> — default: <code>true</code></td>
-      <td>Dismisses the top-most modally presented view.</td>
-    </tr>
-    <tr>
-      <td><code>close(animated:)</code></td>
-      <td><b>animated:</b> <code>Bool</code> — default: <code>true</code></td>
-      <td>Dismisses if presented modally; pops if pushed onto a navigation stack.</td>
-    </tr>
-    <tr>
-      <td><code>restart(animated:)</code></td>
-      <td><b>animated:</b> <code>Bool</code> — default: <code>true</code></td>
-      <td>Clears all stacks and sheet presentations, returning the router to its initial state.</td>
-    </tr>
-    <tr>
-      <td><code>syncItems()</code></td>
-      <td>N/A</td>
-      <td>Synchronises the published <code>items</code> array with internal navigation-stack state. Useful after complex mutations.</td>
-    </tr>
-  </tbody>
-</table>
-<br>
+_____
 
 ### Coordinator
 
-<br>
-<table>
-  <thead>
-    <tr>
-      <th>Method / Property</th>
-      <th>Parameters</th>
-      <th>Description</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td><code>router</code></td>
-      <td>Property — <code>Router&lt;Route&gt;</code></td>
-      <td>The router for this coordinator. Use it for all navigation within this coordinator's flow.</td>
-    </tr>
-    <tr>
-      <td><code>start(animated:)</code></td>
-      <td><b>animated:</b> <code>Bool</code> — default: <code>true</code></td>
-      <td>Must be overridden. Define the initial view or flow here, typically via <code>await startFlow(route:)</code>.</td>
-    </tr>
-    <tr>
-      <td><code>startFlow(route:transitionStyle:animated:)</code></td>
-      <td>
-        <ul>
-          <li><b>route:</b> <code>Route</code></li>
-          <li><b>transitionStyle:</b> <code>TransitionPresentationStyle?</code> — default: <code>nil</code></li>
-          <li><b>animated:</b> <code>Bool</code> — default: <code>true</code></li>
-        </ul>
-      </td>
-      <td>Clears the current navigation stack and starts a new flow with the given route.</td>
-    </tr>
-    <tr>
-      <td><code>finishFlow(animated:)</code></td>
-      <td><b>animated:</b> <code>Bool</code> — default: <code>true</code></td>
-      <td>Dismisses all views managed by this coordinator and removes it from its parent's children list.</td>
-    </tr>
-    <tr>
-      <td><code>navigate(toRoute:presentationStyle:animated:)</code></td>
-      <td>
-        <ul>
-          <li><b>toRoute:</b> <code>Route</code></li>
-          <li><b>presentationStyle:</b> <code>TransitionPresentationStyle?</code> — default: <code>nil</code></li>
-          <li><b>animated:</b> <code>Bool</code> — default: <code>true</code></li>
-        </ul>
-      </td>
-      <td>Convenience wrapper for <code>router.navigate(toRoute:presentationStyle:animated:)</code>.</td>
-    </tr>
-    <tr>
-      <td><code>navigate(to:presentationStyle:animated:)</code></td>
-      <td>
-        <ul>
-          <li><b>to:</b> <code>any CoordinatorType</code></li>
-          <li><b>presentationStyle:</b> <code>TransitionPresentationStyle?</code> — default: <code>nil</code></li>
-          <li><b>animated:</b> <code>Bool</code> — default: <code>true</code></li>
-        </ul>
-      </td>
-      <td>Navigates to another coordinator. Adds it as a child, sets its parent, and calls its <code>start()</code>.</td>
-    </tr>
-    <tr>
-      <td><code>forcePresentation(presentationStyle:animated:rootCoordinator:)</code></td>
-      <td>
-        <ul>
-          <li><b>presentationStyle:</b> <code>TransitionPresentationStyle?</code> — default: <code>nil</code></li>
-          <li><b>animated:</b> <code>Bool</code> — default: <code>true</code></li>
-          <li><b>rootCoordinator:</b> <code>(any CoordinatorType)?</code> — default: <code>nil</code></li>
-        </ul>
-      </td>
-      <td>Forcefully presents this coordinator from the top of the hierarchy. Used for deep links and push notifications.</td>
-    </tr>
-    <tr>
-      <td><code>restart(animated:)</code></td>
-      <td><b>animated:</b> <code>Bool</code> — default: <code>true</code></td>
-      <td>Resets this coordinator's navigation state by calling <code>router.restart()</code>.</td>
-    </tr>
-    <tr>
-      <td><code>close(animated:)</code></td>
-      <td><b>animated:</b> <code>Bool</code> — default: <code>true</code></td>
-      <td>Forwards to <code>router.close(animated:)</code>.</td>
-    </tr>
-    <tr>
-      <td><code>getCoordinatorPresented(customRootCoordinator:)</code></td>
-      <td><b>customRootCoordinator:</b> <code>AnyCoordinatorType?</code> — default: <code>nil</code></td>
-      <td>Returns the coordinator currently visible to the user. Walks the hierarchy from <code>customRootCoordinator</code> (or <code>self</code>) to the top; follows the active tab inside a <code>TabCoordinator</code>.</td>
-    </tr>
-  </tbody>
-</table>
-<br>
+| Method | Description |
+|--------|-------------|
+| `start()` | Override to define the initial view or flow, typically via `await startFlow(route:)`. |
+| `startFlow(route:)` | Clears the current stack and starts a new flow with the given route. |
+| `finishFlow(animated:)` | Dismisses all views of this coordinator and removes it from its parent. |
+| `navigate(toRoute:presentationStyle:animated:)` | Navigates to a route within this coordinator's flow. |
+| `navigate(to:presentationStyle:animated:)` | Presents another coordinator, adds it as a child, and calls its `start()`. |
+| `forcePresentation(presentationStyle:animated:rootCoordinator:)` | Presents this coordinator from the top of the hierarchy. Used for deep links. |
+| `restart(animated:)` | Resets the coordinator's navigation state to its initial route. |
+| `close(animated:)` | Dismisses if presented modally; pops if pushed. |
+| `getView()` | Returns the SwiftUI view for this coordinator. Use this to embed it in your app or another view. |
+| `getCoordinatorPresented(customRootCoordinator:)` | Returns the coordinator currently visible to the user, walking the full hierarchy. |
+
+_____
+
+### Router
+
+The `Router` is available as `coordinator.router` and manages the navigation stack and modal presentations for a single coordinator's flow. Most navigation is done through the `Coordinator` methods above, but the `Router` is useful when you need lower-level control.
+
+| Method / Property | Description |
+|-------------------|-------------|
+| `mainView: Route?` | The root view of the coordinator's flow. |
+| `items: [Route]` | The current navigation stack (push items). |
+| `navigate(toRoute:presentationStyle:animated:)` | Navigates to the given route. `.push` appends to the stack; all other styles present modally. |
+| `present(_:presentationStyle:animated:)` | Presents a view modally. Defaults to `.sheet` if no style is provided. |
+| `pop(animated:)` | Pops the top view from the navigation stack. |
+| `popToRoot(animated:)` | Pops all views except the root from the navigation stack. |
+| `dismiss(animated:)` | Dismisses the top-most modally presented view. |
+| `close(animated:)` | Dismisses if presented modally; pops if on the navigation stack. |
+| `restart(animated:)` | Clears all stacks and modal presentations, returning to the initial state. |
+
+_____
 
 ### TabCoordinator
 
-<br>
-<table>
-  <thead>
-    <tr>
-      <th>Method / Property</th>
-      <th>Parameters / Type</th>
-      <th>Description</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td><code>router</code></td>
-      <td>Property — <code>Router&lt;DefaultRoute&gt;</code></td>
-      <td>The router for the <code>TabCoordinator</code> itself — not for navigation within individual tabs.</td>
-    </tr>
-    <tr>
-      <td><code>pages</code></td>
-      <td>Property — <code>[Page]</code><br><em>iOS 16: <code>@Published</code></em></td>
-      <td>The array of <code>TabPage</code> enum cases defining the tabs.</td>
-    </tr>
-    <tr>
-      <td><code>currentPage</code></td>
-      <td>Property — <code>Page</code><br><em>iOS 16: <code>@Published</code></em></td>
-      <td>Get or set the currently selected tab. Changing this programmatically switches the active tab.</td>
-    </tr>
-    <tr>
-      <td><code>setPages(_:currentPage:)</code></td>
-      <td>
-        <ul>
-          <li><b>_ values:</b> <code>[Page]</code></li>
-          <li><b>currentPage:</b> <code>Page?</code></li>
-        </ul>
-      </td>
-      <td>Dynamically updates the tab set. Initializes coordinators for new pages and cleans up removed ones.</td>
-    </tr>
-    <tr>
-      <td><code>getCoordinatorSelected()</code></td>
-      <td>Returns <code>any CoordinatorType</code> (throws)</td>
-      <td>Returns the child coordinator for the currently selected tab. Throws <code>TabCoordinatorError.coordinatorSelected</code> if not found.</td>
-    </tr>
-    <tr>
-      <td><code>getCoordinator(with:)</code></td>
-      <td><b>page:</b> <code>TabPage</code><br>Returns <code>AnyCoordinatorType?</code></td>
-      <td>Returns the child coordinator for the given <code>TabPage</code>, or <code>nil</code> if not found.</td>
-    </tr>
-    <tr>
-      <td><code>setBadge</code></td>
-      <td>Property — <code>PassthroughSubject&lt;(String?, Page), Never&gt;</code></td>
-      <td>Send <code>("3", .yourTab)</code> to set a badge, or <code>(nil, .yourTab)</code> to remove it.</td>
-    </tr>
-  </tbody>
-</table>
-<br>
+`TabCoordinator` conforms to both `TabCoordinatorType` and `CoordinatorType`, so all methods from the [Coordinator](#coordinator) table are also available on a `TabCoordinator` instance.
+
+The following properties and methods are specific to `TabCoordinator`:
+
+| Method / Property | Description |
+|-------------------|-------------|
+| `pages: [Page]` | The array of `TabPage` cases defining the tabs. |
+| `currentPage: Page` | Get or set the currently selected tab programmatically. |
+| `setCurrentPage(_:)` | Switches to the given tab, validating it exists and differs from the current one. |
+| `setPages(_:currentPage:)` | Dynamically updates the tab set, initializing coordinators for new pages and cleaning up removed ones. |
+| `getCoordinatorSelected()` | Returns the child coordinator for the currently selected tab (throws if not found). |
+| `getCoordinator(with:)` | Returns the child coordinator for a given `TabPage`, or `nil` if not found. |
+| `setBadge(for:with:)` | Sets or removes a badge on a tab. Pass `nil` as the value to remove it. |
+| `popToRoot()` | Pops the active tab's navigation stack to its root view. |
 
 _____
 
