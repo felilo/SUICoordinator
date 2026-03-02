@@ -27,7 +27,7 @@ import Foundation
 /// A protocol representing a router in the coordinator pattern.
 @available(iOS 17.0, *)
 @MainActor
-public protocol RouterType: Observable, AnyObject {
+public protocol RouterType: Observable {
 
     associatedtype Route: RouteType
 

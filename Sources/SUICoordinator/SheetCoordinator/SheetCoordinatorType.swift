@@ -26,7 +26,7 @@ import SwiftUI
 
 /// A protocol representing a type for managing and presenting sheets in a coordinator-based architecture.
 @available(iOS 17.0, *)
-public protocol SheetCoordinatorType: Observable, AnyObject {
+public protocol SheetCoordinatorType: Observable {
 
     typealias Item = SheetItem<AnyViewAlias>
 
