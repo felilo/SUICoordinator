@@ -38,8 +38,9 @@ class DefaultTabCoordinator: TabCoordinator<MyTabPage> {
             viewContainer: { DefaultTabView(dataSource: $0)}
         )
         
-        /// Set badge of a tap
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
+        /// Set badge of a tab
+        Task { [weak self] in
+            try? await Task.sleep(for: .seconds(1))
             self?.setBadge(for: .second, with: "2")
         }
     }

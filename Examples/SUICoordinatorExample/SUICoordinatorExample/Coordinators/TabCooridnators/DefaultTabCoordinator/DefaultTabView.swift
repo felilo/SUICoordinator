@@ -56,7 +56,7 @@ public struct DefaultTabView<DataSource: TabCoordinatorType>: View where DataSou
     /// The data source that provides tab coordinator functionality.
     ///
     /// This object manages the pages, current page selection, and badge updates.
-    @StateObject var dataSource: DataSource
+    @State var dataSource: DataSource
     
     /// The current badge states for all tabs.
     ///
@@ -69,7 +69,7 @@ public struct DefaultTabView<DataSource: TabCoordinatorType>: View where DataSou
     ///   - dataSource: The tab coordinator that provides the data and coordination logic.
     ///   - currentPage: The initial page to select. Should match the data source's current page.
     public init(dataSource: DataSource) {
-        self._dataSource = .init(wrappedValue: dataSource)
+        self.dataSource = dataSource
     }
     
     // ---------------------------------------------------------------------
@@ -88,15 +88,18 @@ public struct DefaultTabView<DataSource: TabCoordinatorType>: View where DataSou
                 legacyTabContainerView()
             }
         }
-        .onChange(of: dataSource.pages) { pages in
+        .onChange(of: dataSource.pages) { _, pages in
             badges = pages.map { (nil, $0) }
-        }
-        .onReceive(dataSource.badge) { (value, page) in
-            guard let index = getBadgeIndex(page: page) else { return }
-            badges[index].value = value
         }
         .task {
             badges = dataSource.pages.map { (nil, $0) }
+            
+            for await badge in dataSource.badges {
+                guard let index = getBadgeIndex(page: badge.1)
+                else { return }
+                
+                badges[index].value = badge.0
+            }
         }
     }
     

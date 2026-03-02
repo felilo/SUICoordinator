@@ -26,7 +26,7 @@ import SwiftUI
 
 struct NavigationActionListView: View {
     
-    @EnvironmentObject var coordinator: HomeCoordinator
+    @Environment(HomeCoordinator.self) var coordinator
     
     var body: some View {
         ZStack {
@@ -36,10 +36,12 @@ struct NavigationActionListView: View {
                 actionRowButton(title: "Push NavigationView", systemImage: "arrow.forward.square.fill") {
                     await coordinator.navigateToPushView()
                 }
-                
+                .accessibilityIdentifier("btn_pushNavigationView")
+
                 actionRowButton(title: "Presents SheetView", systemImage: "rectangle.bottomthird.inset.fill") {
                     await coordinator.presentSheet()
                 }
+                .accessibilityIdentifier("btn_presentsSheetView")
                 
                 actionRowButton(title: "Presents FullscreenView", systemImage: "rectangle.fill.on.rectangle.fill") {
                     await coordinator.presentFullscreen()
@@ -118,6 +120,7 @@ struct NavigationActionListView: View {
     }
 }
 
-#Preview {
-    NavigationActionListView()
-}
+//#Preview {
+//    NavigationActionListView()
+//        .environment(HomeCoordinator())
+//}

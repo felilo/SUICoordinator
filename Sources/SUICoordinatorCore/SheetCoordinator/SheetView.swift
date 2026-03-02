@@ -24,32 +24,32 @@
 
 import SwiftUI
 
-struct SheetView<Content: View, T: SheetItemType>: View {
+public struct SheetView<Content: View, T: SheetItemType>: View {
     
-    typealias Item = T
-    
+    public typealias Item = T
+
     // ---------------------------------------------------------
     // MARK: Wrapper properties
     // ---------------------------------------------------------
-    
-    @Binding var items: [Item?]
-    
+
+    @Binding public var items: [Item?]
+
     // ---------------------------------------------------------
     // MARK: Properties
     // ---------------------------------------------------------
-    
-    let index: Int
-    let content: ( (Int, (Item)) -> Content)
-    let onDismiss: ActionClosure?
-    let onDidLoad: ActionClosure?
-    let transitionStyle: TransitionPresentationStyle?
-    let animated: Bool
-    
+
+    public let index: Int
+    public let content: ( (Int, (Item)) -> Content)
+    public let onDismiss: ActionClosure?
+    public let onDidLoad: ActionClosure?
+    public let transitionStyle: TransitionPresentationStyle?
+    public let animated: Bool
+
     // ---------------------------------------------------------
     // MARK: Constructor
     // ---------------------------------------------------------
-    
-    init(
+
+    public init(
         index: Int,
         items: Binding<[Item?]>,
         transitionStyle: TransitionPresentationStyle?,
@@ -71,11 +71,11 @@ struct SheetView<Content: View, T: SheetItemType>: View {
     // MARK: View
     // ---------------------------------------------------------
     
-    var body: some View {
+    public var body: some View {
         Group {
-            if let index = $items.indices.firstIndex(of: index) {
-                let item = $items[index]
-                
+            if items.indices.contains(index) {
+                let item = safeBinding(at: index)
+
                 switch getTransitionStyle(from: index) {
                 case .fullScreenCover:
                     fullScreenView(
@@ -187,6 +187,7 @@ struct SheetView<Content: View, T: SheetItemType>: View {
         onDismiss: ActionClosure? = nil,
         @ViewBuilder content: @escaping (Item) -> some View
     ) -> some View {
+#if !os(macOS)
         defaultView
             .fullScreenCover(
                 item: item,
@@ -194,6 +195,9 @@ struct SheetView<Content: View, T: SheetItemType>: View {
                 content: { content($0).onViewDidLoad { onDidLoad?(String(index)) } }
             )
             .transaction { $0.disablesAnimations = !(animated) }
+#else
+        defaultView
+#endif
     }
     
     @ViewBuilder
@@ -220,7 +224,19 @@ struct SheetView<Content: View, T: SheetItemType>: View {
     // ---------------------------------------------------------
     // MARK: Helper Functions
     // ---------------------------------------------------------
-    
+
+    /// Returns a Binding<Item?> that safely returns nil when the index is out of range,
+    /// preventing crashes when the items array is compacted while a view is still mounted.
+    private func safeBinding(at index: Int) -> Binding<Item?> {
+        Binding(
+            get: { items.indices.contains(index) ? items[index] : nil },
+            set: { newValue in
+                guard items.indices.contains(index) else { return }
+                items[index] = newValue
+            }
+        )
+    }
+
     private func getTransitionStyle(from index: Int) -> TransitionPresentationStyle? {
         guard items.indices.contains(index) else {
             return transitionStyle

@@ -57,31 +57,31 @@ public struct SheetItem<T>:SCEquatable, SheetItemType {
     /// It can return either a SwiftUI view or a coordinator, depending on the generic type `T`.
     ///
     /// - Returns: The view or coordinator to present, or `nil` if creation fails.
-    let view: () -> T?
+    public let view: () -> T?
     
     /// A boolean value indicating whether to animate the presentation.
     ///
     /// When `true`, the sheet will be presented with animation.
     /// When `false`, the presentation will occur without animation.
-    let animated: Bool
+    public let animated: Bool
     
     /// The transition presentation style for presenting the sheet item.
     ///
     /// This determines how the sheet is presented (e.g., `.sheet`, `.fullScreenCover`, etc.).
     /// The presentation style affects the visual appearance and behavior of the modal presentation.
-    let presentationStyle: TransitionPresentationStyle
+    public let presentationStyle: TransitionPresentationStyle
     
     /// A subject that emits when the sheet is about to be dismissed.
     ///
     /// This publisher allows observers to react to sheet dismissal events,
     /// enabling cleanup operations or state updates before the sheet disappears.
-    let willDismiss: PassthroughSubject<Void, Never> = .init()
+    public let willDismiss: PassthroughSubject<Void, Never> = .init()
     
     /// A boolean value indicating whether the sheet item contains a coordinator.
     ///
     /// This flag helps the sheet management system determine how to handle the content,
     /// as coordinators may require different lifecycle management than regular views.
-    let isCoordinator: Bool
+    public let isCoordinator: Bool
     
     // ---------------------------------------------------------
     // MARK: Constructor
@@ -98,7 +98,7 @@ public struct SheetItem<T>:SCEquatable, SheetItemType {
     ///
     /// - Important: The `view` closure should be lightweight and avoid expensive operations,
     ///              as it may be called multiple times during the sheet's lifecycle.
-    init(
+    public init(
         id: String,
         animated: Bool,
         presentationStyle: TransitionPresentationStyle,
@@ -122,7 +122,7 @@ public struct SheetItem<T>:SCEquatable, SheetItemType {
     /// across different sheet item implementations.
     ///
     /// - Returns: The `TransitionPresentationStyle` configured for this sheet item.
-    func getPresentationStyle() -> TransitionPresentationStyle {
+    public func getPresentationStyle() -> TransitionPresentationStyle {
         presentationStyle
     }
     
@@ -132,7 +132,7 @@ public struct SheetItem<T>:SCEquatable, SheetItemType {
     /// across different sheet item implementations.
     ///
     /// - Returns: `true` if the presentation should be animated, `false` otherwise.
-    func isAnimated() -> Bool {
+    public func isAnimated() -> Bool {
         animated
     }
 }

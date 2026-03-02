@@ -26,6 +26,7 @@ import SwiftUI
 @testable import SUICoordinator
 
 
+@available(iOS 17.0, *)
 class AnyTabCoordinator: TabCoordinator<AnyEnumTabRoute> {
     init(currentPage: AnyEnumTabRoute = .tab1) {
         super.init(
@@ -37,6 +38,7 @@ class AnyTabCoordinator: TabCoordinator<AnyEnumTabRoute> {
 }
 
 
+@available(iOS 17.0, *)
 enum AnyEnumTabRoute: TabPage, CaseIterable {
     case tab1
     case tab2
@@ -67,6 +69,7 @@ enum AnyEnumTabRoute: TabPage, CaseIterable {
 
 struct AnyTabDataSource { }
 
+@available(iOS 17.0, *)
 struct AnyTabView<DataSource: TabCoordinatorType>: View where DataSource.DataSourcePage == AnyTabDataSource {
     let dataSource: DataSource
     

@@ -24,6 +24,7 @@
 
 import Foundation
 
+@MainActor
 class NavigationActionListDetailViewModel: ObservableObject {
     
     var coordinator: HomeCoordinator
@@ -34,39 +35,39 @@ class NavigationActionListDetailViewModel: ObservableObject {
         self.title = title
     }
     
-    @MainActor func presentSheet() async {
+    func presentSheet() async {
         await coordinator.presentSheet()
     }
     
-    @MainActor func presentFullscreen() async {
+    func presentFullscreen() async {
         await coordinator.presentFullscreen()
     }
     
-    @MainActor func presentViewWithCustomPresentation() async {
+    func presentViewWithCustomPresentation() async {
         await coordinator.presentViewWithCustomPresentation()
     }
     
-    @MainActor func presentDetentsView() async {
+    func presentDetentsView() async {
         await coordinator.presentDetents()
     }
     
-    @MainActor func navigateToPushView() async {
+    func navigateToPushView() async {
         await coordinator.navigateToPushView()
     }
     
-    @MainActor func close() async {
+    func close() async {
         await coordinator.close()
     }
     
-    @MainActor func finish() async {
+    func finish() async {
         await coordinator.finish()
     }
     
-    @MainActor func restartCoordinator() async {
+    func restartCoordinator() async {
         await coordinator.restart()
     }
     
-    @MainActor func presentCustomTabCoordinator() async {
+    func presentCustomTabCoordinator() async {
         await coordinator.presentCustomTabCoordinator()
     }
 }

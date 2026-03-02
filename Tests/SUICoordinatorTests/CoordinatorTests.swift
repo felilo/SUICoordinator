@@ -26,6 +26,7 @@ import XCTest
 import Combine
 @testable import SUICoordinator
 
+@available(iOS 17.0, *)
 final class CoordinatorTests: XCTestCase {
     
     private let animated: Bool = false
@@ -193,10 +194,152 @@ final class CoordinatorTests: XCTestCase {
         XCTAssertEqual(sut.router.sheetCoordinator.items.count, 0)
     }
     
+    // MARK: - isRunning
+
+    @MainActor func test_isRunning_falseBeforeStart() async {
+        let sut = makeSUT()
+        XCTAssertFalse(sut.isRunning)
+    }
+
+    @MainActor func test_isRunning_trueAfterStartFlow() async {
+        let sut = makeSUT()
+        await sut.startFlow(route: .pushStep(1))
+        XCTAssertTrue(sut.isRunning)
+    }
+
+    // MARK: - isTabCoordinable
+
+    @MainActor func test_isTabCoordinable_falseForRegularCoordinator() {
+        let sut = makeSUT()
+        XCTAssertFalse(sut.isTabCoordinable)
+    }
+
+    @MainActor func test_isTabCoordinable_trueForTabCoordinator() {
+        let tab = AnyTabCoordinator()
+        XCTAssertTrue(tab.isTabCoordinable)
+    }
+
+    // MARK: - isEmptyCoordinator
+
+    @MainActor func test_isEmptyCoordinator_trueWhenNoMainView() {
+        let sut = makeSUT()
+        XCTAssertTrue(sut.isEmptyCoordinator)
+    }
+
+    @MainActor func test_isEmptyCoordinator_falseAfterStartFlow() async {
+        let sut = makeSUT()
+        await sut.startFlow(route: .pushStep(1))
+        XCTAssertFalse(sut.isEmptyCoordinator)
+    }
+
+    // MARK: - removeChildren
+
+    @MainActor func test_removeChildren_clearsAllChildren() async {
+        let sut = makeSUT()
+        let child1 = OtherCoordinator()
+        let child2 = AnyCoordinator()
+
+        await navigateToCoordinator(child1, in: sut)
+        await navigateToCoordinator(child2, in: sut)
+        XCTAssertEqual(sut.children.count, 2)
+
+        await sut.removeChildren(animated: animated)
+        XCTAssertTrue(sut.children.isEmpty)
+    }
+
+    // MARK: - close
+
+    @MainActor func test_close_popsLastPushedRoute() async {
+        let sut = makeSUT()
+        await sut.startFlow(route: .pushStep(1))
+        await sut.router.navigate(toRoute: .pushStep2, animated: animated)
+        XCTAssertEqual(sut.router.items.count, 1)
+
+        await sut.close(animated: animated)
+        XCTAssertEqual(sut.router.items.count, 0)
+    }
+
+    @MainActor func test_close_dismissesLastSheet() async {
+        let sut = makeSUT()
+        await sut.startFlow(route: .pushStep(1))
+        await sut.router.navigate(toRoute: .sheetStep, animated: animated)
+        XCTAssertEqual(sut.router.sheetCoordinator.items.count, 1)
+
+        await sut.close(animated: animated)
+        await sut.router.sheetCoordinator.removeAllNilItems()
+        XCTAssertEqual(sut.router.sheetCoordinator.items.count, 0)
+    }
+
+    // MARK: - getCoordinatorPresented
+
+    @MainActor func test_getCoordinatorPresented_returnsSelf_whenNoChildren() async throws {
+        let sut = makeSUT()
+        await sut.startFlow(route: .pushStep(1))
+        let presented = try sut.getCoordinatorPresented()
+        XCTAssertEqual(presented?.uuid, sut.uuid)
+    }
+
+    @MainActor func test_getCoordinatorPresented_returnsDeepestChild() async throws {
+        let sut = makeSUT()
+        let child1 = OtherCoordinator()
+        let child2 = AnyCoordinator()
+
+        await sut.start()
+        await navigateToCoordinator(child1, in: sut)
+        await navigateToCoordinator(child2, in: child1)
+
+        let presented = try sut.getCoordinatorPresented()
+        XCTAssertEqual(presented?.uuid, child2.uuid)
+        await finishFlow(sut: sut)
+    }
+
+    // MARK: - navigate(toRoute:) presentation styles
+
+    @MainActor func test_navigateToRoute_sheet_addsToSheetCoordinator() async {
+        let sut = makeSUT()
+        await sut.startFlow(route: .pushStep(1))
+        await sut.navigate(toRoute: .sheetStep, animated: animated)
+        XCTAssertEqual(sut.router.sheetCoordinator.items.count, 1)
+        await finishFlow(sut: sut)
+    }
+
+    @MainActor func test_navigateToRoute_push_addsToItems() async {
+        let sut = makeSUT()
+        await sut.startFlow(route: .pushStep(1))
+        await sut.navigate(toRoute: .pushStep2, animated: animated)
+        XCTAssertEqual(sut.router.items.count, 1)
+        await finishFlow(sut: sut)
+    }
+
+    @MainActor func test_navigateToRoute_detents_addsToSheetCoordinator() async {
+        let sut = makeSUT()
+        await sut.startFlow(route: .pushStep(1))
+        await sut.navigate(toRoute: .detentsStep, animated: animated)
+        XCTAssertEqual(sut.router.sheetCoordinator.items.count, 1)
+        await finishFlow(sut: sut)
+    }
+
+    // MARK: - children / parent relationship
+
+    @MainActor func test_removeChild_removesSpecificChild() async {
+        let sut = makeSUT()
+        let child1 = OtherCoordinator()
+        let child2 = AnyCoordinator()
+
+        await navigateToCoordinator(child1, in: sut)
+        await navigateToCoordinator(child2, in: sut)
+        XCTAssertEqual(sut.children.count, 2)
+
+        await sut.removeChild(coordinator: child1)
+        XCTAssertEqual(sut.children.count, 1)
+        XCTAssertEqual(sut.children.first?.uuid, child2.uuid)
+        await finishFlow(sut: sut)
+    }
+
     // --------------------------------------------------------------------
     // MARK: Helpers
     // --------------------------------------------------------------------
-    
+
     @MainActor private func makeSUT(file: StaticString = #filePath, line: UInt = #line) -> AnyCoordinator {
         let coordinator = AnyCoordinator()
         trackForMemoryLeaks(coordinator, file: file, line: line)

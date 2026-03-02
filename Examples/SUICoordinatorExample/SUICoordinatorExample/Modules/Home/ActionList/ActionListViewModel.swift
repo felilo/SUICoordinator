@@ -32,31 +32,31 @@ class ActionListViewModel: ObservableObject {
         self.coordinator = coordinator
     }
     
-    @MainActor func navigateToPushView() async {
+    func navigateToPushView() async {
         await coordinator.navigateToPushView()
     }
     
-    @MainActor func presentSheet() async {
+    func presentSheet() async {
         await coordinator.presentSheet()
     }
     
-    @MainActor func presentFullscreen() async {
+    func presentFullscreen() async {
         await coordinator.presentFullscreen()
     }
     
-    @MainActor func presentDetents() async {
+    func presentDetents() async {
         await coordinator.presentDetents()
     }
     
-    @MainActor func presentViewWithCustomPresentation() async {
+    func presentViewWithCustomPresentation() async {
         await coordinator.presentViewWithCustomPresentation()
     }
     
-    @MainActor func presentTabCoordinator() async {
+    func presentTabCoordinator() async {
         await coordinator.presentCustomTabCoordinator()
     }
     
-    @MainActor func finish() async {
+    func finish() async {
         await coordinator.finish()
     }
     

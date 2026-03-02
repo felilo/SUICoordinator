@@ -1,5 +1,5 @@
 //
-//  ViewDidLoadModifier.swift
+//  View+Modifiers.swift
 //
 //  Copyright (c) Andres F. Lozano
 //
@@ -24,6 +24,7 @@
 
 import SwiftUI
 
+@available(iOS 17.0, *)
 extension View {
     
     func sheetCoordinator(
@@ -42,13 +43,5 @@ extension View {
                 onDidLoad: onDidLoad
             )
         )
-    }
-    
-    func onViewDidLoad(perform action: (() -> Void)? = nil) -> some View {
-        self.modifier(ViewDidLoadModifier(action: action))
-    }
-    
-    func clearModalBackground(_ condition: Bool = true)->some View {
-        self.modifier(ClearBackgroundViewModifier(condition: condition))
     }
 }

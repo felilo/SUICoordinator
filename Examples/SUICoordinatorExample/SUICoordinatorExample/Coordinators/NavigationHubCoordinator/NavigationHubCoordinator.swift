@@ -25,18 +25,17 @@
 import Foundation
 import SUICoordinator
 
-class NavigationHubCoordinator: Coordinator<DefaultRoute> {
-    
+@Coordinator(DefaultRoute.self)
+class NavigationHubCoordinator {
+
     // ---------------------------------------------------------------------
-    // MARK: Coordinator
+    // MARK: CoordinatorType
     // ---------------------------------------------------------------------
-    
-    override func start() async {
-        let viewModel = CoordinatorActionListViewModel(coordinator: self)
-        
+
+    func start() async {
         let route = DefaultRoute(
             presentationStyle: .push,
-            content: { CoordinatorActionListView(viewModel: viewModel) }
+            content: { CoordinatorActionListView() }
         )
         
         await startFlow(route: route )

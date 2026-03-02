@@ -1,5 +1,5 @@
 //
-//  TransitionPresentationStyle.swift
+//  ClearBackgroundViewModifier.swift
 //
 //  Copyright (c) Andres F. Lozano
 //
@@ -24,27 +24,38 @@
 
 import SwiftUI
 
-/**
- Enum defining the transition styles for presentation in the Coordinator pattern.
- 
- TransitionPresentationStyle enumerates the different styles used for transitioning between views or presenting views within an application.
- */
-public enum TransitionPresentationStyle: @unchecked Sendable, SCEquatable {
-    
-    /// A push transition style, commonly used in navigation controllers.
-    case push
-    /// A sheet presentation style, often used for modal or overlay views.
-    case sheet
-    /// A full-screen cover presentation style.
-    case fullScreenCover
-    /// A style allowing for presenting views with specific detents.
-    case detents(Set<PresentationDetent>)
-    /// A custom presentation style.
-    case custom(transition: AnyTransition, animation: Animation?, fullScreen: Bool = false)
-    
-    internal var isCustom: Bool {
-        guard case .custom = self else { return false }
-        
-        return true
+#if canImport(UIKit)
+struct ClearBackgroundView: UIViewRepresentable {
+    func makeUIView(context: Context) -> some UIView {
+        let view = UIView()
+        DispatchQueue.main.async {
+            view.superview?.superview?.backgroundColor = .clear
+        }
+        return view
+    }
+    func updateUIView(_ uiView: UIViewType, context: Context) { }
+}
+#endif
+
+struct ClearBackgroundViewModifier: ViewModifier {
+
+    let condition: Bool
+
+    func body(content: Content) -> some View {
+        if condition {
+#if canImport(UIKit)
+            if #available(iOS 16.4, *) {
+                content
+                    .presentationBackground(.clear)
+            } else {
+                content
+                    .background(ClearBackgroundView())
+            }
+#else
+            content
+#endif
+        } else {
+            content
+        }
     }
 }

@@ -1,5 +1,5 @@
 //
-//  SheetCoordinating.swift
+//  SheetCoordinatorView.swift
 //
 //  Copyright (c) Andres F. Lozano
 //
@@ -23,35 +23,19 @@
 //
 
 import SwiftUI
-import Combine
 
+@available(iOS 17.0, *)
 struct SheetCoordinatorView: ViewModifier {
-    
-    // ---------------------------------------------------------
-    // MARK: typealias
-    // ---------------------------------------------------------
     
     typealias Action = ((String) -> Void)
     typealias Value = AnyViewAlias
     
-    // ---------------------------------------------------------
-    // MARK: Wrapper Properties
-    // ---------------------------------------------------------
-    
-    @ObservedObject var coordinator: SheetCoordinator<Value>
+    @Bindable var coordinator: SheetCoordinator<Value>
     @State var index = 0
-    
-    // ---------------------------------------------------------
-    // MARK: Properties
-    // ---------------------------------------------------------
     
     public var isLast: Bool
     public var onDissmis: ActionClosure?
     public var onDidLoad: ActionClosure?
-    
-    // ---------------------------------------------------------
-    // MARK: ViewModifier
-    // ---------------------------------------------------------
     
     @ViewBuilder
     func body(content: Content) -> some View {
@@ -72,11 +56,6 @@ struct SheetCoordinatorView: ViewModifier {
             }
     }
     
-    // ---------------------------------------------------------
-    // MARK: Helper Views
-    // ---------------------------------------------------------
-    
-    
     private func buildContent(
         with index: Int,
         item: SheetItem<Value>
@@ -89,7 +68,6 @@ struct SheetCoordinatorView: ViewModifier {
                 onDissmis: onDissmis,
                 onDidLoad: onDidLoad
             )
-            
         return addSheet(to: view, with: item.presentationStyle)
     }
     
@@ -105,7 +83,7 @@ struct SheetCoordinatorView: ViewModifier {
     }
 }
 
-
+@available(iOS 17.0, *)
 extension View {
     func hidden(_ isHidden: Bool) -> some View {
         self.frame(maxHeight: !isHidden ? .infinity : 0)
