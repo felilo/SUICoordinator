@@ -41,6 +41,7 @@ _____
 
 > A single `import SUICoordinator` (or `import SUICoordinator16`) is all you need — all public types are available immediately.
 
+*Want to run something immediately?* **Clone the example app** → [Examples folder](https://github.com/felilo/SUICoordinator/blob/main/Examples/SUICoordinatorExample/SUICoordinatorExample).
 _____
 
 ## Basic Usage
@@ -126,6 +127,7 @@ struct HomeView: View {
         .navigationTitle("Coordinator Actions")
     }
 }
+
 ```
 
 ### 4. Setup in Your App
@@ -179,15 +181,15 @@ struct AppTabPageDataSource {
 
     @ViewBuilder var icon: some View {
         switch page {
-            case .home: Image(systemName: "house.fill")
-            case .settings: Image(systemName: "gearshape.fill")
+            case .homeCoordinator: Image(systemName: "house.fill")
+            case .settingsCoordinator: Image(systemName: "gearshape.fill")
         }
     }
 
     @ViewBuilder var title: some View {
         switch page {
-            case .home: Text("Home")
-            case .settings: Text("Settings")
+            case .homeCoordinator: Text("Home")
+            case .settingsCoordinator: Text("Settings")
         }
     }
 }
@@ -198,8 +200,8 @@ enum AppTabPage: TabPage, CaseIterable {
 
     var position: Int {
         switch self {
-            case .home: return 0
-            case .settings: return 1
+            case .homeCoordinator: return 0
+            case .settingsCoordinator: return 1
         }
     }
 
