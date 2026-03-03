@@ -55,9 +55,9 @@ final class CoordinatorMacroTests: XCTestCase {
                     await startFlow(route: .main)
                 }
 
-                public var router: Router<HomeRoute>
+                public var router: Router<HomeRoute> = .init()
 
-                public var uuid: String
+                public lazy var uuid: String = "\\(NSStringFromClass(type(of: self))) - \\(UUID().uuidString)"
 
                 public var parent: (any CoordinatorType)?
 
@@ -65,9 +65,7 @@ final class CoordinatorMacroTests: XCTestCase {
 
                 public var tagId: String?
 
-                @MainActor public init() {
-                    self.router = .init()
-                    self.uuid = "\\(NSStringFromClass(type(of: self))) - \\(UUID().uuidString)"
+                public nonisolated init() {
                 }
 
                 @ObservationIgnored private let _$observationRegistrar = Observation.ObservationRegistrar()
@@ -102,9 +100,62 @@ final class CoordinatorMacroTests: XCTestCase {
             """
             @Coordinator(HomeRoute.self)
             class HomeCoordinator {
-                init() {
-                    self.router = .init()
-                    self.uuid = "custom-id"
+                init() {}
+                func start() async {}
+            }
+            """,
+            expandedSource:
+            """
+            class HomeCoordinator {
+                init() {}
+                @MainActor
+                func start() async {}
+
+                public var router: Router<HomeRoute> = .init()
+
+                public lazy var uuid: String = "\\(NSStringFromClass(type(of: self))) - \\(UUID().uuidString)"
+
+                public var parent: (any CoordinatorType)?
+
+                public var children: [(any CoordinatorType)] = []
+
+                public var tagId: String?
+
+                @ObservationIgnored private let _$observationRegistrar = Observation.ObservationRegistrar()
+
+                public nonisolated func access<Member>(
+                    keyPath: KeyPath<HomeCoordinator, Member>
+                ) {
+                    _$observationRegistrar.access(self, keyPath: keyPath)
+                }
+
+                public nonisolated func withMutation<Member, T>(
+                    keyPath: KeyPath<HomeCoordinator, Member>,
+                    _ mutation: () throws -> T
+                ) rethrows -> T {
+                    try _$observationRegistrar.withMutation(of: self, keyPath: keyPath, mutation)
+                }
+            }
+
+            @available(iOS 17.0, *)
+            extension HomeCoordinator: CoordinatorType {
+            }
+
+            extension HomeCoordinator: Observable {
+            }
+            """,
+            macros: testMacros
+        )
+    }
+
+    func test_expansion_customInitWithArgument() {
+        assertMacroExpansion(
+            """
+            @Coordinator(HomeRoute.self)
+            class HomeCoordinator {
+                let config: AppConfig
+                init(config: AppConfig) {
+                    self.config = config
                 }
                 func start() async {}
             }
@@ -112,17 +163,16 @@ final class CoordinatorMacroTests: XCTestCase {
             expandedSource:
             """
             class HomeCoordinator {
-                @MainActor
-                init() {
-                    self.router = .init()
-                    self.uuid = "custom-id"
+                let config: AppConfig
+                init(config: AppConfig) {
+                    self.config = config
                 }
                 @MainActor
                 func start() async {}
 
-                public var router: Router<HomeRoute>
+                public var router: Router<HomeRoute> = .init()
 
-                public var uuid: String
+                public lazy var uuid: String = "\\(NSStringFromClass(type(of: self))) - \\(UUID().uuidString)"
 
                 public var parent: (any CoordinatorType)?
 
@@ -174,7 +224,7 @@ final class CoordinatorMacroTests: XCTestCase {
                 @MainActor
                 func start() async {}
 
-                public var uuid: String
+                public lazy var uuid: String = "\\(NSStringFromClass(type(of: self))) - \\(UUID().uuidString)"
 
                 public var parent: (any CoordinatorType)?
 
@@ -182,9 +232,7 @@ final class CoordinatorMacroTests: XCTestCase {
 
                 public var tagId: String?
 
-                @MainActor public init() {
-                    self.router = .init()
-                    self.uuid = "\\(NSStringFromClass(type(of: self))) - \\(UUID().uuidString)"
+                public nonisolated init() {
                 }
 
                 @ObservationIgnored private let _$observationRegistrar = Observation.ObservationRegistrar()
@@ -258,9 +306,9 @@ final class CoordinatorMacroTests: XCTestCase {
                 @MainActor
                 func start() async {}
 
-                public var router: Router<HomeRoute>
+                public var router: Router<HomeRoute> = .init()
 
-                public var uuid: String
+                public lazy var uuid: String = "\\(NSStringFromClass(type(of: self))) - \\(UUID().uuidString)"
 
                 public var parent: (any CoordinatorType)?
 
@@ -268,9 +316,7 @@ final class CoordinatorMacroTests: XCTestCase {
 
                 public var tagId: String?
 
-                @MainActor public init() {
-                    self.router = .init()
-                    self.uuid = "\\(NSStringFromClass(type(of: self))) - \\(UUID().uuidString)"
+                public nonisolated init() {
                 }
 
                 @ObservationIgnored private let _$observationRegistrar = Observation.ObservationRegistrar()

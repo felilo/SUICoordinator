@@ -28,22 +28,29 @@ import Foundation
 @Coordinator(HomeRoute.self)
 class HomeCoordinator {
 
-    private let animated: Bool = true
+    private let animated: Bool
+    
+    // ---------------------------------------------------------------------
+    // MARK: Init
+    // ---------------------------------------------------------------------
+    
+    init(animated: Bool = true) {
+        self.animated = animated
+    }
 
     // ---------------------------------------------------------------------
     // MARK: CoordinatorType
     // ---------------------------------------------------------------------
-
-    func start() async {
-        await startFlow(route: .actionListView)
-    }
     
-    // ---------------------------------------------------------------------
-    // MARK: Additional flows
-    // ---------------------------------------------------------------------
+    func start() async {
+        await startFlow(route: .actionListView(coordinator: self))
+    }
+}
+
+extension HomeCoordinator: ActionListCoordinatorType {
     
     func navigateToPushView() async {
-        let title = "Hello, PushView! \(router.items.count + 1)"
+        let title = "Hello, PushView!\(router.items.count + 1)"
         await navigate(toRoute: .push(coordinator: self, title: title), animated: animated)
     }
     
@@ -74,5 +81,13 @@ class HomeCoordinator {
     
     func finish() async {
         await finishFlow(animated: animated)
+    }
+    
+    func close() async {
+        await close(animated: animated)
+    }
+    
+    func restart() async {
+        await restart(animated: animated)
     }
 }

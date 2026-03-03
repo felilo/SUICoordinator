@@ -45,7 +45,7 @@ public protocol CoordinatorType: SCHashable, ObservableObject {
     // ---------------------------------------------------------
     
     /// The unique identifier for the coordinator.
-    var uuid: String { get set }
+    var uuid: String { get }
     
     /// An optional tag identifier for additional context or identification.
     var tagId: String? { get set }

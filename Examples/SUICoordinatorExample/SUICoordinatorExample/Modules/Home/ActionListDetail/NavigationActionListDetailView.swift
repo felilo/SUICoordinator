@@ -107,6 +107,7 @@ struct NavigationActionListDetailView: View {
     }
 }
 
-//#Preview {
-//    NavigationActionListDetailView(coordinator: .init(), title: "1")
-//}
+
+#Preview {
+    NavigationActionListDetailView(coordinator: .init(), title: "Preview")
+}

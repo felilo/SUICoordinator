@@ -27,10 +27,10 @@ import Foundation
 @MainActor
 class NavigationActionListDetailViewModel: ObservableObject {
     
-    var coordinator: HomeCoordinator
+    var coordinator: any ActionListCoordinatorType
     var title: String
     
-    init(coordinator: HomeCoordinator, title: String) {
+    init(coordinator: any ActionListCoordinatorType, title: String) {
         self.coordinator = coordinator
         self.title = title
     }

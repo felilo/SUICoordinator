@@ -24,6 +24,7 @@
 
 import Foundation
 
+@MainActor
 class ActionListViewModel: ObservableObject {
     
     let coordinator: HomeCoordinator
@@ -60,7 +61,7 @@ class ActionListViewModel: ObservableObject {
         await coordinator.finish()
     }
     
-    @MainActor func showFinishButton() -> Bool {
+    func showFinishButton() -> Bool {
         !(coordinator.parent is HomeCoordinator)
     }
 }

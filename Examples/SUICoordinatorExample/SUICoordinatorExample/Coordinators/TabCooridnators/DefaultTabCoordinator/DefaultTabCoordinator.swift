@@ -22,7 +22,6 @@
 //  THE SOFTWARE.
 //
 
-import Foundation
 import SUICoordinator
 
 class DefaultTabCoordinator: TabCoordinator<MyTabPage> {
