@@ -76,7 +76,7 @@ extension NavigationHubCoordinator: ActionListCoordinatorType {
     }
 
     func presentDetents() async {
-        let coordinator = HomeCoordinator()
+        let coordinator = HomeCoordinator(config: .init(initialRoute: .detents(title: "Hello, Detents!")))
         await navigate(to: coordinator, presentationStyle: .detents([.medium]))
     }
 
