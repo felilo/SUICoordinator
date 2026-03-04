@@ -68,8 +68,8 @@ enum HomeRoute: RouteType {
     @ViewBuilder
     var body: some View {
         switch self {
-            case .homeView(let dependencies): HomeView(dependencies: .init(dependencies))
-            case .pushView(let dependencies): PushView(dependencies: .init(dependencies))
+            case .homeView(let dependencies): HomeView(dependencies: dependencies)
+            case .pushView(let dependencies): PushView(dependencies: dependencies)
             case .sheetView(let coordinator): SheetView(coordinator: coordinator)
         }
     }
