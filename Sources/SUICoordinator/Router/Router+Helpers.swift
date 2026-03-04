@@ -32,7 +32,7 @@ extension RouterType {
     /// Removes a specific item at the given index from the sheet coordinator.
     ///
     /// - Parameter index: The index of the item to remove.
-    func removeItemFromSheetCoordinator(at index: String) async -> Void {
+    func removeItemFromSheetCoordinator(at index: String) async {
         await sheetCoordinator.remove(at: index)
     }
 }

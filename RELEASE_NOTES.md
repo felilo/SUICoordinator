@@ -1,3 +1,33 @@
+# Release Notes — v1.1.1
+
+## Improvements
+
+### `@Coordinator` macro — custom `init` now supported
+Previously, coordinators using the `@Coordinator` macro could not define a custom `init` with parameters because the macro always generated a fixed `@MainActor public init()` that owned the `router` assignment. `Router.init()` is now `nonisolated` and `router` is initialized inline as a stored-property default, freeing the generated `init` from `@MainActor` and allowing user-written initializers to coexist without any actor annotation.
+
+```swift
+// Before — custom init was not possible; only the macro-generated init() could be used
+@Coordinator(HomeRoute.self)
+class HomeCoordinator {
+    // ❌ could not add custom init with parameters
+}
+
+// After — custom init works with no boilerplate
+@Coordinator(HomeRoute.self)
+class HomeCoordinator {
+    @ObservationIgnored private let animated: Bool
+
+    init(animated: Bool = true) {
+        self.animated = animated
+    }
+}
+```
+
+### `Router.init()` is now `nonisolated`
+`Router.init()` no longer requires a `@MainActor` context, making it safe to call as a stored-property inline default and from `nonisolated` init sites.
+
+---
+
 # Release Notes — v1.0.1
 
 ## New Features

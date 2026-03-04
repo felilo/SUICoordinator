@@ -26,7 +26,7 @@ import SwiftUI
 
 struct NavigationActionListView: View {
     
-    @Environment(HomeCoordinator.self) var coordinator
+    @Environment(\.actionListCoordinator) var coordinator
     
     var body: some View {
         ZStack {
@@ -34,29 +34,29 @@ struct NavigationActionListView: View {
             
             List {
                 actionRowButton(title: "Push NavigationView", systemImage: "arrow.forward.square.fill") {
-                    await coordinator.navigateToPushView()
+                    await coordinator?.navigateToPushView()
                 }
                 .accessibilityIdentifier("btn_pushNavigationView")
 
                 actionRowButton(title: "Presents SheetView", systemImage: "rectangle.bottomthird.inset.fill") {
-                    await coordinator.presentSheet()
+                    await coordinator?.presentSheet()
                 }
                 .accessibilityIdentifier("btn_presentsSheetView")
                 
                 actionRowButton(title: "Presents FullscreenView", systemImage: "rectangle.fill.on.rectangle.fill") {
-                    await coordinator.presentFullscreen()
+                    await coordinator?.presentFullscreen()
                 }
                 
                 actionRowButton(title: "Presents DetentsView", systemImage: "rectangle.split.2x1.fill") {
-                    await coordinator.presentDetents()
+                    await coordinator?.presentDetents()
                 }
                 
                 actionRowButton(title: "Present with Custom Presentation", systemImage: "sparkles.rectangle.stack.fill") {
-                    await coordinator.presentViewWithCustomPresentation()
+                    await coordinator?.presentViewWithCustomPresentation()
                 }
                 
                 actionRowButton(title: "Presents Tab view Coordinator", systemImage: "square.grid.2x2.fill") {
-                    await coordinator.presentCustomTabCoordinator()
+                    await coordinator?.presentCustomTabCoordinator()
                 }
             }
             .toolbar(content: toolbarContent)
@@ -72,7 +72,7 @@ struct NavigationActionListView: View {
         systemImage: String,
         action: @escaping () async -> Void
     ) -> some View {
-        
+
         Button {
             Task { await action() }
         } label: {
@@ -112,7 +112,7 @@ struct NavigationActionListView: View {
     @ViewBuilder
     private func toolbarContent() -> some View {
         Button {
-            Task { await coordinator.finish() }
+            Task { await coordinator?.finish() }
         } label: {
             Text("Finish flow")
                 .font(.headline)
@@ -120,7 +120,7 @@ struct NavigationActionListView: View {
     }
 }
 
-//#Preview {
-//    NavigationActionListView()
-//        .environment(HomeCoordinator())
-//}
+#Preview {
+    NavigationActionListView()
+        .environment(\.actionListCoordinator, NavigationHubCoordinator())
+}

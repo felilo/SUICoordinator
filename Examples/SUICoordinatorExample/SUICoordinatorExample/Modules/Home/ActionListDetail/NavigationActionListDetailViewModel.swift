@@ -25,9 +25,10 @@
 import Foundation
 
 @MainActor
-class NavigationActionListDetailViewModel: ObservableObject {
+@Observable
+class NavigationActionListDetailViewModel {
     
-    var coordinator: HomeCoordinator
+    let coordinator: HomeCoordinator
     var title: String
     
     init(coordinator: HomeCoordinator, title: String) {
@@ -63,11 +64,11 @@ class NavigationActionListDetailViewModel: ObservableObject {
         await coordinator.finish()
     }
     
-    func restartCoordinator() async {
+    @MainActor func restartCoordinator() async {
         await coordinator.restart()
     }
     
-    func presentCustomTabCoordinator() async {
+    @MainActor func presentCustomTabCoordinator() async {
         await coordinator.presentCustomTabCoordinator()
     }
 }

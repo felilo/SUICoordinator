@@ -123,9 +123,9 @@ struct SUICoordinatorExampleApp: App {
             // This case demonstrates presenting a different Coordinator modally (HomeCoordinator in this example).
             // It creates a new `HomeCoordinator` instance and uses `forcePresentation`
             // to display it as a sheet over the current context, managed by the `mainCoordinator`.
-            let coordinator = HomeCoordinator()
+            let coordinator = HomeCoordinator(config: .init(initialRoute: .detents(title: "Hi, there!")))
             try await coordinator.forcePresentation(
-                presentationStyle: .sheet,
+                presentationStyle: .fullScreenCover,
                 rootCoordinator: mainCoordinator
             )
         }
