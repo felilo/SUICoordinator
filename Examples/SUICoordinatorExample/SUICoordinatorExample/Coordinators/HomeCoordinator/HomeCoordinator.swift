@@ -27,26 +27,26 @@ import SUICoordinator
 
 @Coordinator(HomeRoute.self)
 class HomeCoordinator {
-
+    
     @ObservationIgnored
     private let config: HomeCoordinatorConfig
-
+    
     // ---------------------------------------------------------------------
     // MARK: Init
     // ---------------------------------------------------------------------
-
+    
     init(config: HomeCoordinatorConfig = .init()) {
         self.config = config
     }
-
+    
     // ---------------------------------------------------------------------
     // MARK: CoordinatorType
     // ---------------------------------------------------------------------
-
+    
     func start() async {
         let route: HomeRoute = switch config.initialRoute {
         case let .detents(title):
-            .sheet(coordinator: self, title: title)
+                .detents(coordinator: self, title: title)
         default:
                 .actionListView(coordinator: self)
         }
@@ -106,7 +106,7 @@ extension HomeCoordinator: ActionListCoordinatorType {
 struct HomeCoordinatorConfig {
     var initialRoute: InitialRoute?
     var animated: Bool = true
-
+    
     enum InitialRoute {
         case detents(title: String)
     }
