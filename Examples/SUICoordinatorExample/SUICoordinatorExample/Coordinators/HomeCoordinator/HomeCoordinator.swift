@@ -27,34 +27,28 @@ import SUICoordinator
 
 @Coordinator(HomeRoute.self)
 class HomeCoordinator {
-
+    
     @ObservationIgnored
     private let config: HomeCoordinatorConfig
-
+    
     // ---------------------------------------------------------------------
     // MARK: Init
     // ---------------------------------------------------------------------
-
+    
     init(config: HomeCoordinatorConfig = .init()) {
         self.config = config
     }
-
+    
     // ---------------------------------------------------------------------
     // MARK: CoordinatorType
     // ---------------------------------------------------------------------
-
+    
     func start() async {
         let route: HomeRoute = switch config.initialRoute {
-        case .actionListView:
-            .actionListView(coordinator: self)
         case let .detents(title):
-            .detents(coordinator: self, title: title)
-        case let .sheet(title):
-            .sheet(coordinator: self, title: title)
-        case let .fullscreen(title):
-            .fullscreen(coordinator: self, title: title)
-        case let .push(title):
-            .push(coordinator: self, title: title)
+                .detents(coordinator: self, title: title)
+        default:
+                .actionListView(coordinator: self)
         }
         await startFlow(route: route)
     }
@@ -110,14 +104,10 @@ extension HomeCoordinator: ActionListCoordinatorType {
 // ---------------------------------------------------------------------
 
 struct HomeCoordinatorConfig {
-    var initialRoute: InitialRoute = .actionListView
+    var initialRoute: InitialRoute?
     var animated: Bool = true
-
+    
     enum InitialRoute {
-        case actionListView
         case detents(title: String)
-        case sheet(title: String)
-        case fullscreen(title: String)
-        case push(title: String)
     }
 }

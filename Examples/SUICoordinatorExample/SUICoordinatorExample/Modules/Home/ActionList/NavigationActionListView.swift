@@ -70,7 +70,7 @@ struct NavigationActionListView: View {
     private func actionRowButton(
         title: String,
         systemImage: String,
-        action: @escaping @MainActor () async -> Void
+        action: @escaping () async -> Void
     ) -> some View {
 
         Button {
@@ -120,19 +120,7 @@ struct NavigationActionListView: View {
     }
 }
 
-private final class PreviewCoordinator: ActionListCoordinatorType {
-    func navigateToPushView() async {}
-    func presentSheet() async {}
-    func presentFullscreen() async {}
-    func presentDetents() async {}
-    func presentViewWithCustomPresentation() async {}
-    func presentCustomTabCoordinator() async {}
-    func finish() async {}
-    func close() async {}
-    func restart() async {}
-}
-
 #Preview {
     NavigationActionListView()
-        .environment(\.actionListCoordinator, PreviewCoordinator())
+        .environment(\.actionListCoordinator, NavigationHubCoordinator())
 }
