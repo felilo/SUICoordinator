@@ -23,41 +23,6 @@ class HomeCoordinator {
 }
 ```
 
-### Value-type config pattern for coordinator initialization
-Passing a `RouteType` value directly to a coordinator's `init` is not possible because route cases typically require `coordinator: self`, which isn't available at init time. The recommended pattern is to pass a plain value-type config struct and resolve it into a concrete route inside `start()` where `self` is available.
-
-```swift
-struct MyCoordinatorConfig {
-    var initialRoute: InitialRoute = .home
-    var animated: Bool = true
-
-    enum InitialRoute {
-        case home
-        case detail(title: String)
-    }
-}
-
-@Coordinator(MyRoute.self)
-class MyCoordinator {
-    @ObservationIgnored private let config: MyCoordinatorConfig
-
-    init(config: MyCoordinatorConfig = .init()) {
-        self.config = config
-    }
-
-    func start() async {
-        let route: MyRoute = switch config.initialRoute {
-        case .home:               .home(coordinator: self)
-        case let .detail(title):  .detail(coordinator: self, title: title)
-        }
-        await startFlow(route: route)
-    }
-}
-
-// Usage
-let coordinator = MyCoordinator(config: .init(initialRoute: .detail(title: "Hello")))
-```
-
 ### `Router.init()` is now `nonisolated`
 `Router.init()` no longer requires a `@MainActor` context, making it safe to call as a stored-property inline default and from `nonisolated` init sites.
 
