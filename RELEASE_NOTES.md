@@ -1,3 +1,73 @@
+# Release Notes — v1.0.2
+
+## Improvements
+
+### `@Coordinator` macro — `nonisolated init()` and inline router default
+The macro-generated initializer is now `nonisolated`, allowing coordinators to be constructed from any actor context without `@MainActor` at the call site. The `router` property is also initialized inline (`= .init()`) rather than in the `init` body, which means user-written custom initializers no longer need to assign `self.router` manually.
+
+```swift
+// Before — required manual router assignment
+@Coordinator(HomeRoute.self)
+class HomeCoordinator {
+    init() {
+        self.router = .init()
+    }
+}
+
+// After — router is handled automatically
+@Coordinator(HomeRoute.self)
+class HomeCoordinator {
+    init() {}
+}
+```
+
+### `HomeCoordinatorConfig` — value-type coordinator initialization
+Coordinators that need to vary their initial route can now accept a plain value-type config struct instead of a `RouteType` parameter (which would require `coordinator: self` at init time, creating a chicken-and-egg problem). The config is resolved into a concrete route inside `start()` where `self` is available.
+
+```swift
+struct HomeCoordinatorConfig {
+    var initialRoute: InitialRoute = .actionListView
+    var animated: Bool = true
+
+    enum InitialRoute {
+        case actionListView
+        case detents(title: String)
+        case sheet(title: String)
+        case fullscreen(title: String)
+        case push(title: String)
+    }
+}
+
+@Coordinator(HomeRoute.self)
+class HomeCoordinator {
+    @ObservationIgnored private let config: HomeCoordinatorConfig
+
+    init(config: HomeCoordinatorConfig = .init()) {
+        self.config = config
+    }
+
+    func start() async {
+        let route: HomeRoute = switch config.initialRoute {
+        case .actionListView:     .actionListView(coordinator: self)
+        case let .detents(title): .detents(coordinator: self, title: title)
+        // …
+        }
+        await startFlow(route: route)
+    }
+}
+
+// Usage
+let coordinator = HomeCoordinator(config: .init(initialRoute: .detents(title: "Hello")))
+```
+
+### `NavigationActionListDetailViewModel` migrated to `@Observable`
+The detail view model now uses the `@Observable` macro (iOS 17+) instead of `ObservableObject` + `@Published`, consistent with the rest of the iOS 17 target.
+
+### `Router.init()` is now `nonisolated`
+`Router.init()` no longer requires a `@MainActor` context, making it safe to call as a stored-property inline default and from `nonisolated` init sites.
+
+---
+
 # Release Notes — v1.0.1
 
 ## New Features
