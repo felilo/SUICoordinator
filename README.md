@@ -13,7 +13,6 @@ _____
 
 - **Pure SwiftUI**: No UIKit — no `UINavigationController`, no view representables
 - **Type-Safe Routes**: Route enums own both the presentation style and the view they render
-- **`@Coordinator` Macro**: Composition-based syntax with zero boilerplate (iOS 17+)
 - **Flexible Presentations**: Push, sheet, fullscreen, detents, and custom transitions
 - **Tab Coordination**: `TabCoordinator` with per-tab navigation stacks, custom tab views, and badges
 - **Deep Linking**: `forcePresentation` navigates to any coordinator from push notifications or universal links
@@ -97,6 +96,10 @@ class HomeCoordinator {
 
     func presentSheet() async {
         await navigate(toRoute: .sheetView(coordinator: self))
+    }
+    
+    func presentSheetWithCustomPresentationStyle() async {
+        await navigate(toRoute: .sheetView(coordinator: self), presentationStyle: .detents([.medium, .large]))
     }
 
     func endThisCoordinator() async {
@@ -416,7 +419,6 @@ The `Router` is available as `coordinator.router` and manages the navigation sta
 
 | Method / Property | Description |
 |-------------------|-------------|
-| `mainView: Route?` | The root view of the coordinator's flow. |
 | `items: [Route]` | The current navigation stack (push items). |
 | `navigate(toRoute:presentationStyle:animated:)` | Navigates to the given route. `.push` appends to the stack; all other styles present modally. |
 | `present(_:presentationStyle:animated:)` | Presents a view modally. Defaults to `.sheet` if no style is provided. |
@@ -436,7 +438,6 @@ The following properties and methods are specific to `TabCoordinator`:
 
 | Method / Property | Description |
 |-------------------|-------------|
-| `pages: [Page]` | The array of `TabPage` cases defining the tabs. |
 | `currentPage: Page` | Get or set the currently selected tab programmatically. |
 | `setCurrentPage(_:)` | Switches to the given tab, validating it exists and differs from the current one. |
 | `setPages(_:currentPage:)` | Dynamically updates the tab set, initializing coordinators for new pages and cleaning up removed ones. |
