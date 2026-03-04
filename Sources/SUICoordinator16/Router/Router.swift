@@ -26,7 +26,7 @@ import Combine
 import Foundation
 
 /// A class representing a router in the coordinator pattern.
-@MainActor
+
 public class Router<Route: RouteType>: ObservableObject, RouterType {
 
     // --------------------------------------------------------------------

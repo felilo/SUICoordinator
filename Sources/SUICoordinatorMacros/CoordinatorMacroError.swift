@@ -28,7 +28,6 @@ import SwiftSyntax
 enum CoordinatorMacroDiagnostic: DiagnosticMessage {
     case notAClass
     case missingRouteType
-    case missingObservable
 
     var message: String {
         switch self {
@@ -36,8 +35,6 @@ enum CoordinatorMacroDiagnostic: DiagnosticMessage {
             return "@Coordinator can only be applied to a class declaration"
         case .missingRouteType:
             return "@Coordinator requires a RouteType argument, e.g. @Coordinator(HomeRoute.self)"
-        case .missingObservable:
-            return "@Coordinator requires @Observable on the class (CoordinatorType conforms to Observable)"
         }
     }
 
@@ -47,8 +44,6 @@ enum CoordinatorMacroDiagnostic: DiagnosticMessage {
             return MessageID(domain: "SUICoordinatorMacros", id: "notAClass")
         case .missingRouteType:
             return MessageID(domain: "SUICoordinatorMacros", id: "missingRouteType")
-        case .missingObservable:
-            return MessageID(domain: "SUICoordinatorMacros", id: "missingObservable")
         }
     }
 
@@ -56,8 +51,6 @@ enum CoordinatorMacroDiagnostic: DiagnosticMessage {
         switch self {
         case .notAClass, .missingRouteType:
             return .error
-        case .missingObservable:
-            return .warning
         }
     }
 }

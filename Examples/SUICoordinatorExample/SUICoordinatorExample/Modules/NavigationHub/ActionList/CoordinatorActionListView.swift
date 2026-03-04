@@ -27,7 +27,7 @@ import SwiftUI
 struct CoordinatorActionListView: View {
     
     @Environment(\.isPresented) private var isPresented
-    @Environment(NavigationHubCoordinator.self) var coordinator
+    @Environment(\.navigationHubCoordinator) var coordinator
     
     var body: some View {
         ZStack {
@@ -36,24 +36,28 @@ struct CoordinatorActionListView: View {
             
             List {
                 actionRowButton(title: "Presents Default Tab Coordinator", systemImage: "rectangle.fill.on.rectangle.fill") {
-                    await coordinator.presentDefaultTabCoordinator()
+                    await coordinator?.presentDefaultTabCoordinator()
                 }
                 
                 actionRowButton(title: "Presents Custom Tab Coordinator", systemImage: "square.grid.2x2.fill") {
-                    await coordinator.presentCustomTabCoordinator()
+                    await coordinator?.presentCustomTabCoordinator()
                 }
                 
                 actionRowButton(title: "Presents Home Coordinator", systemImage: "rectangle.bottomthird.inset.fill") {
-                    await coordinator.presentHomeCoordinator()
+                    await coordinator?.presentHomeCoordinator()
                 }
                 
                 actionRowButton(title: "Presents Coordinator with push navigation", systemImage: "rectangle.bottomthird.inset.fill") {
-                    await coordinator.presentHomeCoordinatorWithCustomNavigation()
+                    await coordinator?.presentHomeCoordinatorWithCustomNavigation()
+                }
+
+                actionRowButton(title: "Presents Navigation Action List", systemImage: "list.bullet.rectangle.fill") {
+                    await coordinator?.presentNavigationActionList()
                 }
             }
             .toolbar {
                 Button {
-                    Task { await coordinator.finishFlow() }
+                    Task { await coordinator?.finish() }
                 } label: {
                     Text("Finish flow")
                 }
@@ -107,8 +111,7 @@ struct CoordinatorActionListView: View {
     }
 }
 
-//#Preview {
-//    let coordinator = NavigationHubCoordinator()
-//    CoordinatorActionListView()
-//        .environment(coordinator)
-//}
+#Preview {
+    CoordinatorActionListView()
+        .environment(NavigationHubCoordinator())
+}

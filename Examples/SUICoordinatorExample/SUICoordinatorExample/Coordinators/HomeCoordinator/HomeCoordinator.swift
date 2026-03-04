@@ -22,57 +22,102 @@
 //  THE SOFTWARE.
 //
 
-import SUICoordinator
 import Foundation
+import SUICoordinator
 
 @Coordinator(HomeRoute.self)
 class HomeCoordinator {
 
-    private let animated: Bool = true
+    @ObservationIgnored
+    private let config: HomeCoordinatorConfig
+
+    // ---------------------------------------------------------------------
+    // MARK: Init
+    // ---------------------------------------------------------------------
+
+    init(config: HomeCoordinatorConfig = .init()) {
+        self.config = config
+    }
 
     // ---------------------------------------------------------------------
     // MARK: CoordinatorType
     // ---------------------------------------------------------------------
 
     func start() async {
-        await startFlow(route: .actionListView)
+        let route: HomeRoute = switch config.initialRoute {
+        case .actionListView:
+            .actionListView(coordinator: self)
+        case let .detents(title):
+            .detents(coordinator: self, title: title)
+        case let .sheet(title):
+            .sheet(coordinator: self, title: title)
+        case let .fullscreen(title):
+            .fullscreen(coordinator: self, title: title)
+        case let .push(title):
+            .push(coordinator: self, title: title)
+        }
+        await startFlow(route: route)
     }
-    
-    // ---------------------------------------------------------------------
-    // MARK: Additional flows
-    // ---------------------------------------------------------------------
+}
+
+extension HomeCoordinator: ActionListCoordinatorType {
     
     func navigateToPushView() async {
-        let title = "Hello, PushView! \(router.items.count + 1)"
-        await navigate(toRoute: .push(coordinator: self, title: title), animated: animated)
+        let title = "Hello, PushView!\(router.items.count + 1)"
+        await navigate(toRoute: .push(coordinator: self, title: title), animated: config.animated)
     }
     
     func presentSheet() async {
         let title = "Hello, Sheet! \(router.items.count + 1)"
-        await navigate(toRoute: .sheet(coordinator: self, title: title), animated: animated)
+        await navigate(toRoute: .sheet(coordinator: self, title: title), animated: config.animated)
     }
     
     func presentFullscreen() async {
         let title = "Hello, Fullscreen! \(router.items.count + 1)"
-        await navigate(toRoute: .fullscreen(coordinator: self, title: title), animated: animated)
+        await navigate(toRoute: .fullscreen(coordinator: self, title: title), animated: config.animated)
     }
     
     func presentDetents() async {
         let title = "Hello, Detents! \(router.items.count + 1)"
-        await navigate(toRoute: .detents(coordinator: self, title: title), animated: animated)
+        await navigate(toRoute: .detents(coordinator: self, title: title), animated: config.animated)
     }
     
     func presentViewWithCustomPresentation() async {
         let title = "Hello, Custom presentation! \(router.items.count + 1)"
-        await navigate(toRoute: .viewCustomTransition(coordinator: self, title: title), animated: animated)
+        await navigate(toRoute: .viewCustomTransition(coordinator: self, title: title), animated: config.animated)
     }
     
     func presentCustomTabCoordinator() async {
         let coordinator = CustomTabCoordinator()
-        await navigate(to: coordinator, presentationStyle: .sheet, animated: animated)
+        await navigate(to: coordinator, presentationStyle: .sheet, animated: config.animated)
     }
     
     func finish() async {
-        await finishFlow(animated: animated)
+        await finishFlow(animated: config.animated)
+    }
+    
+    func close() async {
+        await close(animated: config.animated)
+    }
+    
+    func restart() async {
+        await restart(animated: config.animated)
+    }
+}
+
+// ---------------------------------------------------------------------
+// MARK: HomeCoordinatorConfig
+// ---------------------------------------------------------------------
+
+struct HomeCoordinatorConfig {
+    var initialRoute: InitialRoute = .actionListView
+    var animated: Bool = true
+
+    enum InitialRoute {
+        case actionListView
+        case detents(title: String)
+        case sheet(title: String)
+        case fullscreen(title: String)
+        case push(title: String)
     }
 }

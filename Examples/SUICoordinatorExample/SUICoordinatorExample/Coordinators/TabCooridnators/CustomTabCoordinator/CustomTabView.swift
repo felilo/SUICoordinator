@@ -64,17 +64,17 @@ struct CustomTabView<DataSource: TabCoordinatorType>: View where DataSource.Data
     
     var body: some View {
         ZStack(alignment: .bottomLeading) {
-            if #available(iOS 26.0, *) {
-                TabView(selection: $dataSource.currentPage) {
-                    ForEach(dataSource.pages, id: \.id, content: tabBarItem)
-                }
-                .tabBarMinimizeBehavior(.onScrollDown)
-            } else {
-                TabView(selection: $dataSource.currentPage) {
-                    ForEach(dataSource.pages, id: \.id, content: tabBarItem)
+            TabView(selection: $dataSource.currentPage) {
+                ForEach(dataSource.pages, id: \.id) { page in
+                    if let item = dataSource.getCoordinator(with: page) {
+                        item.getView().asAnyView()
+                            .tag(page)
+                    }
                 }
             }
-            
+            .tabViewStyle(.page)
+//            .tabViewStyle(.page(indexDisplayMode: .never))
+
             VStack() {
                 Spacer()
                 customTabView()
@@ -84,8 +84,9 @@ struct CustomTabView<DataSource: TabCoordinatorType>: View where DataSource.Data
             }
             .frame(maxWidth: .infinity, maxHeight: 60)
             .padding(.horizontal, 16)
+            .padding(.bottom, 20)
         }
-        .ignoresSafeArea(.all, edges: [.leading, .trailing, .top])
+        .ignoresSafeArea(.all, edges: [.all])
         .onChange(of: dataSource.pages) { _, pages in
             badges = pages.map { (nil, $0) }
         }
@@ -105,22 +106,6 @@ struct CustomTabView<DataSource: TabCoordinatorType>: View where DataSource.Data
     // ---------------------------------------------------------------------
     // MARK: Helper views
     // ---------------------------------------------------------------------
-    
-    
-    @ViewBuilder
-    func tabBarItem(page: Page) -> some View {
-        if let item = dataSource.getCoordinator(with: page) {
-            if #available(iOS 18.0, *) {
-                item.getView().asAnyView()
-                    .toolbarVisibility(.hidden, for: .tabBar)
-                    .tag(page)
-            } else {
-                item.getView().asAnyView()
-                    .toolbar(.hidden, for: .tabBar)
-                    .tag(page)
-            }
-        }
-    }
     
     
     private func customTabBarItem(@State page: Page, size: CGRect) -> some View {
@@ -192,4 +177,8 @@ struct CustomTabView<DataSource: TabCoordinatorType>: View where DataSource.Data
     private func getWidthButton(with size: CGRect) -> CGFloat {
         size.width / CGFloat(dataSource.pages.count)
     }
+}
+
+#Preview {
+    CustomTabView(dataSource: DefaultTabCoordinator())
 }

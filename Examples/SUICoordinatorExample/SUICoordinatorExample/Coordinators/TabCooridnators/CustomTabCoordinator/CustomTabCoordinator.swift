@@ -38,8 +38,11 @@ public class CustomTabCoordinator: TabCoordinator<MyTabPage> {
             viewContainer: { CustomTabView(dataSource: $0) }
         )
         
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
+        /// Set badge of a tab
+        Task { [weak self] in
+            try? await Task.sleep(for: .seconds(1))
             self?.setBadge(for: .first, with: "2")
         }
     }
 }
+

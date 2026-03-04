@@ -31,7 +31,7 @@ public protocol CoordinatorType: SCHashable, Observable, AnyObject {
 
     associatedtype Route: RouteType
 
-    var uuid: String { get set }
+    var uuid: String { get }
     var tagId: String? { get set }
     var parent: AnyCoordinatorType? { get set }
     var children: [AnyCoordinatorType] { get set }

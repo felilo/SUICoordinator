@@ -26,7 +26,7 @@ import Foundation
 
 /// A class representing a router in the coordinator pattern.
 @available(iOS 17.0, *)
-@MainActor
+
 @Observable
 public class Router<Route: RouteType>: RouterType {
 
@@ -45,7 +45,7 @@ public class Router<Route: RouteType>: RouterType {
     // MARK: Constructor
     // --------------------------------------------------------------------
 
-    public init() { }
+    public nonisolated init() { }
 
     // --------------------------------------------------------------------
     // MARK: RouterType

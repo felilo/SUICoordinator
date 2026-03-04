@@ -1,5 +1,5 @@
 //
-//  TabbarActionListViewModel.swift
+//  NavigationHubCoordinatorType.swift
 //
 //  Copyright (c) Andres F. Lozano
 //
@@ -22,30 +22,27 @@
 //  THE SOFTWARE.
 //
 
-import Foundation
+import SwiftUI
 
 @MainActor
-class CoordinatorActionListViewModel: ObservableObject {
-    
-    let coordinator: NavigationHubCoordinator
-    
-    init(coordinator: NavigationHubCoordinator) {
-        self.coordinator = coordinator
-    }
-    
-    func presentDefaultTabCoordinator() async {
-        await coordinator.presentDefaultTabCoordinator()
-    }
-    
-    func presentCustomTabCoordinator() async {
-        await coordinator.presentCustomTabCoordinator()
-    }
-    
-    func presentHomeCoordinator() async {
-        await coordinator.presentHomeCoordinator()
-    }
-    
-    func finsh() async {
-        await coordinator.finishFlow(animated: true)
+protocol NavigationHubCoordinatorType: AnyObject {
+    func presentDefaultTabCoordinator() async
+    func presentCustomTabCoordinator() async
+    func presentHomeCoordinator() async
+    func presentHomeCoordinatorWithCustomNavigation() async
+    func presentNavigationActionList() async
+    func finish() async
+}
+
+// MARK: - Environment
+
+private struct NavigationHubCoordinatorKey: EnvironmentKey {
+    nonisolated(unsafe) static let defaultValue: (any NavigationHubCoordinatorType)? = nil
+}
+
+extension EnvironmentValues {
+    var navigationHubCoordinator: (any NavigationHubCoordinatorType)? {
+        get { self[NavigationHubCoordinatorKey.self] }
+        set { self[NavigationHubCoordinatorKey.self] = newValue }
     }
 }

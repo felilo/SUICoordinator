@@ -61,10 +61,14 @@ extension CoordinatorMacro: MemberMacro {
         // ── Coordinator protocol requirements ──────────────────────────────
 
         if !existingMemberNames.contains("router") {
-            members.append("public var router: Router<\(raw: routeTypeName)>")
+            members.append("public var router: Router<\(raw: routeTypeName)> = .init()")
         }
         if !existingMemberNames.contains("uuid") {
-            members.append("public var uuid: String")
+            members.append(
+                """
+                public lazy var uuid: String = "\\(NSStringFromClass(type(of: self))) - \\(UUID().uuidString)"
+                """
+            )
         }
         if !existingMemberNames.contains("parent") {
             members.append("public var parent: (any CoordinatorType)?")
@@ -76,14 +80,7 @@ extension CoordinatorMacro: MemberMacro {
             members.append("public var tagId: String?")
         }
         if !existingMemberNames.contains("init") {
-            members.append(
-                """
-                @MainActor public init() {
-                    self.router = .init()
-                    self.uuid = "\\(NSStringFromClass(type(of: self))) - \\(UUID().uuidString)"
-                }
-                """
-            )
+            members.append("public nonisolated init() {}")
         }
 
         // ── Observation infrastructure (replaces @Observable) ─────────────
@@ -143,7 +140,7 @@ extension CoordinatorMacro: MemberAttributeMacro {
             return [AttributeSyntax(attributeName: IdentifierTypeSyntax(name: .identifier("ObservationTracked")))]
         }
 
-        // Add @MainActor to instance func and init members so they inherit
+        // Add @MainActor to instance func members so they inherit
         // the same isolation as CoordinatorType (@MainActor protocol)
         if let funcDecl = member.as(FunctionDeclSyntax.self) {
             let isStatic = funcDecl.modifiers.contains { $0.name.tokenKind == .keyword(.static) }
@@ -151,16 +148,6 @@ extension CoordinatorMacro: MemberAttributeMacro {
                 attr.as(AttributeSyntax.self)?.attributeName.trimmedDescription == "MainActor"
             }
             if !isStatic && !alreadyMainActor {
-                return [AttributeSyntax(attributeName: IdentifierTypeSyntax(name: .identifier("MainActor")))]
-            }
-        }
-
-        if member.is(InitializerDeclSyntax.self) {
-            let initDecl = member.as(InitializerDeclSyntax.self)!
-            let alreadyMainActor = initDecl.attributes.contains { attr in
-                attr.as(AttributeSyntax.self)?.attributeName.trimmedDescription == "MainActor"
-            }
-            if !alreadyMainActor {
                 return [AttributeSyntax(attributeName: IdentifierTypeSyntax(name: .identifier("MainActor")))]
             }
         }
