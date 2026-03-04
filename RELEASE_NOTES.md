@@ -1,4 +1,4 @@
-# Release Notes — v1.0.2
+# Release Notes — v1.1.1
 
 ## Improvements
 
@@ -21,47 +21,40 @@ class HomeCoordinator {
 }
 ```
 
-### `HomeCoordinatorConfig` — value-type coordinator initialization
-Coordinators that need to vary their initial route can now accept a plain value-type config struct instead of a `RouteType` parameter (which would require `coordinator: self` at init time, creating a chicken-and-egg problem). The config is resolved into a concrete route inside `start()` where `self` is available.
+### Value-type config pattern for coordinator initialization
+Passing a `RouteType` value directly to a coordinator's `init` is not possible because route cases typically require `coordinator: self`, which isn't available at init time. The recommended pattern is to pass a plain value-type config struct and resolve it into a concrete route inside `start()` where `self` is available.
 
 ```swift
-struct HomeCoordinatorConfig {
-    var initialRoute: InitialRoute = .actionListView
+struct MyCoordinatorConfig {
+    var initialRoute: InitialRoute = .home
     var animated: Bool = true
 
     enum InitialRoute {
-        case actionListView
-        case detents(title: String)
-        case sheet(title: String)
-        case fullscreen(title: String)
-        case push(title: String)
+        case home
+        case detail(title: String)
     }
 }
 
-@Coordinator(HomeRoute.self)
-class HomeCoordinator {
-    @ObservationIgnored private let config: HomeCoordinatorConfig
+@Coordinator(MyRoute.self)
+class MyCoordinator {
+    @ObservationIgnored private let config: MyCoordinatorConfig
 
-    init(config: HomeCoordinatorConfig = .init()) {
+    init(config: MyCoordinatorConfig = .init()) {
         self.config = config
     }
 
     func start() async {
-        let route: HomeRoute = switch config.initialRoute {
-        case .actionListView:     .actionListView(coordinator: self)
-        case let .detents(title): .detents(coordinator: self, title: title)
-        // …
+        let route: MyRoute = switch config.initialRoute {
+        case .home:               .home(coordinator: self)
+        case let .detail(title):  .detail(coordinator: self, title: title)
         }
         await startFlow(route: route)
     }
 }
 
 // Usage
-let coordinator = HomeCoordinator(config: .init(initialRoute: .detents(title: "Hello")))
+let coordinator = MyCoordinator(config: .init(initialRoute: .detail(title: "Hello")))
 ```
-
-### `NavigationActionListDetailViewModel` migrated to `@Observable`
-The detail view model now uses the `@Observable` macro (iOS 17+) instead of `ObservableObject` + `@Published`, consistent with the rest of the iOS 17 target.
 
 ### `Router.init()` is now `nonisolated`
 `Router.init()` no longer requires a `@MainActor` context, making it safe to call as a stored-property inline default and from `nonisolated` init sites.
