@@ -26,9 +26,9 @@ import SwiftUI
 
 struct NavigationActionListDetailView: View {
     
-    @StateObject var viewModel: NavigationActionListDetailViewModel
+    @State private var viewModel: NavigationActionListDetailViewModel
     @State private var counter = 0
-    @State var bgColor: Color = Self.randomColor()
+    @State private var bgColor: Color = Self.randomColor()
     
     private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
     
@@ -108,6 +108,6 @@ struct NavigationActionListDetailView: View {
 }
 
 
-#Preview {
-    NavigationActionListDetailView(coordinator: .init(), title: "Preview")
-}
+//#Preview {
+//    NavigationActionListDetailView(coordinator: .init(), title: "Preview")
+//}
