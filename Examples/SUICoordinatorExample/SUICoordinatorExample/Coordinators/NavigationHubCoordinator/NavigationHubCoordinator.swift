@@ -50,10 +50,6 @@ class NavigationHubCoordinator {
     func finish() async {
         await finishFlow(animated: true)
     }
-
-    func finishFlow() async {
-        await finishFlow(animated: true)
-    }
 }
 
 

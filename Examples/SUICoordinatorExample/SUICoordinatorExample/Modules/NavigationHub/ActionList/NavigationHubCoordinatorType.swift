@@ -31,7 +31,7 @@ protocol NavigationHubCoordinatorType: AnyObject {
     func presentHomeCoordinator() async
     func presentHomeCoordinatorWithCustomNavigation() async
     func presentNavigationActionList() async
-    func finishFlow() async
+    func finish() async
 }
 
 // MARK: - Environment

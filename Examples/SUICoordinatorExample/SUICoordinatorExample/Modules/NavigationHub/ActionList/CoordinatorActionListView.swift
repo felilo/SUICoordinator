@@ -57,7 +57,7 @@ struct CoordinatorActionListView: View {
             }
             .toolbar {
                 Button {
-                    Task { await coordinator?.finishFlow() }
+                    Task { await coordinator?.finish() }
                 } label: {
                     Text("Finish flow")
                 }
