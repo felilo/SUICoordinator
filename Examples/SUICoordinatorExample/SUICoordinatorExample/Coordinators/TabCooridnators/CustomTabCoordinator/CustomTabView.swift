@@ -72,8 +72,6 @@ struct CustomTabView<DataSource: TabCoordinatorType>: View where DataSource.Data
                     }
                 }
             }
-            .tabViewStyle(.page)
-//            .tabViewStyle(.page(indexDisplayMode: .never))
 
             VStack() {
                 Spacer()

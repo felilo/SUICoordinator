@@ -78,12 +78,12 @@ struct RouterView<C: CoordinatorType>: View {
     private func addSheetTo(view: (some View)?) -> some View {
         view.environment(coordinator)
             .sheetCoordinator(
-            coordinator: viewModel.sheetCoordinator,
-            onDissmis: { index in Task(priority: .high) { [weak viewModel] in
-                await viewModel?.removeItemFromSheetCoordinator(at: index)
-            }},
-            onDidLoad: nil
-        )
+                coordinator: viewModel.sheetCoordinator,
+                onDissmis: { index in Task(priority: .high) { [weak viewModel] in
+                    await viewModel?.removeItemFromSheetCoordinator(at: index)
+                }},
+                onDidLoad: nil
+            ).environment(coordinator)
     }
     
     // --------------------------------------------------------------------
