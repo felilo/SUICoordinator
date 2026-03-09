@@ -75,6 +75,11 @@ struct SplitView<DataSource: TabCoordinatorType>: View where DataSource.DataSour
         } detail: {
             detailView()
         }
+        .task {
+            if horizontalSizeClass != .compact {
+                self.selectedPage = dataSource.currentPage
+            }
+        }
     }
 
     // ---------------------------------------------------------------------
@@ -120,5 +125,5 @@ struct SplitView<DataSource: TabCoordinatorType>: View where DataSource.DataSour
 }
 
 #Preview {
-    SplitView(dataSource: SplitViewCoordinator(currentPage: .home))
+    SplitView(dataSource: SplitViewCoordinator(currentPage: .hub))
 }
