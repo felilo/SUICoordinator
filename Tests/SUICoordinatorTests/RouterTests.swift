@@ -27,9 +27,10 @@ import XCTest
 
 
 @available(iOS 17.0, *)
+@MainActor
 final class RouterTests: XCTestCase {
     
-    @MainActor func test_navigationStack_pushToRoute() async throws {
+    func test_navigationStack_pushToRoute() async throws {
         let sut = makeSUT()
         let route = AnyEnumRoute.pushStep(1)
         
@@ -38,7 +39,7 @@ final class RouterTests: XCTestCase {
         XCTAssertEqual(sut.items.last?.id, route.id)
     }
     
-    @MainActor func test_navigationStack_pop() async throws {
+    func test_navigationStack_pop() async throws {
         let sut = makeSUT()
         
         await sut.navigate(toRoute: .pushStep(1), animated: false)
@@ -47,7 +48,7 @@ final class RouterTests: XCTestCase {
         XCTAssertNil(sut.items.last ?? nil)
     }
     
-    @MainActor func test_navigationStack_popToRoot() async throws {
+    func test_navigationStack_popToRoot() async throws {
         let sut = makeSUT()
         
         await sut.navigate(toRoute: .pushStep(1), animated: false)
@@ -59,7 +60,7 @@ final class RouterTests: XCTestCase {
         XCTAssertNil(sut.items.last ?? nil)
     }
     
-    @MainActor func test_closeRoute() async throws {
+    func test_closeRoute() async throws {
         let sut = makeSUT()
         
         await sut.navigate(toRoute: .pushStep(1), animated: false)
@@ -72,7 +73,7 @@ final class RouterTests: XCTestCase {
         XCTAssertEqual(sut.sheetCoordinator.items.count, 0)
     }
     
-    @MainActor func test_cleanRouter() async throws {
+    func test_cleanRouter() async throws {
         let sut = makeSUT()
         
         await sut.navigate(toRoute: .pushStep(1), animated: false)
@@ -86,7 +87,7 @@ final class RouterTests: XCTestCase {
         XCTAssertEqual(sut.sheetCoordinator.items.count, 0)
     }
     
-    @MainActor func test_cleanRouter_with_customTransitionView() async throws {
+    func test_cleanRouter_with_customTransitionView() async throws {
         let sut = makeSUT()
         
         await sut.navigate(toRoute: .pushStep(1), animated: false)
@@ -101,7 +102,7 @@ final class RouterTests: XCTestCase {
         XCTAssertEqual(sut.sheetCoordinator.items.count, 0)
     }
     
-    @MainActor func test_restartRouter() async throws {
+    func test_restartRouter() async throws {
         let sut = makeSUT()
         
         await sut.navigate(toRoute: .pushStep(1), animated: false)
@@ -115,7 +116,7 @@ final class RouterTests: XCTestCase {
         XCTAssertNotNil(sut.mainView)
     }
     
-    @MainActor func test_sinkItemsRouter() async throws {
+    func test_sinkItemsRouter() async throws {
         let sut = makeSUT()
         
         await sut.navigate(toRoute: .pushStep(1), animated: false)
@@ -128,7 +129,7 @@ final class RouterTests: XCTestCase {
         XCTAssertEqual(sut.items.count, 2)
     }
     
-    @MainActor func test_presentItem_with_presentationStyle_not_valid() async throws {
+    func test_presentItem_with_presentationStyle_not_valid() async throws {
         let sut = makeSUT()
         
         await sut.present(.sheetStep, presentationStyle: .push, animated: false)
@@ -137,7 +138,7 @@ final class RouterTests: XCTestCase {
         XCTAssertEqual(sut.sheetCoordinator.items.count, 0)
     }
     
-    @MainActor func test_presentItem_with_presentationStyle_valid() async throws {
+    func test_presentItem_with_presentationStyle_valid() async throws {
         let sut = makeSUT()
         
         await sut.present(.sheetStep, presentationStyle: .sheet, animated: false)
@@ -146,7 +147,7 @@ final class RouterTests: XCTestCase {
         XCTAssertEqual(sut.sheetCoordinator.items.count, 1)
     }
     
-    @MainActor func test_dissmiss_sheet_swipedAway() async throws {
+    func test_dissmiss_sheet_swipedAway() async throws {
         let sut = makeSUT()
         let index = 0
         
@@ -162,7 +163,7 @@ final class RouterTests: XCTestCase {
     
     // MARK: - dismiss
 
-    @MainActor func test_dismiss_removesTopSheet() async throws {
+    func test_dismiss_removesTopSheet() async throws {
         let sut = makeSUT()
         await sut.navigate(toRoute: .sheetStep, animated: false)
         XCTAssertEqual(sut.sheetCoordinator.items.count, 1)
@@ -174,7 +175,7 @@ final class RouterTests: XCTestCase {
 
     // MARK: - present with detents
 
-    @MainActor func test_present_detents_addsToSheetCoordinator() async throws {
+    func test_present_detents_addsToSheetCoordinator() async throws {
         let sut = makeSUT()
         await sut.present(.detentsStep, presentationStyle: .detents([.medium]), animated: false)
         XCTAssertEqual(sut.sheetCoordinator.items.count, 1)
@@ -183,7 +184,7 @@ final class RouterTests: XCTestCase {
 
     // MARK: - present with fullScreenCover
 
-    @MainActor func test_present_fullScreenCover_addsToSheetCoordinator() async throws {
+    func test_present_fullScreenCover_addsToSheetCoordinator() async throws {
         let sut = makeSUT()
         await sut.present(.fullScreenStep, presentationStyle: .fullScreenCover, animated: false)
         XCTAssertEqual(sut.sheetCoordinator.items.count, 1)
@@ -191,7 +192,7 @@ final class RouterTests: XCTestCase {
 
     // MARK: - present with custom transition
 
-    @MainActor func test_present_customTransition_addsToSheetCoordinator() async throws {
+    func test_present_customTransition_addsToSheetCoordinator() async throws {
         let sut = makeSUT()
         await sut.present(.customTransition(fullScreen: false), animated: false)
         XCTAssertEqual(sut.sheetCoordinator.items.count, 1)
@@ -200,13 +201,13 @@ final class RouterTests: XCTestCase {
 
     // MARK: - syncItems edge cases
 
-    @MainActor func test_syncItems_emptyItems_doesNotCrash() async throws {
+    func test_syncItems_emptyItems_doesNotCrash() async throws {
         let sut = makeSUT()
         await sut.syncItems() // no items, should not crash
         XCTAssertEqual(sut.items.count, 0)
     }
 
-    @MainActor func test_syncItems_reflectsManualRemoval() async throws {
+    func test_syncItems_reflectsManualRemoval() async throws {
         let sut = makeSUT()
         await sut.navigate(toRoute: .pushStep(1), animated: false)
         await sut.navigate(toRoute: .pushStep2, animated: false)
@@ -219,7 +220,7 @@ final class RouterTests: XCTestCase {
 
     // MARK: - multiple sheets stacked then clean
 
-    @MainActor func test_multipleSheets_cleanRemovesAll() async throws {
+    func test_multipleSheets_cleanRemovesAll() async throws {
         let sut = makeSUT()
         await sut.navigate(toRoute: .sheetStep, animated: false)
         await sut.navigate(toRoute: .fullScreenStep, animated: false)
@@ -232,7 +233,7 @@ final class RouterTests: XCTestCase {
 
     // MARK: - pop on empty stack does not crash
 
-    @MainActor func test_pop_onEmptyStack_doesNotCrash() async throws {
+    func test_pop_onEmptyStack_doesNotCrash() async throws {
         let sut = makeSUT()
         await sut.pop(animated: false) // nothing to pop
         XCTAssertEqual(sut.items.count, 0)
@@ -240,7 +241,7 @@ final class RouterTests: XCTestCase {
 
     // MARK: - animated flag
 
-    @MainActor func test_animated_defaultsToTrue() {
+    func test_animated_defaultsToTrue() {
         let sut = makeSUT()
         XCTAssertTrue(sut.animated)
     }
@@ -249,14 +250,14 @@ final class RouterTests: XCTestCase {
     // MARK: Helpers
     // --------------------------------------------------------------------
 
-    @MainActor private func makeSUT(file: StaticString = #filePath, line: UInt = #line) -> Router<AnyEnumRoute> {
+    private func makeSUT(file: StaticString = #filePath, line: UInt = #line) -> Router<AnyEnumRoute> {
         let router = Router<AnyEnumRoute>()
         router.mainView = .pushStep(1)
         trackForMemoryLeaks(router, file: file, line: line)
         return router
     }
 
-    @MainActor private func makeSheetItem(_ item: any RouteType, animated: Bool = true) -> SheetItem<any RouteType> {
+    private func makeSheetItem(_ item: any RouteType, animated: Bool = true) -> SheetItem<any RouteType> {
         .init(id: UUID().uuidString, animated: animated, presentationStyle: item.presentationStyle, view: { item })
     }
 }
