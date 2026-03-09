@@ -24,8 +24,7 @@
 
 import SwiftUI
 
-@MainActor
-protocol ActionListCoordinatorType: AnyObject {
+protocol ActionListCoordinatorType: AnyObject, Sendable {
     func navigateToPushView() async
     func presentSheet() async
     func presentFullscreen() async
@@ -40,7 +39,7 @@ protocol ActionListCoordinatorType: AnyObject {
 // MARK: - Environment
 
 private struct ActionListCoordinatorKey: EnvironmentKey {
-    nonisolated(unsafe) static let defaultValue: (any ActionListCoordinatorType)? = nil
+    static let defaultValue: (any ActionListCoordinatorType)? = nil
 }
 
 extension EnvironmentValues {

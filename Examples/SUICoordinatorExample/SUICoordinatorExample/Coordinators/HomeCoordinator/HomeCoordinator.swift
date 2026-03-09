@@ -57,27 +57,27 @@ class HomeCoordinator {
 extension HomeCoordinator: ActionListCoordinatorType {
     
     func navigateToPushView() async {
-        let title = "Hello, PushView!\(router.items.count + 1)"
+        let title = "Hello, PushView!"
         await navigate(toRoute: .push(coordinator: self, title: title), animated: config.animated)
     }
     
     func presentSheet() async {
-        let title = "Hello, Sheet! \(router.items.count + 1)"
+        let title = "Hello, Sheet!"
         await navigate(toRoute: .sheet(coordinator: self, title: title), animated: config.animated)
     }
     
     func presentFullscreen() async {
-        let title = "Hello, Fullscreen! \(router.items.count + 1)"
+        let title = "Hello, Fullscreen!"
         await navigate(toRoute: .fullscreen(coordinator: self, title: title), animated: config.animated)
     }
     
     func presentDetents() async {
-        let title = "Hello, Detents! \(router.items.count + 1)"
+        let title = "Hello, Detents!"
         await navigate(toRoute: .detents(coordinator: self, title: title), animated: config.animated)
     }
     
     func presentViewWithCustomPresentation() async {
-        let title = "Hello, Custom presentation! \(router.items.count + 1)"
+        let title = "Hello, Custom presentation!"
         await navigate(toRoute: .viewCustomTransition(coordinator: self, title: title), animated: config.animated)
     }
     

@@ -172,7 +172,9 @@ extension CoordinatorMacro: ExtensionMacro {
             return []
         }
 
-        // CoordinatorType conformance + Observable conformance
+        // CoordinatorType conformance + Observable conformance + @unchecked Sendable
+        // @unchecked Sendable is safe here because all mutable state is accessed
+        // exclusively on the @MainActor, enforced by CoordinatorType's @MainActor isolation.
         let coordinatorExt: DeclSyntax =
             """
             @available(iOS 17.0, *)
@@ -182,14 +184,19 @@ extension CoordinatorMacro: ExtensionMacro {
             """
             extension \(type.trimmed): Observable {}
             """
+        let sendableExt: DeclSyntax =
+            """
+            extension \(type.trimmed): @unchecked Sendable {}
+            """
 
         guard
             let coordinatorExtDecl = coordinatorExt.as(ExtensionDeclSyntax.self),
-            let observableExtDecl = observableExt.as(ExtensionDeclSyntax.self)
+            let observableExtDecl = observableExt.as(ExtensionDeclSyntax.self),
+            let sendableExtDecl = sendableExt.as(ExtensionDeclSyntax.self)
         else {
             return []
         }
-        return [coordinatorExtDecl, observableExtDecl]
+        return [coordinatorExtDecl, observableExtDecl, sendableExtDecl]
     }
 }
 

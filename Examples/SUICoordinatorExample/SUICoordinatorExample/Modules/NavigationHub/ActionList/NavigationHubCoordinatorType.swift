@@ -25,7 +25,7 @@
 import SwiftUI
 
 @MainActor
-protocol NavigationHubCoordinatorType: AnyObject {
+protocol NavigationHubCoordinatorType: AnyObject, Sendable {
     func presentDefaultTabCoordinator() async
     func presentCustomTabCoordinator() async
     func presentSplitViewCoordinator() async
@@ -38,7 +38,7 @@ protocol NavigationHubCoordinatorType: AnyObject {
 // MARK: - Environment
 
 private struct NavigationHubCoordinatorKey: EnvironmentKey {
-    nonisolated(unsafe) static let defaultValue: (any NavigationHubCoordinatorType)? = nil
+    static let defaultValue: (any NavigationHubCoordinatorType)? = nil
 }
 
 extension EnvironmentValues {

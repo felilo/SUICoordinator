@@ -33,7 +33,7 @@ import Observation
 /// - Stored properties: `router`, `uuid`, `parent`, `children`, `tagId`
 /// - A default `init()` (skipped if you define one yourself)
 /// - Full `@Observable`-equivalent observation infrastructure
-/// - `CoordinatorType` and `Observable` conformances via extensions
+/// - `CoordinatorType`, `Observable`, and `@unchecked Sendable` conformances via extensions
 /// - `@MainActor` isolation on all methods (via `CoordinatorType`)
 ///
 /// All navigation methods (`navigate`, `startFlow`, `finishFlow`, `close`, `restart`,
@@ -67,6 +67,6 @@ import Observation
     named(withMutation)
 )
 @attached(memberAttribute)
-@attached(extension, conformances: CoordinatorType, Observable)
+@attached(extension, conformances: CoordinatorType, Observable, Sendable)
 public macro Coordinator<R: RouteType>(_ routeType: R.Type) =
     #externalMacro(module: "SUICoordinatorMacros", type: "CoordinatorMacro")

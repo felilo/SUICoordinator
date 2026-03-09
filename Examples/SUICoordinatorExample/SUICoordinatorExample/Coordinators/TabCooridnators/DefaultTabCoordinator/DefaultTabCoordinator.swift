@@ -30,7 +30,7 @@ class DefaultTabCoordinator: TabCoordinator<MyTabPage> {
     // MARK: Init
     // ---------------------------------------------------------------------
     
-    init() {
+    nonisolated init() {
         super.init(
             pages: Page.allCases,
             currentPage: .first,
@@ -38,7 +38,7 @@ class DefaultTabCoordinator: TabCoordinator<MyTabPage> {
         )
         
         /// Set badge of a tab
-        Task { [weak self] in
+        Task { @MainActor [weak self] in
             try? await Task.sleep(for: .seconds(1))
             self?.setBadge(for: .second, with: "2")
         }

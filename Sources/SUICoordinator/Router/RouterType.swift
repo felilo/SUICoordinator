@@ -31,7 +31,6 @@ public protocol RouterType: Observable {
 
     associatedtype Route: RouteType
 
-    var items: [Route] { get set }
     var sheetCoordinator: SheetCoordinator<AnyViewAlias> { get }
     var mainView: Route? { get }
     var animated: Bool { get }

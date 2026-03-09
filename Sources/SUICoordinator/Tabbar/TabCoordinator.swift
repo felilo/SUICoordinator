@@ -29,85 +29,111 @@ import Foundation
 @available(iOS 17.0, *)
 @Observable
 open class TabCoordinator<Page: TabPage>: TabCoordinatable {
-    
+
     // --------------------------------------------------------------------
     // MARK: Properties
     // --------------------------------------------------------------------
-    
-    public var router: Router<DefaultRoute>
+
+    public var router: Router<DefaultRoute> = .init()
     public var pages: [Page] = []
-    public var currentPage: Page
-    public var uuid: String
     public var parent: (any CoordinatorType)?
     public var children: [(any CoordinatorType)] = []
     public var tagId: String?
-    
+
     // --------------------------------------------------------------------
     // MARK: TabCoordinatorType properties
     // --------------------------------------------------------------------
-    
-    private var presentationStyle: TransitionPresentationStyle
+
     public var badges: AsyncStream<(String?, Page)> { stream }
-    public var viewContainer: (TabCoordinator<Page>) -> (Page.View)
-    
+
+    // --------------------------------------------------------------------
+    // MARK: Private backing storage (nonisolated let — safe from any context)
+    // --------------------------------------------------------------------
+
+    /// Backing storage initialized once in `init`; `uuid`, `currentPage`, and `viewContainer`
+    /// are exposed as computed properties so that the stored values are plain `let` constants,
+    /// which Swift permits writing from a `nonisolated` context.
+    private let _uuid: String
+    private let _presentationStyle: TransitionPresentationStyle
+    private let _initialPages: [Page]
+    private let _initialCurrentPage: Page
+    private let _viewContainer: (TabCoordinator<Page>) -> Page.View
     private let (stream, continuation) = AsyncStream.makeStream(of: (String?, Page).self)
+
+    // Mutable current-page is the only `var` that needs @MainActor isolation.
+    // It is stored separately so `nonisolated init` never touches it.
+    private var _currentPage: Page?
+
+    // ---------------------------------------------------------
+    // MARK: TabCoordinatorType computed wrappers
+    // ---------------------------------------------------------
+
+    public var uuid: String { _uuid }
+
+    public var currentPage: Page {
+        get { _currentPage ?? _initialCurrentPage }
+        set { _currentPage = newValue }
+    }
+
+    public var viewContainer: (TabCoordinator<Page>) -> Page.View {
+        get { _viewContainer }
+    }
 
     // ---------------------------------------------------------
     // MARK: Constructor
     // ---------------------------------------------------------
 
-    public init(
+    public nonisolated init(
         pages: [Page],
         currentPage: Page,
         presentationStyle: TransitionPresentationStyle = .sheet,
-        viewContainer: @escaping (TabCoordinator<Page>) -> Page.View
+        viewContainer: @escaping @MainActor @Sendable (TabCoordinator<Page>) -> Page.View
     ) {
+        self._uuid = "\(NSStringFromClass(type(of: self))) - \(UUID().uuidString)"
+        self._presentationStyle = presentationStyle
+        self._initialPages = pages
+        self._initialCurrentPage = currentPage
+        self._viewContainer = viewContainer
         defer { Task { [weak self] in await self?.start() } }
-        
-        self.router = .init()
-        self.uuid = "\(NSStringFromClass(type(of: self))) - \(UUID().uuidString)"
-        self.presentationStyle = presentationStyle
-        self.currentPage = currentPage
-        self.viewContainer = viewContainer
-        self.pages = pages
     }
-    
+
     // ---------------------------------------------------------
     // MARK: Coordinator
     // ---------------------------------------------------------
-    
+
     open func start() async {
         guard !isRunning else { return }
-        await setupPages(pages, currentPage: currentPage)
-        let cView = viewContainer
+        await setupPages(_initialPages, currentPage: _initialCurrentPage)
+        let cView = _viewContainer
         await startFlow(
             route: .init(
-                presentationStyle: presentationStyle,
+                presentationStyle: _presentationStyle,
                 content: { cView(self) }
             )
         )
     }
-    
+
     // ---------------------------------------------------------
     // MARK: Helper funcs
     // ---------------------------------------------------------
-    
+
     public func getCoordinator(with page: Page) -> AnyCoordinatorType? {
         children.first { $0.tagId == page.id }
     }
-    
+
     open func getCoordinatorSelected() throws -> (any CoordinatorType) {
         guard let index = children.firstIndex(where: { $0.tagId == "\(currentPage.id)" })
         else { throw TabCoordinatorError.coordinatorSelected }
         return children[index]
     }
-    
+
     public func setBadge(for page: Page, with value: String?) {
         continuation.yield((value, page))
     }
-    
+
     public func clean() async {
         await setPages([], currentPage: nil)
         await router.clean(animated: false)
     }
 }
+

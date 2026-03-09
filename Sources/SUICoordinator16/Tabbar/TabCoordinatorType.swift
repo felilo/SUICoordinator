@@ -34,7 +34,7 @@ public protocol TabCoordinatorType: ObservableObject {
     var currentPage: Page { get set }
     var badges: AsyncStream<(String?, Page)> { get }
     var pages: [Page] { get set }
-    var viewContainer: (TabCoordinator<Page>) -> (Page.View) { get set }
+    var viewContainer: (TabCoordinator<Page>) -> (Page.View) { get }
     
     func getCoordinator(with page: Page) -> AnyCoordinatorType?
     func getCoordinatorSelected() throws -> (any CoordinatorType)
