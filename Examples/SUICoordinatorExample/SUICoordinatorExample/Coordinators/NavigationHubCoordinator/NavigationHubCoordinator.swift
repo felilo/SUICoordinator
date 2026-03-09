@@ -100,6 +100,11 @@ extension NavigationHubCoordinator: NavigationHubCoordinatorType {
         await navigate(to: coordinator, presentationStyle: .sheet)
     }
 
+    func presentSplitViewCoordinator() async {
+        let coordinator = SplitViewCoordinator()
+        await navigate(to: coordinator, presentationStyle: .fullScreenCover)
+    }
+
     func presentHomeCoordinator() async {
         let coordinator = HomeCoordinator()
         await navigate(to: coordinator, presentationStyle: .detents([.medium, .large]))

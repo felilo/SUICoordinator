@@ -42,6 +42,10 @@ struct CoordinatorActionListView: View {
                 actionRowButton(title: "Presents Custom Tab Coordinator", systemImage: "square.grid.2x2.fill") {
                     await coordinator?.presentCustomTabCoordinator()
                 }
+
+                actionRowButton(title: "Presents Split View Coordinator", systemImage: "sidebar.left") {
+                    await coordinator?.presentSplitViewCoordinator()
+                }
                 
                 actionRowButton(title: "Presents Home Coordinator", systemImage: "rectangle.bottomthird.inset.fill") {
                     await coordinator?.presentHomeCoordinator()

@@ -1,5 +1,5 @@
 //
-//  NavigationHubCoordinatorType.swift
+//  SplitViewCoordinator.swift
 //
 //  Copyright (c) Andres F. Lozano
 //
@@ -22,28 +22,25 @@
 //  THE SOFTWARE.
 //
 
-import SwiftUI
+import SUICoordinator
 
-@MainActor
-protocol NavigationHubCoordinatorType: AnyObject {
-    func presentDefaultTabCoordinator() async
-    func presentCustomTabCoordinator() async
-    func presentSplitViewCoordinator() async
-    func presentHomeCoordinator() async
-    func presentHomeCoordinatorWithCustomNavigation() async
-    func presentNavigationActionList() async
-    func finish() async
-}
+/// A coordinator that hosts a `NavigationSplitView` instead of a `TabView`.
+///
+/// It reuses `TabCoordinator` as the backbone — page management, coordinator
+/// lifecycle, and badge delivery all work identically. The only difference is
+/// that `SplitView` is passed as the `viewContainer`, replacing `TabView` with
+/// a two-column split layout.
+class SplitViewCoordinator: TabCoordinator<SplitViewTabPage> {
 
-// MARK: - Environment
+    // ---------------------------------------------------------------------
+    // MARK: Init
+    // ---------------------------------------------------------------------
 
-private struct NavigationHubCoordinatorKey: EnvironmentKey {
-    nonisolated(unsafe) static let defaultValue: (any NavigationHubCoordinatorType)? = nil
-}
-
-extension EnvironmentValues {
-    var navigationHubCoordinator: (any NavigationHubCoordinatorType)? {
-        get { self[NavigationHubCoordinatorKey.self] }
-        set { self[NavigationHubCoordinatorKey.self] = newValue }
+    init(currentPage: SplitViewTabPage = .home) {
+        super.init(
+            pages: Page.allCases,
+            currentPage: currentPage,
+            viewContainer: { SplitView(dataSource: $0) }
+        )
     }
 }
