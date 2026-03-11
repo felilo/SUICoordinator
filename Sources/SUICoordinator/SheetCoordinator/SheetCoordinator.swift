@@ -128,6 +128,11 @@ final public class SheetCoordinator<T> {
 
         await removeSheet(at: indexes, animated: animated)
         try? await Task.sleep(for: .seconds(animated ? 0.1 : 0))
+        
+        
+        await itemManager.removeAll()
+        lastPresentationStyle = nil
+        backUpItems.removeAll()
     }
 
     func getNextIndex(_ index: Int) -> Int {

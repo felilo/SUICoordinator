@@ -137,7 +137,12 @@ extension CoordinatorMacro: MemberAttributeMacro {
            let patternName = firstBinding.pattern.as(IdentifierPatternSyntax.self)?.identifier.text,
            patternName != "_$observationRegistrar",
            firstBinding.accessorBlock == nil {
-            return [AttributeSyntax(attributeName: IdentifierTypeSyntax(name: .identifier("ObservationTracked")))]
+            let alreadyIgnored = varDecl.attributes.contains { attr in
+                attr.as(AttributeSyntax.self)?.attributeName.trimmedDescription == "ObservationIgnored"
+            }
+            if !alreadyIgnored {
+                return [AttributeSyntax(attributeName: IdentifierTypeSyntax(name: .identifier("ObservationTracked")))]
+            }
         }
 
         // Add @MainActor to instance func members so they inherit
