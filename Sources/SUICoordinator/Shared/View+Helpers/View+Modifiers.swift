@@ -45,3 +45,17 @@ extension View {
         )
     }
 }
+
+
+@available(iOS 17.0, *)
+struct CoordinatorKey: EnvironmentKey {
+    static let defaultValue: AnyCoordinatorType? = nil
+}
+
+@available(iOS 17.0, *)
+public extension EnvironmentValues {
+    var coordinator: AnyCoordinatorType? {
+        get { self[CoordinatorKey.self] }
+        set { self[CoordinatorKey.self] = newValue }
+    }
+}

@@ -31,14 +31,14 @@ public struct CoordinatorView<DataSource: CoordinatorType>: View {
     // MARK: Wrapper properties
     // --------------------------------------------------------------------
     
-    @State var dataSource: DataSource
+    var dataSource: DataSource
     
     // --------------------------------------------------------------------
     // MARK: Constructor
     // --------------------------------------------------------------------
     
     init(dataSource: DataSource) {
-        self._dataSource = .init(wrappedValue: dataSource)
+        self.dataSource = dataSource
         
         if !dataSource.isRunning && !dataSource.isTabCoordinable {
             Task { @MainActor in await dataSource.start() }
