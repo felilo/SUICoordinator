@@ -29,6 +29,9 @@ import SwiftUI
  
  TransitionPresentationStyle enumerates the different styles used for transitioning between views or presenting views within an application.
  */
+// Safety invariant: TransitionPresentationStyle values are created once at definition time
+// and treated as effectively immutable descriptors. AnyTransition and Animation? in the
+// .custom case are SwiftUI value types used exclusively on the @MainActor.
 public enum TransitionPresentationStyle: @unchecked Sendable, SCEquatable {
     
     /// A push transition style, commonly used in navigation controllers.

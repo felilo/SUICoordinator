@@ -137,7 +137,12 @@ extension CoordinatorMacro: MemberAttributeMacro {
            let patternName = firstBinding.pattern.as(IdentifierPatternSyntax.self)?.identifier.text,
            patternName != "_$observationRegistrar",
            firstBinding.accessorBlock == nil {
-            return [AttributeSyntax(attributeName: IdentifierTypeSyntax(name: .identifier("ObservationTracked")))]
+            let alreadyIgnored = varDecl.attributes.contains { attr in
+                attr.as(AttributeSyntax.self)?.attributeName.trimmedDescription == "ObservationIgnored"
+            }
+            if !alreadyIgnored {
+                return [AttributeSyntax(attributeName: IdentifierTypeSyntax(name: .identifier("ObservationTracked")))]
+            }
         }
 
         // Add @MainActor to instance func members so they inherit
@@ -172,7 +177,9 @@ extension CoordinatorMacro: ExtensionMacro {
             return []
         }
 
-        // CoordinatorType conformance + Observable conformance
+        // CoordinatorType conformance + Observable conformance + @unchecked Sendable
+        // @unchecked Sendable is safe here because all mutable state is accessed
+        // exclusively on the @MainActor, enforced by CoordinatorType's @MainActor isolation.
         let coordinatorExt: DeclSyntax =
             """
             @available(iOS 17.0, *)
@@ -182,14 +189,19 @@ extension CoordinatorMacro: ExtensionMacro {
             """
             extension \(type.trimmed): Observable {}
             """
+        let sendableExt: DeclSyntax =
+            """
+            extension \(type.trimmed): @unchecked Sendable {}
+            """
 
         guard
             let coordinatorExtDecl = coordinatorExt.as(ExtensionDeclSyntax.self),
-            let observableExtDecl = observableExt.as(ExtensionDeclSyntax.self)
+            let observableExtDecl = observableExt.as(ExtensionDeclSyntax.self),
+            let sendableExtDecl = sendableExt.as(ExtensionDeclSyntax.self)
         else {
             return []
         }
-        return [coordinatorExtDecl, observableExtDecl]
+        return [coordinatorExtDecl, observableExtDecl, sendableExtDecl]
     }
 }
 

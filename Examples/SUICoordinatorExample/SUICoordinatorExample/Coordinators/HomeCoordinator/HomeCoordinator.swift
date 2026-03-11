@@ -30,6 +30,16 @@ class HomeCoordinator {
     
     @ObservationIgnored
     private let config: HomeCoordinatorConfig
+    @ObservationIgnored
+    private var pushCounter = 0
+    @ObservationIgnored
+    private var sheetCounter = 0
+    @ObservationIgnored
+    private var fullscreenCounter = 0
+    @ObservationIgnored
+    private var detentsCounter = 0
+    @ObservationIgnored
+    private var customCounter = 0
     
     // ---------------------------------------------------------------------
     // MARK: Init
@@ -48,7 +58,7 @@ class HomeCoordinator {
         case let .detents(title):
                 .detents(coordinator: self, title: title)
         default:
-                .actionListView(coordinator: self)
+                .actionListView
         }
         await startFlow(route: route)
     }
@@ -57,27 +67,32 @@ class HomeCoordinator {
 extension HomeCoordinator: ActionListCoordinatorType {
     
     func navigateToPushView() async {
-        let title = "Hello, PushView!\(router.items.count + 1)"
+        pushCounter += 1
+        let title = "Hello, PushView! \(pushCounter)"
         await navigate(toRoute: .push(coordinator: self, title: title), animated: config.animated)
     }
     
     func presentSheet() async {
-        let title = "Hello, Sheet! \(router.items.count + 1)"
+        sheetCounter += 1
+        let title = "Hello, Sheet! \(sheetCounter)"
         await navigate(toRoute: .sheet(coordinator: self, title: title), animated: config.animated)
     }
     
     func presentFullscreen() async {
-        let title = "Hello, Fullscreen! \(router.items.count + 1)"
+        fullscreenCounter += 1
+        let title = "Hello, Fullscreen! \(fullscreenCounter)"
         await navigate(toRoute: .fullscreen(coordinator: self, title: title), animated: config.animated)
     }
     
     func presentDetents() async {
-        let title = "Hello, Detents! \(router.items.count + 1)"
+        detentsCounter += 1
+        let title = "Hello, Detents! \(detentsCounter)"
         await navigate(toRoute: .detents(coordinator: self, title: title), animated: config.animated)
     }
     
     func presentViewWithCustomPresentation() async {
-        let title = "Hello, Custom presentation! \(router.items.count + 1)"
+        customCounter += 1
+        let title = "Hello, Custom presentation! \(customCounter)"
         await navigate(toRoute: .viewCustomTransition(coordinator: self, title: title), animated: config.animated)
     }
     

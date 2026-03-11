@@ -31,15 +31,14 @@ struct RouterView<C: CoordinatorType>: View {
     // MARK: Properties
     // --------------------------------------------------------------------
     
-    @State private var viewModel: Router<C.Route>
-    private let coordinator: C
-    
+    private var coordinator: C
+    private var viewModel: Router<C.Route> { coordinator.router }
+
     // --------------------------------------------------------------------
     // MARK: Constructor
     // --------------------------------------------------------------------
     
     public init(coordinator: C) {
-        self._viewModel = .init(wrappedValue: coordinator.router)
         self.coordinator = coordinator
     }
     
@@ -59,31 +58,40 @@ struct RouterView<C: CoordinatorType>: View {
     @ViewBuilder
     private func buildBody() -> some View {
         Group {
-            if coordinator.isTabCoordinable {
+            if coordinator.isTabCoordinable == true {
                 viewModel.mainView
-            } else if let mainView = viewModel.mainView {
-                let view = NavigationStack(
-                    path: $viewModel.items,
-                    root: { mainView.navigationDestination(for: C.Route.self) { $0 } }
-                )
-                .transaction { $0.disablesAnimations = !viewModel.animated }
-                .onChange(of: viewModel.items) { _, _ in onChangeItems() }
-                
-                addSheetTo(view: view)
+            } else if let view = viewModel.mainView {
+                addSheetTo(view: navigationStack(rootView: view))
+            } else {
+                Color.white.opacity(0.01)
+                    .environment(\.coordinator, nil)
             }
         }
     }
     
     @ViewBuilder
     private func addSheetTo(view: (some View)?) -> some View {
-        view.environment(coordinator)
+        let router = coordinator.router
+        
+        view.environment(\.coordinator, coordinator)
             .sheetCoordinator(
-                coordinator: viewModel.sheetCoordinator,
-                onDissmis: { index in Task(priority: .high) { [weak viewModel] in
-                    await viewModel?.removeItemFromSheetCoordinator(at: index)
-                }},
-                onDidLoad: nil
-            ).environment(coordinator)
+            coordinator: router.sheetCoordinator,
+            onDissmis: { index in Task(priority: .high) { [weak router] in
+                await router?.removeItemFromSheetCoordinator(at: index)
+            }},
+            onDidLoad: nil
+        )
+    }
+    
+    @ViewBuilder
+    private func navigationStack(rootView: (some View)?) -> some View {
+        let router = coordinator.router
+        NavigationStack(
+            path: Binding(get: { router.items }, set: { router.items = $0 }),
+            root: { rootView?.navigationDestination(for: C.Route.self) { $0 } }
+        )
+        .transaction { $0.disablesAnimations = !router.animated }
+        .onChange(of: router.items) { _, _ in onChangeItems() }
     }
     
     // --------------------------------------------------------------------

@@ -27,13 +27,11 @@ import Foundation
 /// A protocol representing a router in the coordinator pattern.
 @available(iOS 17.0, *)
 @MainActor
-public protocol RouterType: Observable {
+public protocol RouterType: Observable, SCIdentifiable {
 
     associatedtype Route: RouteType
 
-    var items: [Route] { get set }
     var sheetCoordinator: SheetCoordinator<AnyViewAlias> { get }
-    var mainView: Route? { get }
     var animated: Bool { get }
 
     func navigate(toRoute route: Route, presentationStyle: TransitionPresentationStyle?, animated: Bool) async
@@ -45,4 +43,5 @@ public protocol RouterType: Observable {
     func close(animated: Bool) async -> Void
     func restart(animated: Bool) async -> Void
     func syncItems() async -> Void
+    func setView(with view: Route?) async -> Void
 }

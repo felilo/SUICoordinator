@@ -154,7 +154,7 @@ public extension CoordinatorType {
     /// ```
     
     func startFlow(route: Route) async -> Void {
-        if !isRunning { router.mainView = route }
+        if !isRunning { router.setView(with: route) }
     }
     
     /// Forces the presentation of the coordinator.

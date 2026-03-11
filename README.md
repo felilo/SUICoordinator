@@ -25,7 +25,7 @@ _____
 SUICoordinator ships two importable products that expose the same public API:
 
 - **`SUICoordinator`** (iOS 17+) — uses `@Observable`. Recommended for new projects.
-- **`SUICoordinator16`** (iOS 16+) — uses `ObservableObject` + Combine. See [SUICoordinator16.md](SUICoordinator16.md) for the full guide.
+- **`SUICoordinator16`** (iOS 16+) — uses `ObservableObject` + Combine. See [SUICoordinator16.md](Docs/SUICoordinator16.md) for the full guide.
 
 _____
 
@@ -56,7 +56,7 @@ import SUICoordinator
 enum HomeRoute: RouteType {
     case homeView(dependencies: DependenciesHomeView)
     case pushView(dependencies: DependenciesPushView)
-    case sheetView(coordinator: HomeCoordinator)
+    case sheetView
 
     var presentationStyle: TransitionPresentationStyle {
         switch self {
@@ -68,9 +68,9 @@ enum HomeRoute: RouteType {
     @ViewBuilder
     var body: some View {
         switch self {
-            case .homeView(let dependencies): HomeView(dependencies: dependencies)
-            case .pushView(let dependencies): PushView(dependencies: dependencies)
-            case .sheetView(let coordinator): SheetView(coordinator: coordinator)
+            case .homeView(let dependencies): HomeView(dependencies: .init(dependencies))
+            case .pushView(let dependencies): PushView(dependencies: .init(dependencies))
+            case .sheetView: SheetView()
         }
     }
 }
@@ -95,11 +95,11 @@ class HomeCoordinator {
     }
 
     func presentSheet() async {
-        await navigate(toRoute: .sheetView(coordinator: self))
+        await navigate(toRoute: .sheetView)
     }
     
     func presentSheetWithCustomPresentationStyle() async {
-        await navigate(toRoute: .sheetView(coordinator: self), presentationStyle: .detents([.medium, .large]))
+        await navigate(toRoute: .sheetView, presentationStyle: .detents([.medium, .large]))
     }
 
     func endThisCoordinator() async {
@@ -108,29 +108,32 @@ class HomeCoordinator {
 }
 ```
 
-> **iOS 16 support**: If your deployment target is iOS 16, use `SUICoordinator16` instead. See [SUICoordinator16.md](SUICoordinator16.md) for the complete guide.
+> **iOS 16 support**: If your deployment target is iOS 16, use `SUICoordinator16` instead. See [SUICoordinator16.md](Docs/SUICoordinator16.md) for the complete guide.
 
 ### 3. Define Views
 
-Use `@Environment` to access the coordinator from your views:
+Use `@Environment(\.coordinator)` to access the coordinator from your views. Cast it to the expected coordinator type:
 
 ```swift
 import SwiftUI
 import SUICoordinator
 
 struct HomeView: View {
-    @Environment(HomeCoordinator.self) var coordinator
+    @Environment(\.coordinator) private var anyCoordinator
+
+    private var coordinator: HomeCoordinator? {
+        anyCoordinator as? HomeCoordinator
+    }
 
     var body: some View {
         List {
-            Button("Push Example View") { Task { await coordinator.navigateToPushView() } }
-            Button("Present Sheet Example") { Task { await coordinator.presentSheet() } }
-            Button("Present Tab Coordinator") { Task { await coordinator.presentDefaultTabs() } }
+            Button("Push Example View") { Task { await coordinator?.navigateToPushView() } }
+            Button("Present Sheet Example") { Task { await coordinator?.presentSheet() } }
+            Button("Present Tab Coordinator") { Task { await coordinator?.presentDefaultTabs() } }
         }
         .navigationTitle("Coordinator Actions")
     }
 }
-
 ```
 
 ### 4. Setup in Your App
@@ -445,6 +448,16 @@ The following properties and methods are specific to `TabCoordinator`:
 | `getCoordinator(with:)` | Returns the child coordinator for a given `TabPage`, or `nil` if not found. |
 | `setBadge(for:with:)` | Sets or removes a badge on a tab. Pass `nil` as the value to remove it. |
 | `popToRoot()` | Pops the active tab's navigation stack to its root view. |
+
+_____
+
+## Architecture Guides
+
+SUICoordinator works with any architecture. See the dedicated guides:
+
+- [MVVM](Docs/MVVM.md) — ViewModels delegate navigation to the coordinator
+- [TCA](Docs/TCA.md) — Navigation triggered from reducer effects via a dependency
+- [Decoupled Views](Docs/DecoupledViews.md) — Views with zero coordinator dependency
 
 _____
 

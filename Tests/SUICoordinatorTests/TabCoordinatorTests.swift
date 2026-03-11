@@ -28,11 +28,12 @@ import SwiftUI
 
 
 @available(iOS 17.0, *)
+@MainActor
 final class TabCoordinatorTests: XCTestCase {
-    
+
     private let animated: Bool = false
-    
-    @MainActor func test_setPages() async throws {
+
+    func test_setPages() async throws {
         let sut = makeSUT()
         let pages = [AnyEnumTabRoute.tab2]
         
@@ -43,16 +44,17 @@ final class TabCoordinatorTests: XCTestCase {
         await finishFlow(sut: sut)
     }
     
-    @MainActor func test_changeTab() async throws {
+    func test_changeTab() async throws {
         let sut = makeSUT(currentPage: .tab1)
-        
+        await sut.start()
+
         XCTAssertEqual(sut.currentPage, .tab1)
         sut.currentPage = .tab2
         XCTAssertEqual(sut.currentPage, .tab2)
         await finishFlow(sut: sut)
     }
     
-    @MainActor func test_get_coordinator_selected_fail() async {
+    func test_get_coordinator_selected_fail() async {
         let sut = makeSUT(currentPage: .tab1)
         
         await sut.start()
@@ -67,7 +69,7 @@ final class TabCoordinatorTests: XCTestCase {
         await finishFlow(sut: sut)
     }
     
-    @MainActor func test_navigateToCoordinator() async throws {
+    func test_navigateToCoordinator() async throws {
         let sut = makeSUT(currentPage: .tab1)
         let coordinator = AnyCoordinator()
         
@@ -79,7 +81,7 @@ final class TabCoordinatorTests: XCTestCase {
         await finishFlow(sut: sut)
     }
     
-    @MainActor func test_popToRoot_in_tab() async throws {
+    func test_popToRoot_in_tab() async throws {
         let sut = makeSUT(currentPage: .tab1)
         await sut.start()
         
@@ -94,13 +96,14 @@ final class TabCoordinatorTests: XCTestCase {
         await finishFlow(sut: sut)
     }
     
-    @MainActor func test_siTabCoordinator() async throws {
+    func test_siTabCoordinator() async throws {
         let sut = makeSUT(currentPage: .tab1)
+        await sut.start()
         XCTAssertTrue(sut.isTabCoordinable)
         await finishFlow(sut: sut)
     }
     
-    @MainActor func test_finshCoordinator() async throws {
+    func test_finshCoordinator() async throws {
         let sut = makeSUT()
         let coordinator1 = OtherCoordinator()
         let coordinator2 = AnyCoordinator()
@@ -112,7 +115,7 @@ final class TabCoordinatorTests: XCTestCase {
         XCTAssertTrue(sut.isEmptyCoordinator)
     }
     
-    @MainActor func test_force_to_present_coordinator() async throws {
+    func test_force_to_present_coordinator() async throws {
         let sut = makeSUT(currentPage: .tab1)
         let coordinator = AnyCoordinator()
         
@@ -129,7 +132,7 @@ final class TabCoordinatorTests: XCTestCase {
         await finishFlow(sut: sut)
     }
     
-    @MainActor func test_get_coordinator_at_position() async throws {
+    func test_get_coordinator_at_position() async throws {
         let sut = makeSUT()
         let pages = [AnyEnumTabRoute.tab2, .tab1]
         
@@ -143,7 +146,7 @@ final class TabCoordinatorTests: XCTestCase {
         await finishFlow(sut: sut)
     }
     
-    @MainActor func test_start_coordinator() async throws {
+    func test_start_coordinator() async throws {
         let sut = makeSUT()
         let pages = [AnyEnumTabRoute.tab2, .tab1]
         
@@ -159,7 +162,7 @@ final class TabCoordinatorTests: XCTestCase {
         await finishFlow(sut: sut)
     }
     
-    @MainActor func test_finishCoordinator_from_child() async throws {
+    func test_finishCoordinator_from_child() async throws {
         let sut = makeSUT()
         let pages = [AnyEnumTabRoute.tab2, .tab1]
         
@@ -173,7 +176,7 @@ final class TabCoordinatorTests: XCTestCase {
         XCTAssertTrue(sut.isEmptyCoordinator)
     }
     
-    @MainActor func test_getCoordinator_selected_given_a_coordinatorObject() async throws {
+    func test_getCoordinator_selected_given_a_coordinatorObject() async throws {
         let sut = makeSUT(currentPage: .tab3)
         let myCustomCoordinator = AnyCoordinator()
         
@@ -195,7 +198,7 @@ final class TabCoordinatorTests: XCTestCase {
     
     // MARK: - setBadge
 
-    @MainActor func test_setBadge_emitsBadgeValue() async throws {
+    func test_setBadge_emitsBadgeValue() async throws {
         let sut = makeSUT(currentPage: .tab1)
         await sut.start()
 
@@ -221,7 +224,7 @@ final class TabCoordinatorTests: XCTestCase {
 
     // MARK: - setCurrentPage via coordinator
 
-    @MainActor func test_setCurrentPage_viaCoordinator_updatesCurrentPage() async throws {
+    func test_setCurrentPage_viaCoordinator_updatesCurrentPage() async throws {
         let sut = makeSUT(currentPage: .tab1)
         await sut.start()
 
@@ -236,7 +239,7 @@ final class TabCoordinatorTests: XCTestCase {
 
     // MARK: - getCoordinator(with:) success and nil
 
-    @MainActor func test_getCoordinator_returnsNilForMissingPage() async throws {
+    func test_getCoordinator_returnsNilForMissingPage() async throws {
         let sut = makeSUT()
         await sut.start()
         await sut.setPages([.tab1])
@@ -247,7 +250,7 @@ final class TabCoordinatorTests: XCTestCase {
 
     // MARK: - setPages with currentPage parameter
 
-    @MainActor func test_setPages_withCurrentPage_updatesCurrentPage() async throws {
+    func test_setPages_withCurrentPage_updatesCurrentPage() async throws {
         let sut = makeSUT(currentPage: .tab1)
         await sut.start()
         await sut.setPages([.tab2, .tab3], currentPage: .tab3)
@@ -258,7 +261,7 @@ final class TabCoordinatorTests: XCTestCase {
 
     // MARK: - isRunning
 
-    @MainActor func test_tabCoordinator_isRunning_afterStart() async throws {
+    func test_tabCoordinator_isRunning_afterStart() async throws {
         let sut = makeSUT()
         XCTAssertFalse(sut.isRunning)
         await sut.start()
@@ -268,7 +271,7 @@ final class TabCoordinatorTests: XCTestCase {
 
     // MARK: - children count after setPages
 
-    @MainActor func test_setPages_childrenCountMatchesPages() async throws {
+    func test_setPages_childrenCountMatchesPages() async throws {
         let sut = makeSUT()
         await sut.start()
 
@@ -280,7 +283,7 @@ final class TabCoordinatorTests: XCTestCase {
 
     // MARK: - clean
 
-    @MainActor func test_clean_removesChildrenAndSheets() async throws {
+    func test_clean_removesChildrenAndSheets() async throws {
         let sut = makeSUT()
         await sut.start()
         await sut.clean()
@@ -288,7 +291,7 @@ final class TabCoordinatorTests: XCTestCase {
         await finishFlow(sut: sut)
     }
 
-    @MainActor private func makeSUT(
+    private func makeSUT(
         currentPage: AnyEnumTabRoute = AnyEnumTabRoute.tab1,
         file: StaticString = #filePath,
         line: UInt = #line

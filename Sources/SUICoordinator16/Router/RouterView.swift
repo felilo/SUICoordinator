@@ -64,7 +64,9 @@ struct RouterView<C: CoordinatorType>: View {
             } else if let mainView = viewModel.mainView {
                 let view = NavigationStack(
                     path: $viewModel.items,
-                    root: { mainView.navigationDestination(for: C.Route.self) { $0 } }
+                    root: {
+                        mainView.navigationDestination(for: C.Route.self) { $0 }
+                    }
                 )
                 .transaction { $0.disablesAnimations = !viewModel.animated }
                 .onChange(of: viewModel.items, perform: onChangeItems)
@@ -76,7 +78,7 @@ struct RouterView<C: CoordinatorType>: View {
     
     @ViewBuilder
     private func addSheetTo(view: (some View)?) -> some View {
-        view.environmentObject(coordinator)
+        view
             .sheetCoordinator(
             coordinator: viewModel.sheetCoordinator,
             onDissmis: { index in Task(priority: .high) { [weak viewModel] in
@@ -92,5 +94,17 @@ struct RouterView<C: CoordinatorType>: View {
     
     private func onChangeItems(_ value: [C.Route]) {
         Task { await viewModel.syncItems() }
+    }
+}
+
+private struct CoordinatorKey: EnvironmentKey {
+    static let defaultValue: AnyCoordinatorType? = nil
+}
+
+
+public extension EnvironmentValues {
+    var coordinator: AnyCoordinatorType? {
+        get { self[CoordinatorKey.self] }
+        set { self[CoordinatorKey.self] = newValue }
     }
 }

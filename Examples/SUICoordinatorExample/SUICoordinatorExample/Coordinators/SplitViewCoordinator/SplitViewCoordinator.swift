@@ -1,5 +1,5 @@
 //
-//  TabCoordinatorType.swift
+//  SplitViewCoordinator.swift
 //
 //  Copyright (c) Andres F. Lozano
 //
@@ -22,25 +22,25 @@
 //  THE SOFTWARE.
 //
 
-import Foundation
+import SUICoordinator
 
-@MainActor
-public protocol TabCoordinatorType: ObservableObject {
-    
-    associatedtype Page: TabPage
-    typealias BadgeItem = (value: String?, page: Page)
-    typealias DataSourcePage = Page.DataSource
-    
-    var currentPage: Page { get set }
-    var badges: AsyncStream<(String?, Page)> { get }
-    var pages: [Page] { get set }
-    var viewContainer: (TabCoordinator<Page>) -> (Page.View) { get }
-    
-    func getCoordinator(with page: Page) -> AnyCoordinatorType?
-    func getCoordinatorSelected() throws -> (any CoordinatorType)
-    func clean() async
-    func setBadge(for page: Page, with value: String?)
+/// A coordinator that hosts a `NavigationSplitView` instead of a `TabView`.
+///
+/// It reuses `TabCoordinator` as the backbone — page management, coordinator
+/// lifecycle, and badge delivery all work identically. The only difference is
+/// that `SplitView` is passed as the `viewContainer`, replacing `TabView` with
+/// a two-column split layout.
+class SplitViewCoordinator: TabCoordinator<SplitViewTabPage> {
+
+    // ---------------------------------------------------------------------
+    // MARK: Init
+    // ---------------------------------------------------------------------
+
+    init(currentPage: SplitViewTabPage = .home) {
+        super.init(
+            pages: Page.allCases,
+            currentPage: currentPage,
+            viewContainer: { SplitView(dataSource: $0) }
+        )
+    }
 }
-
-/// A type alias representing a coordinator that conforms to both `CoordinatorType` and `TabCoordinatorType`.
-public typealias TabCoordinatable = CoordinatorType & TabCoordinatorType

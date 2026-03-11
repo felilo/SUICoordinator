@@ -25,7 +25,6 @@
 import SwiftUI
 
 struct NavigationActionListDetailView: View {
-    
     @State private var viewModel: NavigationActionListDetailViewModel
     @State private var counter = 0
     @State private var bgColor: Color = Self.randomColor()
@@ -108,6 +107,6 @@ struct NavigationActionListDetailView: View {
 }
 
 
-//#Preview {
-//    NavigationActionListDetailView(coordinator: .init(), title: "Preview")
-//}
+#Preview {
+    NavigationActionListDetailView(coordinator: .init(), title: "Preview")
+}

@@ -34,12 +34,13 @@ public class Router<Route: RouteType>: RouterType {
     // MARK: Properties
     // --------------------------------------------------------------------
 
-    public var mainView: Route?
-    public var items: [Route] = []
-    public var sheetCoordinator: SheetCoordinator<AnyViewAlias> = .init()
+    @ObservationIgnored
+    private var itemManager = ItemManager<Route>()
+    @ObservationIgnored
     public var animated: Bool = true
-
-    private let itemManager = ItemManager<Route>()
+    public var sheetCoordinator: SheetCoordinator<AnyViewAlias> = .init()
+    public var items: [Route] = []
+    var mainView: Route?
 
     // --------------------------------------------------------------------
     // MARK: Constructor
@@ -103,8 +104,8 @@ public class Router<Route: RouteType>: RouterType {
 
     public func clean(animated: Bool, withMainView: Bool = true) async -> Void {
         await popToRoot(animated: false)
-        sheetCoordinator = .init()
-        if withMainView { mainView = nil }
+        if withMainView { setView(with: nil) }
+        await sheetCoordinator.clean()
     }
 
     public func restart(animated: Bool) async -> Void {
@@ -114,7 +115,7 @@ public class Router<Route: RouteType>: RouterType {
             await popToRoot(animated: false)
             await sheetCoordinator.clean(animated: animated)
             self.animated = animated
-            sheetCoordinator = .init()
+            await sheetCoordinator.clean()
         }
     }
 
@@ -146,10 +147,14 @@ public class Router<Route: RouteType>: RouterType {
         if !(await sheetCoordinator.areEmptyItems) {
             await dismiss(animated: animated)
             if finishFlow {
-                try? await Task.sleep(for: .milliseconds(animated ? 600 : 100))
+                try? await Task.sleep(for: .milliseconds(animated ? 500 : 100))
             }
         } else if !(await itemManager.areItemsEmpty()) {
             await pop(animated: animated)
         }
+    }
+    
+    public func setView(with view: Route?) {
+        mainView = view
     }
 }

@@ -56,3 +56,10 @@ open class Coordinator<Route: RouteType>: CoordinatorType {
         fatalError("This method must be overwritten")
     }
 }
+
+// Safety invariant: all mutable state (router, uuid, parent, children, tagId) is exclusively
+// accessed on the @MainActor, enforced by CoordinatorType's @MainActor protocol isolation.
+// @unchecked Sendable is required because the @Observable macro does not synthesise Sendable
+// and the open class cannot be made final.
+@available(iOS 17.0, *)
+extension Coordinator: @unchecked Sendable {}

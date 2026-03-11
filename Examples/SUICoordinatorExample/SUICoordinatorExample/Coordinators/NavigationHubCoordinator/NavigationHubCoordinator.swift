@@ -38,10 +38,7 @@ class NavigationHubCoordinator {
         let _self = self
         let route = DefaultRoute(
             presentationStyle: .push,
-            content: {
-                CoordinatorActionListView()
-                    .environment(\.navigationHubCoordinator, _self)
-            }
+            content: { CoordinatorActionListView() }
         )
 
         await startFlow(route: route)
@@ -100,6 +97,11 @@ extension NavigationHubCoordinator: NavigationHubCoordinatorType {
         await navigate(to: coordinator, presentationStyle: .sheet)
     }
 
+    func presentSplitViewCoordinator() async {
+        let coordinator = SplitViewCoordinator()
+        await navigate(to: coordinator, presentationStyle: .fullScreenCover)
+    }
+
     func presentHomeCoordinator() async {
         let coordinator = HomeCoordinator()
         await navigate(to: coordinator, presentationStyle: .detents([.medium, .large]))
@@ -114,10 +116,7 @@ extension NavigationHubCoordinator: NavigationHubCoordinatorType {
         let _self = self
         let route = DefaultRoute(
             presentationStyle: .push,
-            content: {
-                NavigationActionListView()
-                    .environment(\.actionListCoordinator, _self)
-            }
+            content: { NavigationActionListView() }
         )
         await navigate(toRoute: route)
     }
