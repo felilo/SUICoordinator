@@ -38,10 +38,7 @@ class NavigationHubCoordinator {
         let _self = self
         let route = DefaultRoute(
             presentationStyle: .push,
-            content: {
-                CoordinatorActionListView()
-                    .environment(\.navigationHubCoordinator, _self)
-            }
+            content: { CoordinatorActionListView() }
         )
 
         await startFlow(route: route)
@@ -119,10 +116,7 @@ extension NavigationHubCoordinator: NavigationHubCoordinatorType {
         let _self = self
         let route = DefaultRoute(
             presentationStyle: .push,
-            content: {
-                NavigationActionListView()
-                    .environment(\.actionListCoordinator, _self)
-            }
+            content: { NavigationActionListView() }
         )
         await navigate(toRoute: route)
     }

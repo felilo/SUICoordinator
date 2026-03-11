@@ -48,7 +48,7 @@ class HomeCoordinator {
         case let .detents(title):
                 .detents(coordinator: self, title: title)
         default:
-                .actionListView(coordinator: self)
+                .actionListView
         }
         await startFlow(route: route)
     }
