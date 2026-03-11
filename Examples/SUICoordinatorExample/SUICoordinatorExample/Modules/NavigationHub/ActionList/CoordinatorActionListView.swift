@@ -27,7 +27,11 @@ import SwiftUI
 struct CoordinatorActionListView: View {
     
     @Environment(\.isPresented) private var isPresented
-    @Environment(\.navigationHubCoordinator) var coordinator
+    @Environment(\.coordinator) var anyCoordinator
+    
+    private var coordinator: NavigationHubCoordinatorType? {
+        anyCoordinator as? NavigationHubCoordinatorType
+    }
     
     var body: some View {
         ZStack {
@@ -61,7 +65,7 @@ struct CoordinatorActionListView: View {
             }
             .toolbar {
                 Button {
-                    Task { await coordinator?.finish() }
+                    runAction { await coordinator?.finish() }
                 } label: {
                     Text("Finish flow")
                 }
@@ -79,7 +83,7 @@ struct CoordinatorActionListView: View {
         action: @escaping () async -> Void
     ) -> some View {
         Button {
-            Task { await action() }
+            runAction(action)
         } label: {
             HStack(spacing: 16) {
                 Image(systemName: systemImage)
@@ -112,6 +116,10 @@ struct CoordinatorActionListView: View {
                 .padding(.horizontal, 16)
         )
         .listRowSeparator(.hidden)
+    }
+    
+    private func runAction(_ action: (() async -> Void)?) {
+        Task { await action?() }
     }
 }
 

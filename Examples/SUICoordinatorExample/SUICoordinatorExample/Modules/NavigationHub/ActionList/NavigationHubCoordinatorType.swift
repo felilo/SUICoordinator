@@ -25,7 +25,7 @@
 import SwiftUI
 
 @MainActor
-protocol NavigationHubCoordinatorType: AnyObject, Sendable {
+protocol NavigationHubCoordinatorType: Sendable {
     func presentDefaultTabCoordinator() async
     func presentCustomTabCoordinator() async
     func presentSplitViewCoordinator() async

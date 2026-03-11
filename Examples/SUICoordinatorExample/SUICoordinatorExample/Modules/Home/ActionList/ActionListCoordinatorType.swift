@@ -24,7 +24,7 @@
 
 import SwiftUI
 
-protocol ActionListCoordinatorType: AnyObject, Sendable {
+protocol ActionListCoordinatorType: Sendable {
     func navigateToPushView() async
     func presentSheet() async
     func presentFullscreen() async

@@ -26,7 +26,11 @@ import SwiftUI
 
 struct NavigationActionListView: View {
     
-    @Environment(\.actionListCoordinator) var coordinator
+    @Environment(\.coordinator) var anyCoodinator
+    
+    private var coordinator: ActionListCoordinatorType? {
+        anyCoodinator as? ActionListCoordinatorType
+    }
     
     var body: some View {
         ZStack {
@@ -122,5 +126,4 @@ struct NavigationActionListView: View {
 
 #Preview {
     NavigationActionListView()
-        .environment(\.actionListCoordinator, NavigationHubCoordinator())
 }
