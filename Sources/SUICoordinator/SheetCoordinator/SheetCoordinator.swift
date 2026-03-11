@@ -34,12 +34,15 @@ final public class SheetCoordinator<T> {
     public typealias Item = SheetItem<T>
 
     var items: [Item?]
-
+    @ObservationIgnored
     private let itemManager = ItemManager<Item?>()
-
+    @ObservationIgnored
     public private(set) var lastPresentationStyle: TransitionPresentationStyle?
+    @ObservationIgnored
     public private(set) var animated: Bool?
+    @ObservationIgnored
     private var backUpItems: [Int: String]
+    @ObservationIgnored
     var onRemoveItem: ((String) async -> Void)?
 
     init(
