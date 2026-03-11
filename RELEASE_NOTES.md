@@ -1,3 +1,37 @@
+# Release Notes — v1.1.2
+
+## Bug Fixes
+
+### Memory leak in `RouterView` — `Router` no longer owned by the view
+`RouterView` previously held its own `@State var viewModel: Router<...>`, creating an independent router instance that was separate from the coordinator's router. This caused the router to be retained by the view even after the coordinator finished, leading to a memory leak. `RouterView` now reads the router directly from its coordinator, ensuring the router's lifetime is tied to the coordinator.
+
+### Coordinator environment not propagated through sheet presentations
+The coordinator was not available via `@Environment(\.coordinator)` (or `@EnvironmentObject` on iOS 16) inside views presented as sheet, fullScreenCover, or detents. `.environment(\.coordinator, coordinator)` is now applied after the `sheetCoordinator` modifier in `RouterView`, so all presented views receive the coordinator correctly.
+
+### `SheetCoordinator.clean()` left observable `items` out of sync
+After `clean()` cleared the internal `ItemManager`, it did not call `updateItems()`, leaving the observable `items` array with stale entries. Views and tests observing `sheetCoordinator.items` would see incorrect counts. `clean()` now calls `updateItems()` after clearing state.
+
+### `@Coordinator` macro applied `@ObservationTracked` to `@ObservationIgnored` vars
+The `MemberAttributeMacro` role of `@Coordinator` unconditionally applied `@ObservationTracked` to all stored `var` properties, including those already annotated with `@ObservationIgnored`. This caused a compiler error when both attributes were present. The macro now skips `@ObservationTracked` when `@ObservationIgnored` is already on the property.
+
+## Improvements
+
+### Shared coordinator environment key
+A shared `\.coordinator` environment key (`EnvironmentValues.coordinator: (any CoordinatorType)?`) has been added to both `SUICoordinator` and `SUICoordinator16`. Views can now access their coordinator without importing a specific coordinator type:
+
+```swift
+// iOS 17
+@Environment(\.coordinator) private var coordinator
+
+// iOS 16
+@Environment(\.coordinator) private var coordinator
+```
+
+### `Router.setView(with:)` added to `RouterType`
+`setView(with:)` is now part of the `RouterType` protocol, making it accessible anywhere a `RouterType` is used.
+
+---
+
 # Release Notes — v1.1.1
 
 ## Improvements
