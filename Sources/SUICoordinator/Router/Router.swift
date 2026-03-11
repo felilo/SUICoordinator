@@ -116,7 +116,7 @@ public class Router<Route: RouteType>: RouterType {
             await popToRoot(animated: false)
             await sheetCoordinator.clean(animated: animated)
             self.animated = animated
-            sheetCoordinator = .init()
+            await sheetCoordinator.clean()
         }
     }
 
