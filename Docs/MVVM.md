@@ -170,4 +170,4 @@ No `XCTestExpectation`, no view rendering, no environment setup required.
 
 ---
 
-[← Back to README](README.md)
+[← Back to README](../README.md)

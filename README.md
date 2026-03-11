@@ -25,7 +25,7 @@ _____
 SUICoordinator ships two importable products that expose the same public API:
 
 - **`SUICoordinator`** (iOS 17+) — uses `@Observable`. Recommended for new projects.
-- **`SUICoordinator16`** (iOS 16+) — uses `ObservableObject` + Combine. See [SUICoordinator16.md](SUICoordinator16.md) for the full guide.
+- **`SUICoordinator16`** (iOS 16+) — uses `ObservableObject` + Combine. See [SUICoordinator16.md](Docs/SUICoordinator16.md) for the full guide.
 
 _____
 
@@ -108,7 +108,7 @@ class HomeCoordinator {
 }
 ```
 
-> **iOS 16 support**: If your deployment target is iOS 16, use `SUICoordinator16` instead. See [SUICoordinator16.md](SUICoordinator16.md) for the complete guide.
+> **iOS 16 support**: If your deployment target is iOS 16, use `SUICoordinator16` instead. See [SUICoordinator16.md](Docs/SUICoordinator16.md) for the complete guide.
 
 ### 3. Define Views
 
@@ -455,9 +455,9 @@ _____
 
 SUICoordinator works with any architecture. See the dedicated guides:
 
-- [MVVM](MVVM.md) — ViewModels delegate navigation to the coordinator
-- [TCA](TCA.md) — Navigation triggered from reducer effects via a dependency
-- [Decoupled Views](DecoupledViews.md) — Views with zero coordinator dependency
+- [MVVM](Docs/MVVM.md) — ViewModels delegate navigation to the coordinator
+- [TCA](Docs/TCA.md) — Navigation triggered from reducer effects via a dependency
+- [Decoupled Views](Docs/DecoupledViews.md) — Views with zero coordinator dependency
 
 _____
 
