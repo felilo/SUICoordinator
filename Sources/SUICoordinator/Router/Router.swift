@@ -104,8 +104,9 @@ public class Router<Route: RouteType>: RouterType {
 
     public func clean(animated: Bool, withMainView: Bool = true) async -> Void {
         await popToRoot(animated: false)
-        if withMainView { setView(with: nil) }
         await sheetCoordinator.clean()
+        if withMainView { setView(with: nil) }
+        sheetCoordinator = .init()
     }
 
     public func restart(animated: Bool) async -> Void {
