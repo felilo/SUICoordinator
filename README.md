@@ -56,7 +56,7 @@ import SUICoordinator
 enum HomeRoute: RouteType {
     case homeView(dependencies: DependenciesHomeView)
     case pushView(dependencies: DependenciesPushView)
-    case sheetView(coordinator: HomeCoordinator)
+    case sheetView
 
     var presentationStyle: TransitionPresentationStyle {
         switch self {
@@ -70,7 +70,7 @@ enum HomeRoute: RouteType {
         switch self {
             case .homeView(let dependencies): HomeView(dependencies: .init(dependencies))
             case .pushView(let dependencies): PushView(dependencies: .init(dependencies))
-            case .sheetView(let coordinator): SheetView(coordinator: coordinator)
+            case .sheetView: SheetView()
         }
     }
 }
@@ -95,11 +95,11 @@ class HomeCoordinator {
     }
 
     func presentSheet() async {
-        await navigate(toRoute: .sheetView(coordinator: self))
+        await navigate(toRoute: .sheetView)
     }
     
     func presentSheetWithCustomPresentationStyle() async {
-        await navigate(toRoute: .sheetView(coordinator: self), presentationStyle: .detents([.medium, .large]))
+        await navigate(toRoute: .sheetView, presentationStyle: .detents([.medium, .large]))
     }
 
     func endThisCoordinator() async {
@@ -448,6 +448,16 @@ The following properties and methods are specific to `TabCoordinator`:
 | `getCoordinator(with:)` | Returns the child coordinator for a given `TabPage`, or `nil` if not found. |
 | `setBadge(for:with:)` | Sets or removes a badge on a tab. Pass `nil` as the value to remove it. |
 | `popToRoot()` | Pops the active tab's navigation stack to its root view. |
+
+_____
+
+## Architecture Guides
+
+SUICoordinator works with any architecture. See the dedicated guides:
+
+- [MVVM](MVVM.md) — ViewModels delegate navigation to the coordinator
+- [TCA](TCA.md) — Navigation triggered from reducer effects via a dependency
+- [Decoupled Views](DecoupledViews.md) — Views with zero coordinator dependency
 
 _____
 
