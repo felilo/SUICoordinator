@@ -112,25 +112,28 @@ class HomeCoordinator {
 
 ### 3. Define Views
 
-Use `@Environment` to access the coordinator from your views:
+Use `@Environment(\.coordinator)` to access the coordinator from your views. Cast it to the expected coordinator type:
 
 ```swift
 import SwiftUI
 import SUICoordinator
 
 struct HomeView: View {
-    @Environment(HomeCoordinator.self) var coordinator
+    @Environment(\.coordinator) private var anyCoordinator
+
+    private var coordinator: HomeCoordinator? {
+        anyCoordinator as? HomeCoordinator
+    }
 
     var body: some View {
         List {
-            Button("Push Example View") { Task { await coordinator.navigateToPushView() } }
-            Button("Present Sheet Example") { Task { await coordinator.presentSheet() } }
-            Button("Present Tab Coordinator") { Task { await coordinator.presentDefaultTabs() } }
+            Button("Push Example View") { Task { await coordinator?.navigateToPushView() } }
+            Button("Present Sheet Example") { Task { await coordinator?.presentSheet() } }
+            Button("Present Tab Coordinator") { Task { await coordinator?.presentDefaultTabs() } }
         }
         .navigationTitle("Coordinator Actions")
     }
 }
-
 ```
 
 ### 4. Setup in Your App
