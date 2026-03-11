@@ -11,6 +11,9 @@ The coordinator was not available via `@Environment(\.coordinator)` (or `@Enviro
 ### `SheetCoordinator.clean()` left observable `items` out of sync
 After `clean()` cleared the internal `ItemManager`, it did not call `updateItems()`, leaving the observable `items` array with stale entries. Views and tests observing `sheetCoordinator.items` would see incorrect counts. `clean()` now calls `updateItems()` after clearing state.
 
+### `Router.clean()` and `Router.restart()` reset sheet coordinator to a fresh instance
+`clean()` and `restart()` now replace the `sheetCoordinator` with a new instance instead of calling `clean()` on the existing one, ensuring a fully reset state with no residual entries.
+
 ### `@Coordinator` macro applied `@ObservationTracked` to `@ObservationIgnored` vars
 The `MemberAttributeMacro` role of `@Coordinator` unconditionally applied `@ObservationTracked` to all stored `var` properties, including those already annotated with `@ObservationIgnored`. This caused a compiler error when both attributes were present. The macro now skips `@ObservationTracked` when `@ObservationIgnored` is already on the property.
 
