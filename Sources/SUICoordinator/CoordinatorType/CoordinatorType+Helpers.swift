@@ -182,7 +182,6 @@ extension CoordinatorType {
         
         sheetCoordinator.onRemoveItem = { [weak sheetCoordinator, weak coordinator] id in
             if id.contains(uuid) {
-                try? await Task.sleep(for: .seconds(0.2))
                 await coordinator?.finish(animated: false, withDismiss: false)
                 sheetCoordinator?.onRemoveItem = nil
             }
@@ -212,7 +211,7 @@ extension CoordinatorType {
         if effectivePresentationStyle == .push {
             effectivePresentationStyle = .custom(
                 transition: .move(edge: .trailing),
-                animation: .default,
+                animation:.spring(response: 0.35, dampingFraction: 0.85),
                 fullScreen: true
             )
         } else if case .custom(let t, let a, _) = effectivePresentationStyle {

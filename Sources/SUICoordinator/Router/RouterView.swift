@@ -58,10 +58,12 @@ struct RouterView<C: CoordinatorType>: View {
     @ViewBuilder
     private func buildBody() -> some View {
         Group {
-            if coordinator.isTabCoordinable == true {
-                viewModel.mainView
-            } else if let view = viewModel.mainView {
-                addSheetTo(view: navigationStack(rootView: view))
+            if let view = viewModel.mainView {
+                if coordinator.isTabCoordinable == true {
+                    view
+                } else {
+                    addSheetTo(view: navigationStack(rootView: view))
+                }
             } else {
                 Color.white.opacity(0.01)
                     .environment(\.coordinator, nil)
@@ -71,21 +73,21 @@ struct RouterView<C: CoordinatorType>: View {
     
     @ViewBuilder
     private func addSheetTo(view: (some View)?) -> some View {
-        let router = coordinator.router
-        
+        let router = viewModel
         view.environment(\.coordinator, coordinator)
             .sheetCoordinator(
             coordinator: router.sheetCoordinator,
-            onDissmis: { index in Task(priority: .high) { [weak router] in
+            onDissmis: { _ in },
+            onDisappear: { index in Task(priority: .high) { [weak router] in
+                await router?.onFinish.send(())
                 await router?.removeItemFromSheetCoordinator(at: index)
-            }},
-            onDidLoad: nil
+            }}
         )
     }
     
     @ViewBuilder
     private func navigationStack(rootView: (some View)?) -> some View {
-        let router = coordinator.router
+        let router = viewModel
         NavigationStack(
             path: Binding(get: { router.items }, set: { router.items = $0 }),
             root: { rootView?.navigationDestination(for: C.Route.self) { $0 } }

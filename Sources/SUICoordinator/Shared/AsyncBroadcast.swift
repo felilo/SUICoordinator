@@ -1,5 +1,5 @@
 //
-//  ViewModifier.swift
+//  AsyncBroadcast.swift
 //
 //  Copyright (c) Andres F. Lozano
 //
@@ -22,18 +22,30 @@
 //  THE SOFTWARE.
 //
 
-import SwiftUI
+import Foundation
 
-struct ViewDidLoadModifier: ViewModifier {
-    @State private var viewDidLoad = false
-    public let action: (() -> Void)?
-    
-    public func body(content: Content) -> some View {
-        content.onAppear {
-            if !viewDidLoad {
-                viewDidLoad.toggle()
-                action?()
+actor AsyncBroadcast<Value> {
+
+    private var continuations: [UUID: AsyncStream<Value>.Continuation] = [:]
+
+    func stream() -> AsyncStream<Value> {
+        let id = UUID()
+
+        return AsyncStream { continuation in
+            continuations[id] = continuation
+            continuation.onTermination = { [weak self] _ in
+                Task { await self?.removeContinuation(id) }
             }
         }
+    }
+
+    func send(_ value: Value) {
+        for continuation in continuations.values {
+            continuation.yield(value)
+        }
+    }
+
+    private func removeContinuation(_ id: UUID) {
+        continuations.removeValue(forKey: id)
     }
 }

@@ -87,7 +87,13 @@ final class CoordinatorTests: XCTestCase {
         
         await sut.start()
         await navigateToCoordinator(sut, in: coordinator)
-        
+
+        // Simulate SwiftUI dismissing the sheet before finishFlow is called.
+        // Router.close(finishFlow:true) waits on onFinish, which only fires from
+        // the SwiftUI view layer. Clearing the sheet first makes close() take the
+        // empty-sheet branch (pop), which does not block on onFinish.
+        await coordinator.router.sheetCoordinator.clean(animated: false)
+
         await finishFlow(sut: sut)
         XCTAssertEqual(sut.router.items.count, 0)
         XCTAssertTrue(sut.children.isEmpty)

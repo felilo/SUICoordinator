@@ -121,13 +121,6 @@ struct CustomTransitionView<Item: SheetItemType, Content: View>: View {
     }
     
     private func finish() async {
-        let duration = 0.3
         showContent = false
-        
-        if animated { try? await Task.sleep(for: .seconds(duration)) }
-        
-        guard !isFullScreen else { return (item = nil) }
-        
-        onDismiss?("")
     }
 }

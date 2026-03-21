@@ -48,8 +48,8 @@ struct SheetCoordinatorView: ViewModifier {
                         transitionStyle: coordinator.lastPresentationStyle,
                         animated: coordinator.animated ?? true,
                         content: buildContent,
-                        onDismiss: onDissmis,
-                        onDidLoad: onDidLoad
+                        onDidLoad: onDidLoad,
+                        onDismiss: onDissmis
                     )
                     .hidden($coordinator.items.isEmpty || isLast)
                 }

@@ -127,7 +127,7 @@ final public class SheetCoordinator<T> {
         }
 
         await removeSheet(at: indexes, animated: animated)
-        try? await Task.sleep(for: .seconds(animated ? 0.1 : 0))
+        try? await Task.sleep(for: .milliseconds(animated ? 50 : 0))
 
         await itemManager.removeAll()
         await updateItems()
