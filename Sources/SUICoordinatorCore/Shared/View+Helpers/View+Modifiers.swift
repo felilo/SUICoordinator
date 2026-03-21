@@ -38,6 +38,7 @@ public extension View {
     ///
     /// - Parameter isEnabled: Whether to apply the clear background effect.
     /// - Returns: A view with an optionally cleared modal background.
+    @ViewBuilder
     func clearModalBackground(_ isEnabled: Bool = true) -> some View {
         modifier(ClearBackgroundViewModifier(condition: isEnabled))
     }

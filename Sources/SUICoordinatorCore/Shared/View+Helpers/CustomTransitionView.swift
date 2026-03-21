@@ -102,9 +102,8 @@ struct CustomTransitionView<Item: SheetItemType, Content: View>: View {
         if let item = item {
             content
                 .onViewDidLoad { onDidLoad?("") }
-                .onReceive(item.willDismiss) { _ in
-                    Task { await finish() }
-                }
+                .onDisappear { if !item.isCoordinator { onDismiss?("") } }
+                .onReceive(item.willDismiss) { _ in finish() }
         }
     }
     
@@ -112,15 +111,12 @@ struct CustomTransitionView<Item: SheetItemType, Content: View>: View {
     // MARK: Helper Functions
     // ---------------------------------------------------------
     
-    private func start(with item: Item?) async {
-        guard item != nil, animated else {
-            return await finish()
-        }
-        
+    private func start(with item: Item?) {
+        guard item != nil, animated else { return finish() }
         showContent = true
     }
     
-    private func finish() async {
+    private func finish() {
         showContent = false
     }
 }
