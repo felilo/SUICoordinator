@@ -35,7 +35,6 @@ class NavigationHubCoordinator {
     // ---------------------------------------------------------------------
 
     func start() async {
-        let _self = self
         let route = DefaultRoute(
             presentationStyle: .push,
             content: { CoordinatorActionListView() }
@@ -113,7 +112,6 @@ extension NavigationHubCoordinator: NavigationHubCoordinatorType {
     }
 
     func presentNavigationActionList() async {
-        let _self = self
         let route = DefaultRoute(
             presentationStyle: .push,
             content: { NavigationActionListView() }
