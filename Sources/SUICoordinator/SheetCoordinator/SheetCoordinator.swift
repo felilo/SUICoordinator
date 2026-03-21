@@ -39,6 +39,8 @@ final public class SheetCoordinator<T> {
     @ObservationIgnored
     public private(set) var lastPresentationStyle: TransitionPresentationStyle?
     @ObservationIgnored
+    public private(set) var isCoordinator: Bool = false
+    @ObservationIgnored
     public private(set) var animated: Bool?
     @ObservationIgnored
     private var backUpItems: [Int: String]
@@ -70,15 +72,18 @@ final public class SheetCoordinator<T> {
     public func presentSheet(_ sheet: Item) async -> Void {
         animated = sheet.animated
         lastPresentationStyle = sheet.presentationStyle
+        isCoordinator = sheet.isCoordinator
         await itemManager.addItem(sheet)
         await backUpItems[totalItems] = sheet.id
         await updateItems()
     }
 
     func removeLastSheet(animated: Bool) async -> Void {
-        guard !(await areEmptyItems) else { return await updateItems() }
+        guard !(await areEmptyItems),
+              let totalItems = await itemManager.getAllItems().lastIndex(where: { $0 != nil })
+        else { return await updateItems() }
         self.animated = animated
-        let totalItems = await totalItems
+        
         await updateLastPresentationStyle()
         if lastPresentationStyle?.isCustom == true {
             await itemManager.getItem(at: totalItems)?.willDismiss.send()
@@ -154,11 +159,19 @@ final public class SheetCoordinator<T> {
     }
 
     private func updateLastPresentationStyle() async {
-        let presentationStyle = await itemManager.getAllItems().last(where: {
+        let items = await itemManager.getAllItems()
+        
+        let presentationStyle = items.last(where: {
             $0?.presentationStyle != nil
         })??.presentationStyle
-        guard presentationStyle != lastPresentationStyle else { return }
-        lastPresentationStyle = presentationStyle
+        
+        if presentationStyle != lastPresentationStyle {
+            lastPresentationStyle = presentationStyle
+        }
+        
+        if let isCoordinator = items.last(where: { $0?.isCoordinator != nil })??.isCoordinator {
+            self.isCoordinator = isCoordinator
+        }
     }
 
     private func handleRemove(index: Int) async {
