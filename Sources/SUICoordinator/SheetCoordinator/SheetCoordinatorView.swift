@@ -36,6 +36,7 @@ struct SheetCoordinatorView: ViewModifier {
     public var isLast: Bool
     public var onDissmis: ActionClosure?
     public var onDidLoad: ActionClosure?
+    public var onDisappear: ActionClosure?
     
     @ViewBuilder
     func body(content: Content) -> some View {
@@ -48,8 +49,8 @@ struct SheetCoordinatorView: ViewModifier {
                         transitionStyle: coordinator.lastPresentationStyle,
                         animated: coordinator.animated ?? true,
                         content: buildContent,
-                        onDismiss: onDissmis,
-                        onDidLoad: onDidLoad
+                        onDidLoad: onDidLoad,
+                        onDismiss: onDissmis
                     )
                     .hidden($coordinator.items.isEmpty || isLast)
                 }
@@ -61,6 +62,7 @@ struct SheetCoordinatorView: ViewModifier {
         item: SheetItem<Value>
     ) -> some View {
         let view = item.view()?.asAnyView()
+            .onDisappear { onDisappear?("\(index)")}
             .sheetCoordinator(
                 coordinator: coordinator,
                 index: coordinator.getNextIndex(index),

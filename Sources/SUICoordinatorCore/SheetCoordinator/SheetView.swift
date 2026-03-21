@@ -55,8 +55,8 @@ public struct SheetView<Content: View, T: SheetItemType>: View {
         transitionStyle: TransitionPresentationStyle?,
         animated: Bool,
         @ViewBuilder content: @escaping (Int, Item) -> Content,
-        onDismiss: ActionClosure? = nil,
-        onDidLoad: ActionClosure?
+        onDidLoad: ActionClosure?,
+        onDismiss: ActionClosure? = nil
     ) {
         self.index = index
         self._items = items

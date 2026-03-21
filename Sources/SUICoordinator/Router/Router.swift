@@ -41,6 +41,7 @@ public class Router<Route: RouteType>: RouterType {
     public var sheetCoordinator: SheetCoordinator<AnyViewAlias> = .init()
     public var items: [Route] = []
     var mainView: Route?
+    var onFinish = AsyncBroadcast<Void>()
 
     // --------------------------------------------------------------------
     // MARK: Constructor
@@ -85,13 +86,13 @@ public class Router<Route: RouteType>: RouterType {
     public func pop(animated: Bool) async -> Void {
         self.animated = animated
         await self.handlePopAction()
-        await self.updateItems()
+        await self.updateItems(animated: animated)
     }
 
     public func popToRoot(animated: Bool = true) async -> Void {
         self.animated = animated
         await itemManager.removeAll()
-        await updateItems()
+        await updateItems(animated: animated)
     }
 
     public func dismiss(animated: Bool = true) async -> Void {
@@ -129,10 +130,13 @@ public class Router<Route: RouteType>: RouterType {
         await itemManager.removeLastItem()
     }
 
-    func updateItems() async {
+    func updateItems(animated: Bool = false) async {
         let itemsManager = await itemManager.getAllItems()
         guard items != itemsManager else { return }
         items = itemsManager
+        if animated {
+            try? await Task.sleep(for: .milliseconds(150))
+        }
     }
 
     public func syncItems() async {
@@ -148,7 +152,8 @@ public class Router<Route: RouteType>: RouterType {
         if !(await sheetCoordinator.areEmptyItems) {
             await dismiss(animated: animated)
             if finishFlow {
-                try? await Task.sleep(for: .milliseconds(animated ? 500 : 100))
+                let stream = await onFinish.stream()
+                for await _ in stream { break }
             }
         } else if !(await itemManager.areItemsEmpty()) {
             await pop(animated: animated)

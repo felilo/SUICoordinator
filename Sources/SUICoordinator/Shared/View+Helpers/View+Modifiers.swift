@@ -32,7 +32,8 @@ extension View {
         index: Int = 0,
         isLast: Bool = false,
         onDissmis: ActionClosure? = nil,
-        onDidLoad: ActionClosure? = nil
+        onDidLoad: ActionClosure? = nil,
+        onDisappear: ActionClosure? = nil
     ) -> some View {
         modifier(
             SheetCoordinatorView(
@@ -40,7 +41,8 @@ extension View {
                 index: index,
                 isLast: isLast,
                 onDissmis: onDissmis,
-                onDidLoad: onDidLoad
+                onDidLoad: onDidLoad,
+                onDisappear: onDisappear
             )
         )
     }

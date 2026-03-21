@@ -29,7 +29,7 @@ struct ViewDidLoadModifier: ViewModifier {
     public let action: (() -> Void)?
     
     public func body(content: Content) -> some View {
-        content.task {
+        content.onAppear {
             if !viewDidLoad {
                 viewDidLoad.toggle()
                 action?()
