@@ -53,11 +53,11 @@ open class TabCoordinator<Page: TabPage>: TabCoordinatable {
     /// Backing storage initialized once in `init`; `uuid`, `currentPage`, and `viewContainer`
     /// are exposed as computed properties so that the stored values are plain `let` constants,
     /// which Swift permits writing from a `nonisolated` context.
-    private let _uuid: String
-    private let _presentationStyle: TransitionPresentationStyle
-    private let _initialPages: [Page]
-    private let _initialCurrentPage: Page
-    private let _viewContainer: (TabCoordinator<Page>) -> Page.View
+    @ObservationIgnored private let _uuid: String
+    @ObservationIgnored private let _presentationStyle: TransitionPresentationStyle
+    @ObservationIgnored private let _initialPages: [Page]
+    @ObservationIgnored private let _initialCurrentPage: Page
+    @ObservationIgnored private let _viewContainer: @MainActor @Sendable (TabCoordinator<Page>) -> Page.View
     private let (stream, continuation) = AsyncStream.makeStream(of: (String?, Page).self)
 
     // Mutable current-page is the only `var` that needs @MainActor isolation.
@@ -75,7 +75,7 @@ open class TabCoordinator<Page: TabPage>: TabCoordinatable {
         set { _currentPage = newValue }
     }
 
-    public var viewContainer: (TabCoordinator<Page>) -> Page.View {
+    public var viewContainer: @MainActor @Sendable (TabCoordinator<Page>) -> Page.View {
         get { _viewContainer }
     }
 
