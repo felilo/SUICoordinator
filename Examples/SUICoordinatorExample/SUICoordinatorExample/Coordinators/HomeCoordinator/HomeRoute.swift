@@ -68,7 +68,7 @@ enum HomeRoute: RouteType {
             let .fullscreen(coordinator, title),
             let .detents(coordinator, title):
             NavigationActionListDetailView(coordinator: coordinator, title: title)
-        case let .actionListView:
+        case .actionListView:
             NavigationActionListView()
         }
     }

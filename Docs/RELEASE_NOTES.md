@@ -1,3 +1,53 @@
+# Release Notes — v1.3.2
+
+## Bug Fixes
+
+### `Router.finishFlow` no longer uses arbitrary `sleep` — replaced with event-driven wait
+`finishFlow(animated:)` previously waited for sheet dismissal using a fixed `Task.sleep` (500ms animated, 100ms unanimated). This was fragile and caused timing issues under load. The router now uses an `AsyncBroadcast<Void>` channel (`onFinish`). The `RouterView`'s `onDisappear` callback fires `onFinish.send(())` when the sheet actually disappears, and `finishFlow` awaits that signal before continuing. This removes all guesswork from the dismiss-then-finish sequence.
+
+### Spurious 0.2s delay removed before child coordinator `finish`
+`CoordinatorType+Helpers` had a `Task.sleep(for: .seconds(0.2))` inside the `onRemoveItem` closure before calling `coordinator.finish(animated:)`. This delay was not necessary and has been removed.
+
+### `RouterView` no longer re-reads `coordinator.router` in closures — uses captured `viewModel`
+`addSheetTo(view:)` and `navigationStack(rootView:)` now capture `viewModel` (the coordinator's router, already held as a property) instead of accessing `coordinator.router` on each call. This eliminates a subtle re-capture issue that could cause the closures to reference a stale router after coordinator teardown.
+
+### `ViewDidLoadModifier` switched from `.task` to `.onAppear`
+The `viewDidLoad` trigger used `.task { }`, which runs asynchronously and can fire slightly after the view appears. Switching to `.onAppear` ensures the `viewDidLoad` action fires synchronously with the appearance event, matching the expected semantics.
+
+### `CustomTransitionView.finish()` no longer manually calls `onDismiss`
+The `finish()` function previously set `showContent = false`, slept for 0.3 s, and then called `onDismiss?("")`. Dismiss callbacks are now handled via `.onDisappear` on the sheet content in `SheetCoordinatorView`, so the manual sleep and `onDismiss` call inside `finish()` have been removed to avoid double-firing.
+
+### Orphaned custom sheets cleaned up when a sheet below them is dismissed
+When a native sheet (`.sheet`, `.fullScreenCover`, `.detents`) was dismissed — either programmatically or by swipe — any `.custom` transition sheets stacked above it were left orphaned because SwiftUI has no binding to nil out for them. `SheetCoordinator.remove(at:)` now calls `removeCustomSheets(at:)` before processing the removal, which finds and removes all custom-transition items above the dismissed index.
+
+### `isCoordinator` flag added to `SheetItemType` and tracked by `SheetCoordinator`
+A new `isCoordinator: Bool` property has been added to the `SheetItemType` protocol and `SheetItem`. `SheetCoordinator` tracks this flag and exposes it as `isCoordinator: Bool`. `RouterView` uses it to route `onDismiss` and `onDisappear` callbacks correctly — only coordinator-backed sheets await the `onFinish` signal; plain route sheets are removed immediately on dismiss.
+
+### `SheetCoordinator` fires `onRemoveItem` for coordinator items above a removed sheet
+When a sheet at a given index is removed, `handleRemove` now scans all items above it and fires `onRemoveItem` for any that are coordinator-backed, ensuring coordinator lifecycle callbacks are not silently dropped when a parent sheet is dismissed out of order.
+
+### Custom presentation style `fullScreen` flag is now preserved
+`CoordinatorType+Helpers` previously forced `fullScreen: true` on all `.custom` presentation styles when presenting a coordinator. It now preserves the `fullScreen` value already set on the style, and sets push-converted custom styles to `fullScreen: false`.
+
+### `clearModalBackground` restored in `RouterView` for tab coordinators
+The `.clearModalBackground` modifier was accidentally dropped from `RouterView` in a prior change. It has been restored — it is applied only when `coordinator.isTabCoordinable` is `true`, preserving correct background clearing behaviour for tab-embedded coordinators.
+
+## Improvements
+
+### Push navigation uses spring animation
+Routes presented with `.push` now use `.spring(response: 0.35, dampingFraction: 0.85)` instead of `.default`, giving push transitions a natural feel consistent with `NavigationStack` behaviour.
+
+### `onDisappear` callback added to `SheetCoordinatorView` and `View+Modifiers`
+A new `onDisappear: ActionClosure?` parameter has been added to `SheetCoordinatorView` and the `.sheetCoordinator(...)` view modifier. It is invoked when the sheet content view disappears, enabling reliable post-dismissal callbacks without polling or timers.
+
+### `SheetCoordinator.clean()` sleep reduced from 100ms to 50ms
+The `Task.sleep` in `clean()` between `removeSheet` and `removeAll` has been reduced from 100ms to 50ms, making coordinator teardown faster while still allowing the removal animation to complete.
+
+### `Router.updateItems(animated:)` delay is conditional
+`updateItems` now accepts an `animated: Bool` parameter. A 150ms delay is applied only when `animated` is `true`, so unanimated resets (e.g. `popToRoot(animated: false)`) return immediately.
+
+---
+
 # Release Notes — v1.3.1
 
 ## Bug Fixes

@@ -110,6 +110,12 @@ extension HomeCoordinator: ActionListCoordinatorType {
     }
     
     func restart() async {
+        pushCounter = 0
+        sheetCounter = 0
+        fullscreenCounter = 0
+        detentsCounter = 0
+        customCounter = 0
+        
         await restart(animated: config.animated)
     }
 }

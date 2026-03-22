@@ -77,10 +77,18 @@ struct RouterView<C: CoordinatorType>: View {
         view.environment(\.coordinator, coordinator)
             .sheetCoordinator(
             coordinator: router.sheetCoordinator,
-            onDissmis: { _ in },
-            onDisappear: { index in Task(priority: .high) { [weak router] in
-                await router?.onFinish.send(())
-                await router?.removeItemFromSheetCoordinator(at: index)
+            onDissmis: { index in Task { @MainActor [weak router] in
+                guard let router else { return }
+                if !router.isCoordinator {
+                    await router.removeItemFromSheetCoordinator(at: index)
+                }
+            }},
+            onDisappear: { index in Task { @MainActor [weak router] in
+                guard let router else { return }
+                if router.isCoordinator {
+                    await router.onFinish.send(())
+                    await router.removeItemFromSheetCoordinator(at: index)
+                }
             }}
         )
     }

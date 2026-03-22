@@ -198,6 +198,82 @@ final class SheetCoordinatorTests: XCTestCase {
         XCTAssertNotNil(receivedId)
     }
 
+    // MARK: - removeCustomSheets
+
+    func test_removeCustomSheets_cleansUpCustomSheetsAboveRemovedIndex() async {
+        let sut = makeSUT()
+        let customItem = makeSheetItem(
+            "Custom",
+            presentationStyle: .custom(transition: .move(edge: .bottom), animation: .default, fullScreen: false)
+        )
+
+        await presentSheet(makeSheetItem("Sheet"), with: sut)      // index 0 — plain sheet
+        await presentSheet(customItem, with: sut)                   // index 1 — custom (orphan candidate)
+
+        // Removing index 0 should also clean up the custom sheet at index 1
+        await sut.remove(at: "0")
+
+        XCTAssertTrue(sut.items.isEmpty)
+    }
+
+    func test_removeCustomSheets_doesNotRemoveNonCustomSheetsAbove() async {
+        let sut = makeSUT()
+
+        await presentSheet(makeSheetItem("First"), with: sut)       // index 0
+        await presentSheet(makeSheetItem("Second"), with: sut)      // index 1 — plain sheet, should survive
+
+        await sut.remove(at: "0")
+
+        // Non-custom sheet above is not cleaned up by removeCustomSheets
+        XCTAssertEqual(sut.items.count, 1)
+    }
+
+    // MARK: - handleRemove / getBackupItemIndex
+
+    func test_handleRemove_firesOnRemoveItem_forCoordinatorItemsAboveRemovedIndex() async {
+        let sut = makeSUT()
+        var receivedIds: [String] = []
+        sut.onRemoveItem = { id in receivedIds.append(id) }
+
+        // handleRemove scans from nextIndex (index+1) onwards after the removed item is compacted out.
+        // Need 3 items: remove index 1 → nextIndex=2 → after remove+compact, item originally at index 2
+        // is now at index 1, which handleRemove(index:2) would scan — but we need the coordinator at
+        // original index 2 to still be at index 2 after removal of index 1 (no compaction mid-scan).
+        // Simplest: 3 items, remove index 0 → nextIndex=1, after compact item[1]→[0], item[2]→[1].
+        // handleRemove(index:1) scans index 1 (original index 2).
+        let coordinatorItem = makeSheetItem("Coordinator", presentationStyle: .sheet, isCoordinator: true)
+
+        await presentSheet(makeSheetItem("First"), with: sut)       // index 0 — removed
+        await presentSheet(makeSheetItem("Second"), with: sut)      // index 1 — shifts to 0 after removal
+        await presentSheet(coordinatorItem, with: sut)              // index 2 — shifts to 1, scanned by handleRemove
+
+        await sut.remove(at: "0")
+
+        XCTAssertTrue(receivedIds.contains(coordinatorItem.id))
+    }
+
+    func test_handleRemove_doesNotFireCallback_forNonCoordinatorItemsAbove() async {
+        let sut = makeSUT()
+        var receivedIds: [String] = []
+        sut.onRemoveItem = { id in receivedIds.append(id) }
+
+        let firstItem = makeSheetItem("First")
+        let secondItem = makeSheetItem("Second")   // plain, no coordinator
+        let thirdItem  = makeSheetItem("Third")    // plain, no coordinator
+
+        await presentSheet(firstItem, with: sut)
+        await presentSheet(secondItem, with: sut)
+        await presentSheet(thirdItem, with: sut)
+
+        // Remove index 0; handleRemove scans above but finds no coordinator items → no extra callbacks
+        await sut.remove(at: "0")
+
+        // onRemoveItem fires for the removed item itself (backUpItems entry for index 0),
+        // but NOT for the non-coordinator items above via handleRemove
+        XCTAssertEqual(receivedIds.count, 1)
+        XCTAssertEqual(receivedIds.first, firstItem.id)
+    }
+
     // MARK: - Edge cases
 
     func test_remove_at_invalidIndex_doesNotCrash() async {

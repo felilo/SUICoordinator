@@ -26,14 +26,14 @@ import SwiftUI
 @testable import SUICoordinator
 
 @available(iOS 17.0, *)
-class AnyCoordinator: Coordinator<AnyEnumRoute> {
+class AnyCoordinator: Coordinator<AnyEnumRoute>, @unchecked Sendable {
     override func start() async {
         await startFlow(route: .pushStep(1))
     }
 }
 
 @available(iOS 17.0, *)
-class OtherCoordinator: Coordinator<DefaultRoute> { 
+class OtherCoordinator: Coordinator<DefaultRoute>, @unchecked Sendable { 
     override func start() async {
         let page = AnyEnumRoute.pushStep(1)
         await startFlow(route: .init(presentationStyle: page.presentationStyle, content: { page }))
@@ -41,7 +41,7 @@ class OtherCoordinator: Coordinator<DefaultRoute> {
 }
 
 @available(iOS 17.0, *)
-class ThirdCoordinator: Coordinator<DefaultRoute> {
+class ThirdCoordinator: Coordinator<DefaultRoute>, @unchecked Sendable {
     override func start() async {
         let page = AnyEnumRoute.pushStep(1)
         await startFlow(route: .init(presentationStyle: page.presentationStyle, content: { page }))

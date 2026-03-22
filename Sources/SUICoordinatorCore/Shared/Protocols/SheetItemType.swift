@@ -46,4 +46,6 @@ public protocol SheetItemType: Identifiable {
     
     /// Returns the presentation style for this sheet item.
     func getPresentationStyle() -> TransitionPresentationStyle
+    
+    var isCoordinator: Bool { get }
 }
