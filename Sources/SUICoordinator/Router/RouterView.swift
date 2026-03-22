@@ -48,6 +48,7 @@ struct RouterView<C: CoordinatorType>: View {
     
     var body: some View {
         ZStack { buildBody() }
+            .clearModalBackground(coordinator.isTabCoordinable)
     }
     
     // --------------------------------------------------------------------
