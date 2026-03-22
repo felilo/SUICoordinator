@@ -17,6 +17,21 @@ The `viewDidLoad` trigger used `.task { }`, which runs asynchronously and can fi
 ### `CustomTransitionView.finish()` no longer manually calls `onDismiss`
 The `finish()` function previously set `showContent = false`, slept for 0.3 s, and then called `onDismiss?("")`. Dismiss callbacks are now handled via `.onDisappear` on the sheet content in `SheetCoordinatorView`, so the manual sleep and `onDismiss` call inside `finish()` have been removed to avoid double-firing.
 
+### Orphaned custom sheets cleaned up when a sheet below them is dismissed
+When a native sheet (`.sheet`, `.fullScreenCover`, `.detents`) was dismissed — either programmatically or by swipe — any `.custom` transition sheets stacked above it were left orphaned because SwiftUI has no binding to nil out for them. `SheetCoordinator.remove(at:)` now calls `removeCustomSheets(at:)` before processing the removal, which finds and removes all custom-transition items above the dismissed index.
+
+### `isCoordinator` flag added to `SheetItemType` and tracked by `SheetCoordinator`
+A new `isCoordinator: Bool` property has been added to the `SheetItemType` protocol and `SheetItem`. `SheetCoordinator` tracks this flag and exposes it as `isCoordinator: Bool`. `RouterView` uses it to route `onDismiss` and `onDisappear` callbacks correctly — only coordinator-backed sheets await the `onFinish` signal; plain route sheets are removed immediately on dismiss.
+
+### `SheetCoordinator` fires `onRemoveItem` for coordinator items above a removed sheet
+When a sheet at a given index is removed, `handleRemove` now scans all items above it and fires `onRemoveItem` for any that are coordinator-backed, ensuring coordinator lifecycle callbacks are not silently dropped when a parent sheet is dismissed out of order.
+
+### Custom presentation style `fullScreen` flag is now preserved
+`CoordinatorType+Helpers` previously forced `fullScreen: true` on all `.custom` presentation styles when presenting a coordinator. It now preserves the `fullScreen` value already set on the style, and sets push-converted custom styles to `fullScreen: false`.
+
+### `clearModalBackground` restored in `RouterView` for tab coordinators
+The `.clearModalBackground` modifier was accidentally dropped from `RouterView` in a prior change. It has been restored — it is applied only when `coordinator.isTabCoordinable` is `true`, preserving correct background clearing behaviour for tab-embedded coordinators.
+
 ## Improvements
 
 ### Push navigation uses spring animation
