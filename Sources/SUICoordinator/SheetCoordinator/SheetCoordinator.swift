@@ -104,8 +104,9 @@ final public class SheetCoordinator<T> {
         guard let index = Int(index),
               (await itemManager.isValid(index: index))
         else { return await updateItems() }
+        let nextIndex = index + 1
         
-        await removeCustomSheets(at: index)
+        await removeCustomSheets(at: nextIndex)
 
         if let id = backUpItems[index] {
             await onRemoveItem?(id)
@@ -117,7 +118,7 @@ final public class SheetCoordinator<T> {
             return await updateItems()
         }
 
-        await handleRemove(index: index - 1)
+        await handleRemove(index: nextIndex)
         await updateLastPresentationStyle()
         await removeAllNilItems()
     }
@@ -162,9 +163,9 @@ final public class SheetCoordinator<T> {
     
     private func removeCustomSheets(at index: Int) async {
         let items = await itemManager.getAllItems()
-        guard items.indices.contains(index + 1) else { return }
+        guard items.indices.contains(index) else { return }
         
-        let customItems = Array(items.suffix(from: index + 1))
+        let customItems = Array(items.suffix(from: index))
             .filter { $0?.presentationStyle.isCustom == true }
         
         for item in customItems {
