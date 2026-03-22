@@ -212,13 +212,13 @@ extension CoordinatorType {
             effectivePresentationStyle = .custom(
                 transition: .move(edge: .trailing),
                 animation:.spring(response: 0.35, dampingFraction: 0.85),
-                fullScreen: true
+                fullScreen: false
             )
-        } else if case .custom(let t, let a, _) = effectivePresentationStyle {
+        } else if case .custom(let t, let a, let fs) = effectivePresentationStyle {
             effectivePresentationStyle = .custom(
                 transition: t,
                 animation: a,
-                fullScreen: true
+                fullScreen: fs
             )
         }
         
