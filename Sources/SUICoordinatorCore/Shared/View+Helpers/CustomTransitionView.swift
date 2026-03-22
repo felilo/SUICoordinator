@@ -88,7 +88,7 @@ struct CustomTransitionView<Item: SheetItemType, Content: View>: View {
             }
         }
         .animation(animation, value: showContent)
-        .onViewDidLoad { start(with: item) }
+        .onViewDidLoad { Task { @MainActor in start(with: item) }}
     }
     
     // ---------------------------------------------------------
