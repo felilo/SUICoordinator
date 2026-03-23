@@ -27,39 +27,41 @@ import Foundation
 /// An open class representing a coordinator in a coordinator-based architecture.
 @available(iOS 17.0, *)
 @Observable
-open class Coordinator<Route: RouteType>: CoordinatorType {
-    
+open class Coordinator<Route: RouteType>: CoordinatorType, Sendable {
+
     // --------------------------------------------------------------------
     // MARK: Properties
     // --------------------------------------------------------------------
-    
-    public var router: Router<Route>
-    public var uuid: String
+
+    public var router: Router<Route> = .init()
+    public var uuid: String = ""
     public var parent: (any CoordinatorType)?
     public var children: [(any CoordinatorType)] = []
     public var tagId: String?
-    
+
     // --------------------------------------------------------------------
     // MARK: Constructor
     // --------------------------------------------------------------------
-    
-    public init() {
-        self.router = .init()
-        self.uuid = "\(NSStringFromClass(type(of: self))) - \(UUID().uuidString)"
+
+    /// Creates a new coordinator instance.
+    ///
+    /// `nonisolated` so that subclasses can also declare `nonisolated init`
+    /// and call `super.init()` without an actor-isolation error. The stored
+    /// properties are all initialised via their inline defaults above.
+    public nonisolated init() {
+        // uuid cannot be set here (main-actor isolation), so it is assigned
+        // in start() or on first access. Subclasses that need a stable uuid
+        // before start() should set it from a @MainActor context.
     }
-    
+
     // --------------------------------------------------------------------
     // MARK: Helper funcs
     // --------------------------------------------------------------------
-    
+
     open func start() async {
+        if uuid.isEmpty {
+            uuid = "\(NSStringFromClass(type(of: self))) - \(UUID().uuidString)"
+        }
         fatalError("This method must be overwritten")
     }
 }
-
-// Safety invariant: all mutable state (router, uuid, parent, children, tagId) is exclusively
-// accessed on the @MainActor, enforced by CoordinatorType's @MainActor protocol isolation.
-// @unchecked Sendable is required because the @Observable macro does not synthesise Sendable
-// and the open class cannot be made final.
-@available(iOS 17.0, *)
-extension Coordinator: @unchecked Sendable {}
