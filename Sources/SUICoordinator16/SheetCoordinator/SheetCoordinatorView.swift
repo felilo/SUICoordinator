@@ -62,7 +62,7 @@ struct SheetCoordinatorView: ViewModifier {
         with index: Int,
         item: SheetItem<Value>
     ) -> some View {
-        var view = item.view()?
+        let view = item.view()?
             .environment(\.coordinator, item.isCoordinator ? nil : coordinatorType)
             .asAnyView()
             .onDisappear { onDisappear?("\(index)") }
