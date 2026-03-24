@@ -49,7 +49,6 @@ struct RouterView<C: CoordinatorType>: View {
     
     var body: some View {
         ZStack { buildBody() }
-            .clearModalBackground(coordinator.isTabCoordinable)
     }
     
     // --------------------------------------------------------------------
@@ -59,40 +58,58 @@ struct RouterView<C: CoordinatorType>: View {
     @ViewBuilder
     private func buildBody() -> some View {
         Group {
-            if coordinator.isTabCoordinable {
-                viewModel.mainView
-            } else if let mainView = viewModel.mainView {
-                let view = NavigationStack(
-                    path: $viewModel.items,
-                    root: {
-                        mainView.navigationDestination(for: C.Route.self) { $0 }
-                    }
-                )
-                .transaction { $0.disablesAnimations = !viewModel.animated }
-                .onChange(of: viewModel.items, perform: onChangeItems)
-                
-                addSheetTo(view: view)
+            if let view = viewModel.mainView {
+                if coordinator.isTabCoordinable == true {
+                    view.environment(\.coordinator, nil)
+                } else {
+                    addSheetTo(view: navigationStack(rootView: view))
+                }
+            } else {
+                Color.white.opacity(0.01)
+                    .environment(\.coordinator, nil)
             }
         }
     }
     
     @ViewBuilder
     private func addSheetTo(view: (some View)?) -> some View {
-        view
+        let router = viewModel
+        view.environment(\.coordinator, coordinator)
             .sheetCoordinator(
             coordinator: viewModel.sheetCoordinator,
-            onDissmis: { index in Task(priority: .high) { [weak viewModel] in
-                await viewModel?.removeItemFromSheetCoordinator(at: index)
+            coordinatorType: coordinator,
+            onDissmis: { index in Task { @MainActor [weak router] in
+                guard let router else { return }
+                if !router.isCoordinator {
+                    await router.removeItemFromSheetCoordinator(at: index)
+                }
             }},
-            onDidLoad: nil
+            onDisappear: { index in Task { @MainActor [weak router] in
+                guard let router else { return }
+                if router.isCoordinator {
+                    await router.onFinish.send(())
+                    await router.removeItemFromSheetCoordinator(at: index)
+                }
+            }}
         )
+    }
+    
+    @ViewBuilder
+    private func navigationStack(rootView: (some View)?) -> some View {
+        let router = viewModel
+        NavigationStack(
+            path: Binding(get: { router.items }, set: { router.items = $0 }),
+            root: { rootView?.navigationDestination(for: C.Route.self) { $0 } }
+        )
+        .transaction { $0.disablesAnimations = !router.animated }
+        .onChange(of: viewModel.items, perform: { _ in onChangeItems() })
     }
     
     // --------------------------------------------------------------------
     // MARK: Helper functions
     // --------------------------------------------------------------------
     
-    private func onChangeItems(_ value: [C.Route]) {
+    private func onChangeItems() {
         Task { await viewModel.syncItems() }
     }
 }
@@ -100,7 +117,6 @@ struct RouterView<C: CoordinatorType>: View {
 private struct CoordinatorKey: EnvironmentKey {
     static let defaultValue: AnyCoordinatorType? = nil
 }
-
 
 public extension EnvironmentValues {
     var coordinator: AnyCoordinatorType? {
