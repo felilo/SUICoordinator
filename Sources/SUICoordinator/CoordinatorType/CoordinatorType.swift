@@ -25,17 +25,47 @@
 import Foundation
 
 /// A protocol representing a coordinator in the coordinator pattern.
+///
+/// Coordinators are responsible for the navigation flow and business logic
+/// of a specific module or feature in an application.
+///
+/// - Important: Adopt this protocol in your custom coordinator implementations.
 @available(iOS 17.0, *)
 @MainActor
 public protocol CoordinatorType: SCHashable, Observable, AnyObject {
 
+    // ---------------------------------------------------------
+    // MARK: Associated Type
+    // ---------------------------------------------------------
+
+    /// The associated type representing the route associated with the coordinator.
     associatedtype Route: RouteType
 
+    // ---------------------------------------------------------
+    // MARK: Properties
+    // ---------------------------------------------------------
+
+    /// The unique identifier for the coordinator.
     var uuid: String { get }
+
+    /// An optional tag identifier for additional context or identification.
     var tagId: String? { get set }
+
+    /// The parent coordinator, if any, to which this coordinator is a child.
     var parent: AnyCoordinatorType? { get set }
+
+    /// An array of child coordinators associated with this coordinator.
     var children: [AnyCoordinatorType] { get set }
+
+    /// The router responsible for navigation within the coordinator.
     var router: Router<Route> { get set }
 
+    // ---------------------------------------------------------
+    // MARK: Helper Functions
+    // ---------------------------------------------------------
+
+    /// Start the coordinator, triggering the initial navigation or setup.
+    ///
+    /// - Returns: An asynchronous void task representing the start process.
     func start() async -> Void
 }
