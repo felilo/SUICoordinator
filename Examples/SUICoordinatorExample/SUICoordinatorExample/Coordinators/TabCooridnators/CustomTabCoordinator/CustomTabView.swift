@@ -72,7 +72,7 @@ struct CustomTabView<DataSource: TabCoordinatorType>: View where DataSource.Data
                     }
                 }
             }
-
+            
             VStack() {
                 Spacer()
                 customTabView()

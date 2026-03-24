@@ -41,13 +41,13 @@ import SUICoordinator
 /// detail column when the user taps a sidebar row, and the system back button
 /// automatically returns to the sidebar.
 struct SplitView<DataSource: TabCoordinatorType>: View where DataSource.DataSourcePage == SplitViewTabPageDataSource {
-
+    
     typealias Page = DataSource.Page
-
+    
     // ---------------------------------------------------------------------
     // MARK: Properties
     // ---------------------------------------------------------------------
-
+    
     @State var dataSource: DataSource
     /// Tracks the sidebar selection so `List` can apply the standard system
     /// highlight to the active row.
@@ -56,19 +56,19 @@ struct SplitView<DataSource: TabCoordinatorType>: View where DataSource.DataSour
     /// Set to `.detail` after a sidebar tap so the detail column is shown.
     @State private var preferredCompactColumn: NavigationSplitViewColumn = .sidebar
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
-
+    
     // ---------------------------------------------------------------------
     // MARK: Init
     // ---------------------------------------------------------------------
-
+    
     init(dataSource: DataSource) {
         self.dataSource = dataSource
     }
-
+    
     // ---------------------------------------------------------------------
     // MARK: View
     // ---------------------------------------------------------------------
-
+    
     var body: some View {
         NavigationSplitView(preferredCompactColumn: $preferredCompactColumn) {
             sidebarView()
@@ -81,11 +81,11 @@ struct SplitView<DataSource: TabCoordinatorType>: View where DataSource.DataSour
             }
         }
     }
-
+    
     // ---------------------------------------------------------------------
     // MARK: Helper views
     // ---------------------------------------------------------------------
-
+    
     @ViewBuilder
     private func sidebarView() -> some View {
         List(dataSource.pages, id: \.id, selection: $selectedPage) { page in
@@ -113,7 +113,7 @@ struct SplitView<DataSource: TabCoordinatorType>: View where DataSource.DataSour
             }
         }
     }
-
+    
     @ViewBuilder
     private func detailView() -> some View {
         if let coordinator = dataSource.getCoordinator(with: dataSource.currentPage) {

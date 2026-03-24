@@ -31,11 +31,11 @@ import SUICoordinator
 /// that `SplitView` is passed as the `viewContainer`, replacing `TabView` with
 /// a two-column split layout.
 class SplitViewCoordinator: TabCoordinator<SplitViewTabPage> {
-
+    
     // ---------------------------------------------------------------------
     // MARK: Init
     // ---------------------------------------------------------------------
-
+    
     init(currentPage: SplitViewTabPage = .home) {
         super.init(
             pages: Page.allCases,

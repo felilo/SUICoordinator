@@ -27,28 +27,28 @@ import SUICoordinator
 
 /// Pages shown in the sidebar of the `NavigationSplitView` example.
 public enum SplitViewTabPage: TabPage, CaseIterable {
-
+    
     case home
     case hub
-
+    
     // ---------------------------------------------------------
     // MARK: TabPage
     // ---------------------------------------------------------
-
+    
     public var position: Int {
         switch self {
         case .home: return 0
         case .hub:  return 1
         }
     }
-
+    
     public func coordinator() -> AnyCoordinatorType {
         switch self {
         case .home: return HomeCoordinator()
         case .hub:  return NavigationHubCoordinator()
         }
     }
-
+    
     public var dataSource: SplitViewTabPageDataSource {
         .init(page: self)
     }
@@ -59,9 +59,9 @@ public enum SplitViewTabPage: TabPage, CaseIterable {
 // ---------------------------------------------------------
 
 public struct SplitViewTabPageDataSource {
-
+    
     let page: SplitViewTabPage
-
+    
     @ViewBuilder
     public var icon: some View {
         switch page {
@@ -69,7 +69,7 @@ public struct SplitViewTabPageDataSource {
         case .hub:  Image(systemName: "network")
         }
     }
-
+    
     @ViewBuilder
     public var title: some View {
         switch page {

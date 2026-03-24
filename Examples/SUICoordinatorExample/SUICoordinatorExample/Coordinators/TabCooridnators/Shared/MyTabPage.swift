@@ -35,17 +35,17 @@ public enum MyTabPage: TabPage, CaseIterable {
     
     public var position: Int {
         switch self {
-            case .first: return 0
-            case .second: return 1
+        case .first: return 0
+        case .second: return 1
         }
     }
     
     public func coordinator() -> AnyCoordinatorType {
         switch self {
-            case .first:
-            return HomeCoordinator()
-            case .second:
-                return NavigationHubCoordinator()
+        case .first:
+            HomeCoordinator()
+        case .second:
+            NavigationHubCoordinator()
         }
     }
     

@@ -106,7 +106,7 @@ public struct DefaultTabView<DataSource: TabCoordinatorType>: View where DataSou
     // ---------------------------------------------------------------------
     // MARK: Helper funcs
     // ---------------------------------------------------------------------
-   
+    
     @ViewBuilder
     private func legacyTabContainerView() -> some View {
         TabView(selection: $dataSource.currentPage){
@@ -123,7 +123,7 @@ public struct DefaultTabView<DataSource: TabCoordinatorType>: View where DataSou
             }
         }
     }
-
+    
     @available(iOS 18, *)
     @ViewBuilder
     private func modernTabContainerView() -> some View {
