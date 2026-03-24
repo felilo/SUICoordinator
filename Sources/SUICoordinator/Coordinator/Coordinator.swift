@@ -34,7 +34,7 @@ open class Coordinator<Route: RouteType>: CoordinatorType, Sendable {
     // --------------------------------------------------------------------
 
     public var router: Router<Route> = .init()
-    public var uuid: String = ""
+    public var uuid: String = UUID().uuidString
     public var parent: (any CoordinatorType)?
     public var children: [(any CoordinatorType)] = []
     public var tagId: String?
@@ -59,9 +59,6 @@ open class Coordinator<Route: RouteType>: CoordinatorType, Sendable {
     // --------------------------------------------------------------------
 
     open func start() async {
-        if uuid.isEmpty {
-            uuid = "\(NSStringFromClass(type(of: self))) - \(UUID().uuidString)"
-        }
         fatalError("This method must be overwritten")
     }
 }
