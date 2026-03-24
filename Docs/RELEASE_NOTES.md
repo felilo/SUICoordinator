@@ -1,3 +1,37 @@
+# Release Notes — v1.4.2
+
+## New Features
+
+### `Coordinator<Route>` subclassing as an alternative to `@Coordinator` macro
+The `Coordinator<Route>` base class is now fully usable without the macro. Subclass it directly when you prefer explicit inheritance over the macro syntax:
+
+```swift
+class HomeCoordinator: Coordinator<HomeRoute> {
+    override func start() async {
+        await startFlow(route: .home)
+    }
+}
+```
+
+### `RouteType` typealias added to `SUICoordinator16`
+`RouteType` is now re-exported from `SUICoordinator16`, matching the `SUICoordinator` public API surface and removing the need to reference `SUICoordinatorCore` directly.
+
+## Improvements
+
+### `TabCoordinator` badges use `PassthroughSubject` instead of `AsyncStream`
+The `badges` property in `TabCoordinatorType` and `TabCoordinator` has been changed from `AsyncStream<(String?, Page)>` to `PassthroughSubject<(String?, Page), Never>`. This makes badge updates easier to drive imperatively and removes the need to manage a stream continuation. These changes was implemented only in SUICoordinator16
+
+### `TabCoordinatorType` gains primary associated type and mutable `viewContainer`
+`TabCoordinatorType` now uses primary associated type syntax (`TabCoordinatorType<Page>`), and the `viewContainer` requirement is now `get`/`set` instead of get-only, enabling assignment after initialisation. These changes was implemented only in SUICoordinator16
+
+### `Coordinator.uuid` is now eagerly initialised
+`uuid` is now set to `UUID().uuidString` as an inline default, removing the lazy guard that previously populated it inside `start()`. The `uuid` is stable from the moment the coordinator is allocated.
+
+### `TabCoordinator` and `TabCoordinatorType` documented
+Public API documentation comments have been added to `TabCoordinator` and `TabCoordinatorType`, covering all properties and methods.
+
+---
+
 # Release Notes — v1.3.2
 
 ## Bug Fixes
