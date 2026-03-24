@@ -45,7 +45,7 @@ class HomeCoordinator {
     // MARK: Init
     // ---------------------------------------------------------------------
     
-    init(config: HomeCoordinatorConfig = .init()) {
+    nonisolated init(config: HomeCoordinatorConfig = .init()) {
         self.config = config
     }
     

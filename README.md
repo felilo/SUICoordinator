@@ -108,6 +108,17 @@ class HomeCoordinator {
 }
 ```
 
+> **Without the macro**: If you prefer not to use the `@Coordinator` macro, you can subclass `Coordinator<Route>` directly:
+> ```swift
+> class HomeCoordinator: Coordinator<HomeRoute> {
+>
+>     override func start() async {
+>         let dependencies = HomeViewDependencies()
+>         await startFlow(route: .homeView(dependencies: dependencies))
+>     }
+> }
+> ```
+
 > **iOS 16 support**: If your deployment target is iOS 16, use `SUICoordinator16` instead. See [SUICoordinator16.md](Docs/SUICoordinator16.md) for the complete guide.
 
 ### 3. Define Views
@@ -314,6 +325,16 @@ struct MyExampleApp: App {
 
 _____
 
+## Architecture Guides
+
+SUICoordinator works with any architecture. See the dedicated guides:
+
+- [MVVM](Docs/MVVM.md) — ViewModels delegate navigation to the coordinator
+- [TCA](Docs/TCA.md) — Navigation triggered from reducer effects via a dependency
+- [Decoupled Views](Docs/DecoupledViews.md) — Views with zero coordinator dependency
+
+_____
+
 ## API Reference
 
 A `Coordinator` owns a `Router`, which drives both the navigation stack and modal presentations. Routes (`RouteType`) are the unit of navigation — each one declares how it should be presented (`presentationStyle`) and what it renders (`body`). You never interact with the `Router` directly in most cases; the `Coordinator` exposes convenience methods that delegate to it.
@@ -449,15 +470,6 @@ The following properties and methods are specific to `TabCoordinator`:
 | `setBadge(for:with:)` | Sets or removes a badge on a tab. Pass `nil` as the value to remove it. |
 | `popToRoot()` | Pops the active tab's navigation stack to its root view. |
 
-_____
-
-## Architecture Guides
-
-SUICoordinator works with any architecture. See the dedicated guides:
-
-- [MVVM](Docs/MVVM.md) — ViewModels delegate navigation to the coordinator
-- [TCA](Docs/TCA.md) — Navigation triggered from reducer effects via a dependency
-- [Decoupled Views](Docs/DecoupledViews.md) — Views with zero coordinator dependency
 
 _____
 

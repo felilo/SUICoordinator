@@ -40,15 +40,9 @@ public protocol RouterType: ObservableObject {
     // MARK: Properties
     // --------------------------------------------------------------------
 
-    /// An array of route items associated with the router.
-    var items: [Route] { get set }
-
     /// The sheet coordinator associated with the router.
     var sheetCoordinator: SheetCoordinator<AnyViewAlias> { get }
-
-    /// The main view associated with the router.
-    var mainView: Route? { get }
-
+    
     /// The main view associated with the router.
     var animated: Bool { get }
 

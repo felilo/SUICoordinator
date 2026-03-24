@@ -34,4 +34,8 @@ extension RouterType {
     func removeItemFromSheetCoordinator(at index: String) async -> Void {
         await sheetCoordinator.remove(at: index)
     }
+    
+    var isCoordinator: Bool {
+        sheetCoordinator.isCoordinator
+    }
 }

@@ -27,25 +27,24 @@ import Foundation
 
 /// A class representing a router in the coordinator pattern.
 
-public class Router<Route: RouteType>: ObservableObject, RouterType {
+public class Router<Route: RouteType>: RouterType {
 
     // --------------------------------------------------------------------
-    // MARK: Wrapper Properties
+    // MARK: Properties
     // --------------------------------------------------------------------
 
-    @Published public var mainView: Route?
-    @Published public var items: [Route] = []
-    @Published public var sheetCoordinator: SheetCoordinator<AnyViewAlias> = .init()
-
+    private var itemManager = ItemManager<Route>()
     public var animated: Bool = true
-
-    private let itemManager = ItemManager<Route>()
+    @Published public var sheetCoordinator: SheetCoordinator<AnyViewAlias> = .init()
+    @Published public var items: [Route] = []
+    @Published var mainView: Route?
+    var onFinish = AsyncBroadcast<Void>()
 
     // --------------------------------------------------------------------
     // MARK: Constructor
     // --------------------------------------------------------------------
 
-    public init() { }
+    public nonisolated init() { }
 
     // --------------------------------------------------------------------
     // MARK: RouterType
@@ -61,20 +60,14 @@ public class Router<Route: RouteType>: ObservableObject, RouterType {
             await itemManager.addItem(route)
             return await updateItems()
         }
-        await present(
-            route,
-            presentationStyle: presentationStyle,
-            animated: animated)
+        await present(route, presentationStyle: presentationStyle, animated: animated)
     }
 
     public func present(_ view: Route, presentationStyle: TransitionPresentationStyle? = nil, animated: Bool = true) async -> Void {
         self.animated = animated
 
         if (presentationStyle ?? view.presentationStyle) == .push {
-            return await navigate(
-                toRoute: view,
-                presentationStyle: presentationStyle,
-                animated: animated)
+            return await navigate(toRoute: view, presentationStyle: presentationStyle, animated: animated)
         }
 
         let item = SheetItem(
@@ -90,13 +83,13 @@ public class Router<Route: RouteType>: ObservableObject, RouterType {
     public func pop(animated: Bool) async -> Void {
         self.animated = animated
         await self.handlePopAction()
-        await self.updateItems()
+        await self.updateItems(animated: animated)
     }
 
     public func popToRoot(animated: Bool = true) async -> Void {
         self.animated = animated
         await itemManager.removeAll()
-        await updateItems()
+        await updateItems(animated: animated)
     }
 
     public func dismiss(animated: Bool = true) async -> Void {
@@ -109,19 +102,19 @@ public class Router<Route: RouteType>: ObservableObject, RouterType {
 
     public func clean(animated: Bool, withMainView: Bool = true) async -> Void {
         await popToRoot(animated: false)
+        await sheetCoordinator.clean()
+        if withMainView { setView(with: nil) }
         sheetCoordinator = .init()
-        if withMainView { mainView = nil }
     }
 
     public func restart(animated: Bool) async -> Void {
         if sheetCoordinator.items.isEmpty {
             await popToRoot(animated: animated)
         } else {
-            async let _ = await popToRoot(animated: true)
-            try? await Task.sleep(for: .seconds(0.2))
+            await popToRoot(animated: false)
             await sheetCoordinator.clean(animated: animated)
             self.animated = animated
-            sheetCoordinator = .init()
+            await sheetCoordinator.clean()
         }
     }
 
@@ -134,16 +127,18 @@ public class Router<Route: RouteType>: ObservableObject, RouterType {
         await itemManager.removeLastItem()
     }
 
-    func updateItems() async {
+    func updateItems(animated: Bool = false) async {
         let itemsManager = await itemManager.getAllItems()
         guard items != itemsManager else { return }
         items = itemsManager
+        if animated {
+            try? await Task.sleep(for: .milliseconds(150))
+        }
     }
 
     public func syncItems() async {
         let counterManagerItems = await itemManager.getAllItems().count
         let counterItems = items.count
-
         if counterItems != counterManagerItems {
             await itemManager.setItems(items)
             await updateItems()
@@ -154,10 +149,15 @@ public class Router<Route: RouteType>: ObservableObject, RouterType {
         if !(await sheetCoordinator.areEmptyItems) {
             await dismiss(animated: animated)
             if finishFlow {
-                try? await Task.sleep(for: .milliseconds(animated ? 600 : 100))
+                let stream = await onFinish.stream()
+                for await _ in stream { break }
             }
         } else if !(await itemManager.areItemsEmpty()) {
             await pop(animated: animated)
         }
+    }
+    
+    public func setView(with view: Route?) {
+        mainView = view
     }
 }

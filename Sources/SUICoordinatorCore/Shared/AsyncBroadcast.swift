@@ -1,5 +1,5 @@
 //
-//  Aliasess.swift
+//  AsyncBroadcast.swift
 //
 //  Copyright (c) Andres F. Lozano
 //
@@ -22,8 +22,34 @@
 //  THE SOFTWARE.
 //
 
-@_exported import SUICoordinatorCore
-import SwiftUI
+import Foundation
 
-public typealias AnyCoordinatorType = (any CoordinatorType)
-public typealias RouteType = RoutePresentationType & View
+public actor AsyncBroadcast<Value> {
+
+    private var continuations: [UUID: AsyncStream<Value>.Continuation] = [:]
+    
+    public init(continuations: [UUID : AsyncStream<Value>.Continuation] = [:]) {
+        self.continuations = continuations
+    }
+
+    public func stream() -> AsyncStream<Value> {
+        let id = UUID()
+
+        return AsyncStream { continuation in
+            continuations[id] = continuation
+            continuation.onTermination = { [weak self] _ in
+                Task { await self?.removeContinuation(id) }
+            }
+        }
+    }
+
+    public func send(_ value: Value) {
+        for continuation in continuations.values {
+            continuation.yield(value)
+        }
+    }
+
+    private func removeContinuation(_ id: UUID) {
+        continuations.removeValue(forKey: id)
+    }
+}

@@ -25,21 +25,25 @@
 import SwiftUI
 
 extension View {
-
+    
     func sheetCoordinator(
         coordinator: SheetCoordinator<AnyViewAlias>,
         index: Int = 0,
         isLast: Bool = false,
+        coordinatorType: AnyCoordinatorType?,
         onDissmis: ActionClosure? = nil,
-        onDidLoad: ActionClosure? = nil
+        onDidLoad: ActionClosure? = nil,
+        onDisappear: ActionClosure? = nil
     ) -> some View {
         modifier(
             SheetCoordinatorView(
                 coordinator: coordinator,
                 index: index,
                 isLast: isLast,
+                coordinatorType: coordinatorType,
                 onDissmis: onDissmis,
-                onDidLoad: onDidLoad
+                onDidLoad: onDidLoad,
+                onDisappear: onDisappear
             )
         )
     }

@@ -41,18 +41,17 @@ enum HomeRoute: RouteType {
     var presentationStyle: TransitionPresentationStyle {
         switch self {
         case .push:
-            return .push
+            .push
         case .sheet:
-            return .sheet
+            .sheet
         case .fullscreen:
-            return .fullScreenCover
+            .fullScreenCover
         case .detents:
-            return .detents([.medium])
+            .detents([.medium])
         case .actionListView:
-            return .push
-
+            .push
         case .viewCustomTransition:
-            return .custom(
+            .custom(
                 transition: .move(edge: .leading),
                 animation: .bouncy,
             )

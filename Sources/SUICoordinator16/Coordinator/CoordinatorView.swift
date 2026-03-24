@@ -27,10 +27,10 @@ import SwiftUI
 public struct CoordinatorView<DataSource: CoordinatorType>: View {
     
     // --------------------------------------------------------------------
-    // MARK: Wrapper properties
+    // MARK: Properties
     // --------------------------------------------------------------------
     
-    @StateObject var dataSource: DataSource
+    @StateObject private var dataSource: DataSource
     
     // --------------------------------------------------------------------
     // MARK: Constructor
@@ -43,6 +43,7 @@ public struct CoordinatorView<DataSource: CoordinatorType>: View {
             Task { @MainActor in await dataSource.start() }
         }
     }
+    
     
     // --------------------------------------------------------------------
     // MARK: View

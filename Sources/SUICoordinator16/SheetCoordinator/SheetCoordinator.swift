@@ -37,6 +37,7 @@ final public class SheetCoordinator<T>: ObservableObject {
     public private(set) var lastPresentationStyle: TransitionPresentationStyle?
     public private(set) var animated: Bool?
     private var backUpItems: [Int: String]
+    var isCoordinator: Bool = false
     var onRemoveItem: ((String) async -> Void)?
 
     init(
@@ -64,15 +65,18 @@ final public class SheetCoordinator<T>: ObservableObject {
     public func presentSheet(_ sheet: Item) async -> Void {
         animated = sheet.animated
         lastPresentationStyle = sheet.presentationStyle
+        isCoordinator = sheet.isCoordinator
         await itemManager.addItem(sheet)
         await backUpItems[totalItems] = sheet.id
         await updateItems()
     }
 
     func removeLastSheet(animated: Bool) async -> Void {
-        guard !(await areEmptyItems) else { return await updateItems() }
+        guard !(await areEmptyItems),
+              let totalItems = await itemManager.getAllItems().lastIndex(where: { $0 != nil })
+        else { return await updateItems() }
         self.animated = animated
-        let totalItems = await totalItems
+        
         await updateLastPresentationStyle()
         if lastPresentationStyle?.isCustom == true {
             await itemManager.getItem(at: totalItems)?.willDismiss.send()
@@ -93,6 +97,9 @@ final public class SheetCoordinator<T>: ObservableObject {
         guard let index = Int(index),
               (await itemManager.isValid(index: index))
         else { return await updateItems() }
+        let nextIndex = index + 1
+        
+        await removeCustomSheets(at: nextIndex)
 
         if let id = backUpItems[index] {
             await onRemoveItem?(id)
@@ -104,7 +111,7 @@ final public class SheetCoordinator<T>: ObservableObject {
             return await updateItems()
         }
 
-        await handleRemove(index: index - 1)
+        await handleRemove(index: nextIndex)
         await updateLastPresentationStyle()
         await removeAllNilItems()
     }
@@ -121,7 +128,12 @@ final public class SheetCoordinator<T>: ObservableObject {
         }
 
         await removeSheet(at: indexes, animated: animated)
-        try? await Task.sleep(for: .seconds(animated ? 0.1 : 0))
+        try? await Task.sleep(for: .milliseconds(animated ? 50 : 0))
+
+        await itemManager.removeAll()
+        await updateItems()
+        lastPresentationStyle = nil
+        backUpItems.removeAll()
     }
 
     func getNextIndex(_ index: Int) -> Int {
@@ -141,13 +153,35 @@ final public class SheetCoordinator<T>: ObservableObject {
     func updateItems() async {
         items = await itemManager.getAllItems()
     }
+    
+    private func removeCustomSheets(at index: Int) async {
+        let items = await itemManager.getAllItems()
+        guard items.indices.contains(index) else { return }
+        
+        let customItems = Array(items.suffix(from: index))
+            .filter { $0?.presentationStyle.isCustom == true }
+        
+        for item in customItems {
+            if let index = await itemManager.getAllItems().firstIndex(where: { $0?.id == item?.id }) {
+                await remove(at: "\(index)")
+            }
+        }
+    }
 
     private func updateLastPresentationStyle() async {
-        let presentationStyle = await itemManager.getAllItems().last(where: {
+        let items = await itemManager.getAllItems()
+        
+        let presentationStyle = items.last(where: {
             $0?.presentationStyle != nil
         })??.presentationStyle
-        guard presentationStyle != lastPresentationStyle else { return }
-        lastPresentationStyle = presentationStyle
+        
+        if presentationStyle != lastPresentationStyle {
+            lastPresentationStyle = presentationStyle
+        }
+        
+        if let isCoordinator = items.last(where: { $0?.isCoordinator != nil })??.isCoordinator {
+            self.isCoordinator = isCoordinator
+        }
     }
 
     private func handleRemove(index: Int) async {

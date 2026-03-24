@@ -30,7 +30,7 @@ public extension CoordinatorType {
     ///
     /// The method first resolves the **top-most coordinator** in the hierarchy
     /// (starting from `customRootCoordinator` when provided, otherwise from
-    /// `self`).  
+    /// `self`).
     /// If that coordinator is embedded in a `TabCoordinatable`, the function
     /// asks the tab container which child coordinator is **selected** and
     /// returns it; otherwise it simply returns the discovered top coordinator.
@@ -153,7 +153,7 @@ public extension CoordinatorType {
     /// ```
     
     func startFlow(route: Route) async -> Void {
-        if !isRunning { router.mainView = route }
+        if !isRunning { router.setView(with: route) }
     }
     
     /// Forces the presentation of the coordinator.

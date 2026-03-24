@@ -33,14 +33,14 @@ open class Coordinator<Route: RouteType>: ObservableObject, CoordinatorType {
     // --------------------------------------------------------------------
     
     /// The published router associated with the coordinator.
-    @Published public var router: Router<Route>
+    @Published public var router: Router<Route> = .init()
     
     // --------------------------------------------------------------------
     // MARK: Properties
     // --------------------------------------------------------------------
     
     /// The unique identifier for the coordinator.
-    public var uuid: String
+    public let uuid: String = UUID().uuidString
     
     /// The parent coordinator associated with the coordinator.
     public var parent: (any CoordinatorType)?
@@ -54,21 +54,20 @@ open class Coordinator<Route: RouteType>: ObservableObject, CoordinatorType {
     // --------------------------------------------------------------------
     // MARK: Constructor
     // --------------------------------------------------------------------
-    
-    /// Initializes a new instance of `Coordinator`.
-    public init() {
-        self.router = .init()
-        self.uuid = "\(NSStringFromClass(type(of: self))) - \(UUID().uuidString)"
-    }
-    
+
+    /// Creates a new coordinator instance.
+    ///
+    /// `nonisolated` so that subclasses can also declare `nonisolated init`
+    /// and call `super.init()` without an actor-isolation error. The stored
+    /// properties are all initialised via their inline defaults above.
+    public init() { }
+
     // --------------------------------------------------------------------
     // MARK: Helper funcs
     // --------------------------------------------------------------------
-    
-    /// Starts the coordinator.
-    ///
-    /// - Important: Subclasses **must** override this method with their own custom implementation.
+
     open func start() async {
         fatalError("This method must be overwritten")
     }
 }
+
