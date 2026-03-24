@@ -26,3 +26,4 @@
 import SwiftUI
 
 public typealias AnyCoordinatorType = (any CoordinatorType)
+public typealias RouteType = RoutePresentationType & View
