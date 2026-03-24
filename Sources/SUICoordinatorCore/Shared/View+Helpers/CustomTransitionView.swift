@@ -100,8 +100,14 @@ struct CustomTransitionView<Item: SheetItemType, Content: View>: View {
         if let item = item {
             content
                 .onViewDidLoad { onDidLoad?("") }
-                .onDisappear { if !item.isCoordinator { onDismiss?("") } }
-                .onReceive(item.willDismiss) { _ in finish() }
+                .onDisappear {
+                    if !item.isCoordinator {
+                        onDismiss?("")
+                    }
+                }
+                .onReceive(item.willDismiss) { _ in
+                    finish()
+                }
         }
     }
     
