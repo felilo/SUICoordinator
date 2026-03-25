@@ -134,9 +134,7 @@ public class Router<Route: RouteType>: RouterType {
         let itemsManager = await itemManager.getAllItems()
         guard items != itemsManager else { return }
         items = itemsManager
-        if animated {
-            try? await Task.sleep(for: .milliseconds(150))
-        }
+        try? await Task.sleep(for: .milliseconds(animated ? 250 : 1))
     }
 
     public func syncItems() async {

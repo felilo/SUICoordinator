@@ -31,6 +31,16 @@ struct NavigationActionListDetailView: View {
     
     private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
     
+    /// Badge setter injected by `CustomTabView` via `\.setCustomTabBadge`.
+    ///
+    /// `nil` when this view is not inside a `CustomTabView` tab bar.
+    /// Call it with a `(value: String?, page: MyTabPage)` tuple to update a tab badge:
+    /// ```swift
+    /// customTabBadge?(("5", .first))  // shows "5" on the .first tab
+    /// ```
+    @Environment(\.setCustomTabBadge) var customTabBadge
+    
+    
     init(coordinator: HomeCoordinator, title: String) {
         self._viewModel = .init(wrappedValue: .init(
             coordinator: coordinator,
@@ -43,7 +53,10 @@ struct NavigationActionListDetailView: View {
             bgColor.ignoresSafeArea()
             
             List {
-                actionRowButton(title: "Navigate To PushView") { await viewModel.navigateToPushView() }
+                actionRowButton(title: "Navigate To PushView") {
+                    customTabBadge?(("5", .first))
+                    await viewModel.navigateToPushView()
+                }
                 actionRowButton(title: "Presents SheetView") { await viewModel.presentSheet() }
                 actionRowButton(title: "Presents FullscreenView") { await viewModel.presentFullscreen() }
                 actionRowButton(title: "Presents DetentsView") { await viewModel.presentDetentsView() }
