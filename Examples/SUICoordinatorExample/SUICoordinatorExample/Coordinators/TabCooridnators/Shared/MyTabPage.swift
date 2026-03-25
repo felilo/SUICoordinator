@@ -24,7 +24,7 @@
 
 import SUICoordinator
 
-public enum MyTabPage: TabPage, CaseIterable {
+enum MyTabPage: TabPage, CaseIterable {
     
     case first
     case second

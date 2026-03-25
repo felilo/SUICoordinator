@@ -28,6 +28,15 @@ struct NavigationActionListView: View {
     
     @Environment(\.coordinator) var anyCoodinator
     
+    /// Badge setter injected by `DefaultTabView` via `\.setTabBadge`.
+    ///
+    /// `nil` when this view is not inside a `DefaultTabView` tab bar.
+    /// Call it with a `(value: String?, page: MyTabPage)` tuple to update a tab badge:
+    /// ```swift
+    /// setTabBadge?(("10", .first))  // shows "10" on the .first tab
+    /// ```
+    @Environment(\.setTabBadge) private var setTabBadge
+    
     private var coordinator: ActionListCoordinatorType? {
         anyCoodinator as? ActionListCoordinatorType
     }
@@ -38,6 +47,7 @@ struct NavigationActionListView: View {
             
             List {
                 actionRowButton(title: "Push NavigationView", systemImage: "arrow.forward.square.fill") {
+                    setTabBadge?(("10", .first))
                     await coordinator?.navigateToPushView()
                 }
                 .accessibilityIdentifier("btn_pushNavigationView")

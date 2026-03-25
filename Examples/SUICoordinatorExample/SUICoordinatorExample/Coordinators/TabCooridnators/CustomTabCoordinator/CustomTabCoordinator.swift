@@ -25,13 +25,13 @@
 import Foundation
 import SUICoordinator
 
-public class CustomTabCoordinator: TabCoordinator<MyTabPage> {
+class CustomTabCoordinator: TabCoordinator<MyTabPage> {
     
     // ---------------------------------------------------------------------
     // MARK: Init
     // ---------------------------------------------------------------------
     
-    public nonisolated init(currentPage: MyTabPage = .first) {
+    nonisolated init(currentPage: MyTabPage = .first) {
         super.init(
             pages: Page.sortedByPosition(),
             currentPage: currentPage,

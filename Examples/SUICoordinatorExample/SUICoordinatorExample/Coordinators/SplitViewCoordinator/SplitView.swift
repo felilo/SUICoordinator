@@ -40,14 +40,22 @@ import SUICoordinator
 /// `preferredCompactColumn` binding is used to programmatically push to the
 /// detail column when the user taps a sidebar row, and the system back button
 /// automatically returns to the sidebar.
-struct SplitView<DataSource: TabCoordinatorType>: View where DataSource.DataSourcePage == SplitViewTabPageDataSource {
+struct SplitView: View {
     
+    // ---------------------------------------------------------------------
+    // MARK: Typealiases
+    // ---------------------------------------------------------------------
+    
+    /// Concrete coordinator type this view is bound to.
+    typealias DataSource = TabCoordinator<SplitViewTabPage>
+    /// Convenience alias for the page type managed by the coordinator.
     typealias Page = DataSource.Page
     
     // ---------------------------------------------------------------------
     // MARK: Properties
     // ---------------------------------------------------------------------
     
+    /// The coordinator that owns pages, selection state, and child coordinator routing.
     @State var dataSource: DataSource
     /// Tracks the sidebar selection so `List` can apply the standard system
     /// highlight to the active row.
@@ -55,12 +63,17 @@ struct SplitView<DataSource: TabCoordinatorType>: View where DataSource.DataSour
     /// Controls which column is on top when the split view collapses on iPhone.
     /// Set to `.detail` after a sidebar tap so the detail column is shown.
     @State private var preferredCompactColumn: NavigationSplitViewColumn = .sidebar
+    /// Used to detect compact (iPhone) vs regular (iPad) size class and adjust
+    /// navigation behaviour accordingly.
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     
     // ---------------------------------------------------------------------
     // MARK: Init
     // ---------------------------------------------------------------------
     
+    /// Creates a `SplitView` bound to the given coordinator.
+    ///
+    /// - Parameter dataSource: The tab coordinator that provides pages and selection state.
     init(dataSource: DataSource) {
         self.dataSource = dataSource
     }
@@ -69,6 +82,11 @@ struct SplitView<DataSource: TabCoordinatorType>: View where DataSource.DataSour
     // MARK: View
     // ---------------------------------------------------------------------
     
+    /// The main view body.
+    ///
+    /// Wraps the sidebar and detail columns in a `NavigationSplitView`. On launch,
+    /// pre-selects the coordinator's current page on regular-width devices so the
+    /// detail column is populated immediately without requiring a sidebar tap.
     var body: some View {
         NavigationSplitView(preferredCompactColumn: $preferredCompactColumn) {
             sidebarView()
@@ -86,6 +104,15 @@ struct SplitView<DataSource: TabCoordinatorType>: View where DataSource.DataSour
     // MARK: Helper views
     // ---------------------------------------------------------------------
     
+    /// Builds the sidebar column: a `List` of `NavigationLink` rows, one per page.
+    ///
+    /// On regular-width devices the `List(selection:)` binding highlights the active row
+    /// and the `.onChange` handler calls `dataSource.setCurrentPage(_:)` to keep the
+    /// coordinator in sync.
+    ///
+    /// On compact (iPhone) devices the split view collapses to a single column, so
+    /// `.navigationDestination` renders `detailView()` inline and `preferredCompactColumn`
+    /// is pushed to `.detail` after selection to navigate the user forward.
     @ViewBuilder
     private func sidebarView() -> some View {
         List(dataSource.pages, id: \.id, selection: $selectedPage) { page in
@@ -114,6 +141,12 @@ struct SplitView<DataSource: TabCoordinatorType>: View where DataSource.DataSour
         }
     }
     
+    /// Renders the detail column for the currently selected page.
+    ///
+    /// Retrieves the coordinator for `dataSource.currentPage` and calls
+    /// `viewAsAnyView()` to display its root view. Falls back to a
+    /// `ContentUnavailableView` prompt when no coordinator is found
+    /// (e.g. before the coordinator has fully started).
     @ViewBuilder
     private func detailView() -> some View {
         if let coordinator = dataSource.getCoordinator(with: dataSource.currentPage) {
