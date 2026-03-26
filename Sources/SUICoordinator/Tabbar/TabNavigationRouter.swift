@@ -36,5 +36,5 @@ public protocol TabNavigationRouter: Sendable {
     // ---------------------------------------------------------
 
     /// Retrieves a coordinator associated with tab navigation.
-    func coordinator() -> AnyCoordinatorType
+    @MainActor func coordinator() -> (any CoordinatorType)
 }
