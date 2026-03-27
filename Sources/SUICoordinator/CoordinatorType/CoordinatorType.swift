@@ -32,7 +32,7 @@ import Foundation
 /// - Important: Adopt this protocol in your custom coordinator implementations.
 @available(iOS 17.0, *)
 @MainActor
-public protocol CoordinatorType: SCHashable, Observable, AnyObject {
+public protocol CoordinatorType<Route>: SCHashable, Observable, AnyObject {
 
     // ---------------------------------------------------------
     // MARK: Associated Type
@@ -52,13 +52,13 @@ public protocol CoordinatorType: SCHashable, Observable, AnyObject {
     var tagId: String? { get set }
 
     /// The parent coordinator, if any, to which this coordinator is a child.
-    var parent: AnyCoordinatorType? { get set }
+    var parent: CoordinatorType? { get set }
 
     /// An array of child coordinators associated with this coordinator.
-    var children: [AnyCoordinatorType] { get set }
+    var children: [CoordinatorType] { get set }
 
     /// The router responsible for navigation within the coordinator.
-    var router: Router<Route> { get set }
+    var router: RouterType<Route> { get set }
 
     // ---------------------------------------------------------
     // MARK: Helper Functions

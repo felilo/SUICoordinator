@@ -127,7 +127,7 @@ public protocol TabCoordinatorType: Observable, AnyObject {
     ///
     /// - Parameter page: The page whose coordinator should be retrieved.
     /// - Returns: The coordinator for the given page, or `nil` if none exists.
-    func getCoordinator(with page: Page) -> AnyCoordinatorType?
+    func getCoordinator(with page: Page) -> CoordinatorType?
 
     /// Retrieves the currently selected coordinator within the tab coordinator.
     ///
@@ -136,7 +136,7 @@ public protocol TabCoordinatorType: Observable, AnyObject {
     ///
     /// - Returns: The coordinator that corresponds to the currently selected tab.
     /// - Throws: An error if the selected coordinator cannot be determined or found.
-    func getCoordinatorSelected() throws -> (any CoordinatorType)
+    func getCoordinatorSelected() throws -> CoordinatorType
 
     /// Performs cleanup operations for the coordinator.
     ///
