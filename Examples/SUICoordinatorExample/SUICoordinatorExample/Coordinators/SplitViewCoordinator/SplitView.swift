@@ -94,6 +94,10 @@ struct SplitView: View {
             detailView()
         }
         .task {
+            // Pre-select the current page on regular-width devices (iPad) so the
+            // detail column is populated immediately. Skipped on compact (iPhone)
+            // because the split view collapses to a single column and no initial
+            // selection is needed.
             if horizontalSizeClass != .compact {
                 self.selectedPage = dataSource.currentPage
             }
@@ -117,11 +121,8 @@ struct SplitView: View {
     private func sidebarView() -> some View {
         List(dataSource.pages, id: \.id, selection: $selectedPage) { page in
             NavigationLink(value: page) {
-                Label {
-                    page.dataSource.title
-                } icon: {
-                    page.dataSource.icon
-                }
+                Label { page.dataSource.title }
+                icon: { page.dataSource.icon }
             }
         }
         .listStyle(.sidebar)

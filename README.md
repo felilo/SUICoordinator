@@ -253,7 +253,7 @@ class DefaultTabCoordinator: TabCoordinator<AppTabPage> {
 }
 ```
 
-For a detailed example, see [DefaultTabView.swift](https://github.com/felilo/SUICoordinator/blob/main/Examples/SUICoordinatorExample/SUICoordinatorExample/Coordinators/TabCooridnators/DefaultTabCoordinator/DefaultTabView.swift).
+For a detailed example, see [DefaultTabView.swift](https://github.com/felilo/SUICoordinator/blob/main/Examples/SUICoordinatorExample/SUICoordinatorExample/Coordinators/TabCooridnators/DefaultTabCoordinator/DefaultTabView.swift). or [SplitView.swift](https://github.com/felilo/SUICoordinator/blob/main/Examples/SUICoordinatorExample/SUICoordinatorExample/Coordinators/SplitViewCoordinator/SplitView.swift).
 
 ### 3. Present the TabCoordinator
 

@@ -25,17 +25,19 @@
 import SwiftUI
 import SUICoordinator
 
-/// A SwiftUI view that renders a fully custom tab bar driven by a `TabCoordinator`.
+/// A SwiftUI view that renders a fully custom floating-pill tab bar driven by a `TabCoordinator`.
 ///
-/// `CustomTabView` replaces the system `TabView` chrome with a floating rounded-rect
-/// bar overlaid at the bottom of the screen. The native `TabView` is still used as the
-/// page container (for free swipe-between-tabs support), but its default tab bar is hidden
-/// and substituted with `customTabView()`.
+/// `CustomTabView` avoids `TabView` entirely — which eliminates the native tab bar
+/// visibility problem. All coordinator views are kept alive simultaneously (mirroring
+/// `TabView`'s behaviour) with only the active page visible and interactive, preserving
+/// each tab's `NavigationStack` state across switches without any flash.
+///
+/// The tab bar is a floating `ultraThinMaterial` capsule. The selected tab shows an inner
+/// white pill with icon + label side by side; inactive tabs show only the icon.
 ///
 /// **Badge propagation**
-/// This view injects a `\.setCustomTabBadge` environment closure on the outermost `ZStack`
-/// so that screens nested deep inside a `NavigationStack` can update a badge on the custom
-/// bar without holding a coordinator reference.
+/// Injects a `\.setCustomTabBadge` environment closure above the content so that screens
+/// nested inside a `NavigationStack` can update a badge without a direct coordinator reference.
 ///
 /// **Usage**
 /// `CustomTabView` is created by `CustomTabCoordinator` and passed to
@@ -62,10 +64,6 @@ struct CustomTabView: View {
     /// Local mirror of badge state, kept in sync with `dataSource.badges` via `.task`.
     @State private var badges = [BadgeItem]()
     
-    /// Fixed width used when sizing each tab-bar button icon (currently unused; reserved for future icon sizing).
-    private let widthIcon: CGFloat = 22
-    
-    
     // ---------------------------------------------------------------------
     // MARK: Init
     // ---------------------------------------------------------------------
@@ -77,42 +75,42 @@ struct CustomTabView: View {
         self.dataSource = dataSource
     }
     
-    
     // ---------------------------------------------------------------------
     // MARK: View
     // ---------------------------------------------------------------------
     
     /// The main view body.
     ///
-    /// Layers a native `TabView` (page container) below the floating custom tab bar,
-    /// injects the badge setter into the environment, and starts the badge-update stream.
+    /// All coordinator views are kept alive simultaneously (mirroring `TabView` behaviour)
+    /// with only the active page visible and interactive. The floating pill tab bar is
+    /// inserted via `.safeAreaInset(edge: .bottom)` so content never scrolls behind it
+    /// and the bar sits correctly above the home indicator on all devices.
     var body: some View {
-        ZStack(alignment: .bottomLeading) {
-            TabView(selection: $dataSource.currentPage) {
-                ForEach(dataSource.pages, id: \.id) { page in
-                    dataSource.getCoordinator(with: page)?.getView()
-                        .asAnyView()
-                        .tag(page)
+        ZStack {
+            // All coordinator views are kept alive in the hierarchy simultaneously —
+            // mirroring TabView's internal behaviour. Only the active page is visible
+            // and interactive; inactive pages are hidden via opacity and excluded from
+            // hit-testing so they don't intercept touches. This preserves each tab's
+            // NavigationStack state across switches without using TabView at all.
+            ForEach(dataSource.pages, id: \.id) { page in
+                if let coordinator = dataSource.getCoordinator(with: page) {
+                    coordinator.viewAsAnyView()
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .opacity(dataSource.currentPage == page ? 1 : 0)
+                        .allowsHitTesting(dataSource.currentPage == page)
                 }
             }
-            
-            VStack() {
-                Spacer()
-                customTabView()
-            }.background {
-                RoundedRectangle(cornerRadius: 60)
-                    .shadow(color: Color.black.opacity(0.5), radius: 5, y: 4)
-            }
-            .frame(maxWidth: .infinity, maxHeight: 60)
-            .padding(.horizontal, 16)
-            .padding(.bottom, 20)
+        }
+        // Inserts the tab bar at the bottom and automatically adjusts the content's
+        // safe area so views never scroll behind the bar.
+        .safeAreaInset(edge: .bottom, spacing: 0) {
+            customTabView()
         }
         // Injects the badge setter closure so child views can update a custom tab
         // badge without holding a coordinator reference. Applied on the outermost
-        // ZStack (above the TabView) so the closure is visible to views inside
-        // NavigationStacks — NavigationStack does NOT forward @Environment values.
+        // ZStack so the closure is visible to views inside NavigationStacks —
+        // NavigationStack does NOT forward @Environment values.
         .environment(\.setCustomTabBadge, badgeSetter)
-        .ignoresSafeArea(.all, edges: [.all])
         .onChange(of: dataSource.pages) { _, pages in
             badges = pages.map { (nil, $0) }
         }
@@ -128,41 +126,51 @@ struct CustomTabView: View {
         }
     }
     
-    
     // ---------------------------------------------------------------------
     // MARK: Helper views
     // ---------------------------------------------------------------------
     
-    
-    /// Builds a single tappable item for the custom tab bar.
+    /// Builds a single tappable pill item for the floating tab bar.
     ///
-    /// Tapping the button calls `dataSource.setCurrentPage(_:)` to switch tabs.
-    /// The icon and title tint changes to blue for the active page and white otherwise.
-    /// A badge overlay is applied via `customBadge(with:)`.
+    /// The selected tab shows icon + label side by side inside a white inner pill.
+    /// Inactive tabs show only the icon. The label fades in/out and the pill background
+    /// appears/disappears via `.animation(_:value:)`.
     ///
-    /// - Parameters:
-    ///   - page: The tab page this item represents.
-    ///   - size: The global frame of the tab bar container, used to evenly divide button widths.
-    private func customTabBarItem(@State page: Page, size: CGRect) -> some View {
-        Button {
+    /// Content switches instantly (no `withAnimation`) to avoid the opacity flash
+    /// that occurs when two views are partially transparent at the same time.
+    ///
+    /// - Parameter page: The tab page this item represents.
+    private func customTabBarItem(page: Page) -> some View {
+        let isSelected = dataSource.currentPage == page
+        return Button {
+            // Instant switch — no withAnimation prevents the opacity flash on the
+            // content layer while keeping the button visuals animated below.
             dataSource.setCurrentPage(page)
         } label: {
-            ZStack(alignment: .bottom) {
-                VStack(alignment: .center , spacing: 2) {
-                    page.dataSource.icon
+            HStack(spacing: 6) {
+                page.dataSource.icon
+                    .font(.system(size: 16, weight: .medium))
+                    .foregroundStyle(isSelected ? Color.primary : Color.secondary)
+                
+                if isSelected {
                     page.dataSource.title
-                }.foregroundColor(dataSource.currentPage == page ? .blue : .white)
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(Color.primary)
+                        .transition(.opacity)
+                }
             }
+            .padding(.horizontal, 14)
+            .padding(.vertical, 10)
+            .background(isSelected ? Color(.systemBackground) : Color.clear, in: Capsule())
+            // Animates only the button visuals (tint + inner pill) — not the content swap.
+            .animation(.snappy(duration: 0.25), value: dataSource.currentPage)
         }
-        .frame(width: getWidthButton(with: size))
-        .overlay( customBadge(with: page) )
+        .overlay(customBadge(with: page))
     }
-    
     
     /// Renders a red capsule badge overlay for the given page, if a badge value is set.
     ///
     /// Returns `EmptyView` when the page has no badge (`value == nil`).
-    /// The badge is offset to sit in the top-right corner of the tab icon.
     @ViewBuilder
     func customBadge(with page: Page) -> some View {
         if let value = getBadge(page: page)?.value {
@@ -172,63 +180,51 @@ struct CustomTabView: View {
                     .foregroundStyle(.white)
                     .padding(5)
             }
-            .frame(height: 40 / 2 )
+            .frame(height: 40 / 2)
             .background(.red)
             .clipShape(Capsule())
-            .offset(x: 15, y:  -15)
+            .offset(x: 15, y: -15)
         }
     }
     
-    
-    /// Builds the full floating tab bar by laying out one `customTabBarItem` per page
-    /// inside a `GeometryReader` so each item receives an equal share of the bar width.
+    /// Builds the floating pill tab bar.
+    ///
+    /// All tab items sit inside a single outer capsule with `ultraThinMaterial` background.
+    /// The selected item renders an inner white pill (via `customTabBarItem`).
+    /// A drop shadow lifts the bar visually off the content below.
     @ViewBuilder
     func customTabView() -> some View {
-        GeometryReader { proxy in
-            HStack(spacing: 0) {
-                ForEach(dataSource.pages, id: \.id) {
-                    customTabBarItem(
-                        page: $0,
-                        size: proxy.frame(in: .global)
-                    )
-                }
+        HStack(spacing: 4) {
+            ForEach(dataSource.pages, id: \.id) { page in
+                customTabBarItem(page: page)
             }
         }
+        .padding(6)
+        .background(.ultraThinMaterial, in: Capsule())
+        .shadow(color: .black.opacity(0.15), radius: 16, y: 6)
+        .padding(.bottom, 12)
     }
     
+    // ---------------------------------------------------------------------
+    // MARK: Helper funcs
+    // ---------------------------------------------------------------------
     
     /// Returns the `BadgeItem` for the given page, or `nil` if not found.
     private func getBadge(page: Page) -> BadgeItem? {
-        guard let index = getBadgeIndex(page: page) else {
-            return nil
-        }
+        guard let index = getBadgeIndex(page: page) else { return nil }
         return badges[index]
     }
-    
     
     /// Returns the index of the given page in the `badges` array, or `nil` if not found.
     private func getBadgeIndex(page: Page) -> Int? {
         badges.firstIndex(where: { $0.1 == page })
     }
     
-    
-    // ---------------------------------------------------------------------
-    // MARK: Helper funcs
-    // ---------------------------------------------------------------------
-    
-    
-    /// Computes the width of a single tab-bar button by dividing the total bar width evenly
-    /// across all pages.
-    private func getWidthButton(with size: CGRect) -> CGFloat {
-        size.width / CGFloat(dataSource.pages.count)
-    }
-    
     /// A weak-capturing closure forwarded to the coordinator's `setBadge(for:with:)`.
     ///
     /// Captured weakly so the view does not extend the coordinator's lifetime.
     /// Injected into the environment via `\.setCustomTabBadge` and consumed by child
-    /// views that need to trigger a badge update on the custom tab bar
-    /// (e.g. `NavigationActionListDetailView`).
+    /// views that need to trigger a badge update (e.g. `NavigationActionListDetailView`).
     private var badgeSetter: (BadgeItem) -> Void {
         { [weak dataSource] item in
             dataSource?.setBadge(for: item.page, with: item.value)
@@ -244,12 +240,11 @@ struct CustomTabView: View {
     CustomTabView(dataSource: DefaultTabCoordinator())
 }
 
-
 // ---------------------------------------------------------------------
 // MARK: Environment key
 // ---------------------------------------------------------------------
 
-/// `EnvironmentKey` that carries the tab-badge setter closure for the custom rounded-rect tab bar.
+/// `EnvironmentKey` that carries the tab-badge setter closure for the custom tab bar.
 ///
 /// `CustomTabView` injects a concrete closure via `.environment(\.setCustomTabBadge, badgeSetter)`.
 /// Child views anywhere in the subtree — including those inside a `NavigationStack` — can read
@@ -261,7 +256,7 @@ struct CustomTabBadgeKey: EnvironmentKey {
 }
 
 extension EnvironmentValues {
-    /// A closure that updates a tab badge on the custom rounded-rect tab bar.
+    /// A closure that updates a tab badge on the custom tab bar.
     ///
     /// Call it with a `BadgeItem` tuple `(value: String?, page: MyTabPage)`:
     /// ```swift
