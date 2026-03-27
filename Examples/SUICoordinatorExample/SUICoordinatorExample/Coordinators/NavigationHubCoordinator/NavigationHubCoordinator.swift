@@ -25,16 +25,16 @@
 import Foundation
 import SUICoordinator
 
-@Coordinator(DefaultRoute.self)
-class NavigationHubCoordinator {
+//@Coordinator(DefaultRoute.self)
+class NavigationHubCoordinator: Coordinator<DefaultRoute> {
     
-    init() {}
+    override init() {}
     
     // ---------------------------------------------------------------------
     // MARK: CoordinatorType
     // ---------------------------------------------------------------------
     
-    func start() async {
+    override func start() async {
         let route = DefaultRoute(
             presentationStyle: .push,
             content: { CoordinatorActionListView() }

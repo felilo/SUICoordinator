@@ -33,14 +33,14 @@ enum MyTabPage: TabPage, CaseIterable {
     // MARK: TabPage
     // ---------------------------------------------------------
     
-    public var position: Int {
+    var position: Int {
         switch self {
         case .first: return 0
         case .second: return 1
         }
     }
     
-    public func coordinator() -> AnyCoordinatorType {
+    func coordinator() -> AnyCoordinatorType {
         switch self {
         case .first:
             HomeCoordinator()
@@ -49,7 +49,7 @@ enum MyTabPage: TabPage, CaseIterable {
         }
     }
     
-    public var dataSource: MyTabPageDataSource {
+    var dataSource: MyTabPageDataSource {
         .init(page: self)
     }
 }
