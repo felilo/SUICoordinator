@@ -73,10 +73,18 @@ struct NavigationActionListView: View {
                     await coordinator?.presentCustomTabCoordinator()
                 }
             }
-            .toolbar(content: toolbarContent)
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button {
+                        Task { await coordinator?.finish() }
+                    } label: {
+                        Text("Finish flow")
+                            .font(.headline)
+                    }
+                }
+            }
             .navigationTitle("Navigation Action List")
             .listStyle(.plain)
-            .navigationBarTitleDisplayMode(.automatic)
         }
     }
     
@@ -121,16 +129,6 @@ struct NavigationActionListView: View {
                 .padding(.horizontal, 16)
         )
         .listRowSeparator(.hidden)
-    }
-    
-    @ViewBuilder
-    private func toolbarContent() -> some View {
-        Button {
-            Task { await coordinator?.finish() }
-        } label: {
-            Text("Finish flow")
-                .font(.headline)
-        }
     }
 }
 

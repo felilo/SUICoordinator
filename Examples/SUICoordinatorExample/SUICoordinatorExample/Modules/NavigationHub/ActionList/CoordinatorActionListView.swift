@@ -64,15 +64,17 @@ struct CoordinatorActionListView: View {
                 }
             }
             .toolbar {
-                Button {
-                    runAction { await coordinator?.finish() }
-                } label: {
-                    Text("Finish flow")
+                ToolbarItem(placement: .topBarLeading) {
+                    Button {
+                        Task { await coordinator?.finish() }
+                    } label: {
+                        Text("Finish flow")
+                            .font(.headline)
+                    }
                 }
             }
             .navigationTitle("Coordinators List")
             .listStyle(.plain)
-            .navigationBarTitleDisplayMode(.large)
         }
     }
     
