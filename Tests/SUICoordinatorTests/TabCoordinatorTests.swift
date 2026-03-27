@@ -87,8 +87,8 @@ final class TabCoordinatorTests: XCTestCase {
         
         let coordinatorSelected = try sut.getCoordinatorSelected() as? AnyCoordinator
         
-        await coordinatorSelected?.router.navigate(toRoute: .pushStep2)
-        await coordinatorSelected?.router.navigate(toRoute: .pushStep3)
+        await coordinatorSelected?.router.navigate(toRoute: .pushStep2, presentationStyle: nil, animated: animated)
+        await coordinatorSelected?.router.navigate(toRoute: .pushStep3, presentationStyle: nil, animated: animated)
         XCTAssertEqual(coordinatorSelected?.router.items.count, 2)
         
         await sut.popToRoot()
