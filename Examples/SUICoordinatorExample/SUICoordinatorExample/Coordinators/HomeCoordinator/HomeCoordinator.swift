@@ -25,8 +25,8 @@
 import Foundation
 import SUICoordinator
 
-//@Coordinator(HomeRoute.self)
-class HomeCoordinator: Coordinator<HomeRoute> {
+@Coordinator(HomeRoute.self)
+class HomeCoordinator {
     
     @ObservationIgnored
     private let config: HomeCoordinatorConfig
@@ -53,7 +53,7 @@ class HomeCoordinator: Coordinator<HomeRoute> {
     // MARK: CoordinatorType
     // ---------------------------------------------------------------------
     
-    override func start() async {
+    func start() async {
         let route: HomeRoute = switch config.initialRoute {
         case let .detents(title):
                 .detents(coordinator: self, title: title)

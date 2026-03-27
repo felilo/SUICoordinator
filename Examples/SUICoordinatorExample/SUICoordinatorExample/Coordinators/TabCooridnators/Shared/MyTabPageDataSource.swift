@@ -24,12 +24,12 @@
 
 import SwiftUI
 
-public struct MyTabPageDataSource {
+struct MyTabPageDataSource {
     
     let page: MyTabPage
     
     @ViewBuilder
-    public var icon: some View {
+    var icon: some View {
         switch page {
         case .first: Image.init(systemName: "homekit")
         case .second: Image.init(systemName: "gear")
@@ -37,7 +37,7 @@ public struct MyTabPageDataSource {
     }
     
     @ViewBuilder
-    public var title: some View {
+    var title: some View {
         switch page {
         case .first: Text("first")
         case .second: Text("second")
