@@ -246,6 +246,77 @@ final class RouterTests: XCTestCase {
         XCTAssertTrue(sut.animated)
     }
 
+    // MARK: - Default parameter overloads (Router+Helpers)
+
+    func test_navigate_defaultParameters_pushesToItems() async throws {
+        let sut = makeSUT()
+        let route = AnyEnumRoute.pushStep(2)
+
+        await sut.navigate(toRoute: route)
+
+        XCTAssertEqual(sut.items.last?.id, route.id)
+    }
+
+    func test_present_defaultParameters_addsToSheetCoordinator() async throws {
+        let sut = makeSUT()
+
+        await sut.present(.sheetStep)
+
+        XCTAssertEqual(sut.sheetCoordinator.items.count, 1)
+    }
+
+    func test_pop_defaultParameters_removesLastItem() async throws {
+        let sut = makeSUT()
+        await sut.navigate(toRoute: .pushStep(1), animated: false)
+
+        await sut.pop()
+
+        XCTAssertNil(sut.items.last ?? nil)
+    }
+
+    func test_popToRoot_defaultParameters_clearsStack() async throws {
+        let sut = makeSUT()
+        await sut.navigate(toRoute: .pushStep(1), animated: false)
+        await sut.navigate(toRoute: .pushStep2, animated: false)
+
+        await sut.popToRoot()
+
+        XCTAssertEqual(sut.items.count, 0)
+    }
+
+    func test_dismiss_defaultParameters_removesTopSheet() async throws {
+        let sut = makeSUT()
+        await sut.navigate(toRoute: .sheetStep, animated: false)
+
+        await sut.dismiss()
+        await sut.sheetCoordinator.removeAllNilItems()
+
+        XCTAssertEqual(sut.sheetCoordinator.items.count, 0)
+    }
+
+    func test_clean_defaultParameters_preservesMainView() async throws {
+        let sut = makeSUT()
+        await sut.navigate(toRoute: .pushStep(1), animated: false)
+        await sut.navigate(toRoute: .sheetStep, animated: false)
+
+        // clean() delegates to clean(animated:withMainView:false) — mainView must survive
+        await sut.clean()
+        await sut.restart(animated: false)
+
+        XCTAssertEqual(sut.items.count, 0)
+        XCTAssertEqual(sut.sheetCoordinator.items.count, 0)
+        XCTAssertNotNil(sut.mainView)
+    }
+
+    func test_close_defaultParameters_removesLastPushedItem() async throws {
+        let sut = makeSUT()
+        await sut.navigate(toRoute: .pushStep(1), animated: false)
+
+        await sut.close()
+
+        XCTAssertEqual(sut.items.count, 0)
+    }
+
     // --------------------------------------------------------------------
     // MARK: Helpers
     // --------------------------------------------------------------------
