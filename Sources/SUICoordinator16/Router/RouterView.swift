@@ -115,7 +115,7 @@ struct RouterView<C: CoordinatorType>: View {
 }
 
 private struct CoordinatorKey: EnvironmentKey {
-    static let defaultValue: AnyCoordinatorType? = nil
+    static var defaultValue: AnyCoordinatorType? { nil }
 }
 
 public extension EnvironmentValues {

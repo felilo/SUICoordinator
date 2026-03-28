@@ -61,16 +61,16 @@ extension CoordinatorMacro: MemberMacro {
         // ── Coordinator protocol requirements ──────────────────────────────
 
         if !existingMemberNames.contains("router") {
-            members.append("public var router: RouterType<\(raw: routeTypeName)> = Router()")
+            members.append("public var router: any RouterType<\(raw: routeTypeName)> = Router()")
         }
         if !existingMemberNames.contains("uuid") {
             members.append("public var uuid: String = UUID().uuidString")
         }
         if !existingMemberNames.contains("parent") {
-            members.append("public var parent: CoordinatorType?")
+            members.append("public var parent: (any CoordinatorType)?")
         }
         if !existingMemberNames.contains("children") {
-            members.append("public var children: [CoordinatorType] = []")
+            members.append("public var children: [any CoordinatorType] = []")
         }
         if !existingMemberNames.contains("tagId") {
             members.append("public var tagId: String?")

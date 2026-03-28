@@ -55,13 +55,13 @@ final class CoordinatorMacroTests: XCTestCase {
                     await startFlow(route: .main)
                 }
 
-                public var router: RouterType<HomeRoute> = Router()
+                public var router: any RouterType<HomeRoute> = Router()
 
                 public var uuid: String = UUID().uuidString
 
-                public var parent: CoordinatorType?
+                public var parent: (any CoordinatorType)?
 
-                public var children: [CoordinatorType] = []
+                public var children: [any CoordinatorType] = []
 
                 public var tagId: String?
 
@@ -114,13 +114,13 @@ final class CoordinatorMacroTests: XCTestCase {
                 @MainActor
                 func start() async {}
 
-                public var router: RouterType<HomeRoute> = Router()
+                public var router: any RouterType<HomeRoute> = Router()
 
                 public var uuid: String = UUID().uuidString
 
-                public var parent: CoordinatorType?
+                public var parent: (any CoordinatorType)?
 
-                public var children: [CoordinatorType] = []
+                public var children: [any CoordinatorType] = []
 
                 public var tagId: String?
 
@@ -176,13 +176,13 @@ final class CoordinatorMacroTests: XCTestCase {
                 @MainActor
                 func start() async {}
 
-                public var router: RouterType<HomeRoute> = Router()
+                public var router: any RouterType<HomeRoute> = Router()
 
                 public var uuid: String = UUID().uuidString
 
-                public var parent: CoordinatorType?
+                public var parent: (any CoordinatorType)?
 
-                public var children: [CoordinatorType] = []
+                public var children: [any CoordinatorType] = []
 
                 public var tagId: String?
 
@@ -235,9 +235,9 @@ final class CoordinatorMacroTests: XCTestCase {
 
                 public var uuid: String = UUID().uuidString
 
-                public var parent: CoordinatorType?
+                public var parent: (any CoordinatorType)?
 
-                public var children: [CoordinatorType] = []
+                public var children: [any CoordinatorType] = []
 
                 public var tagId: String?
 
@@ -318,13 +318,13 @@ final class CoordinatorMacroTests: XCTestCase {
                 @MainActor
                 func start() async {}
 
-                public var router: RouterType<HomeRoute> = Router()
+                public var router: any RouterType<HomeRoute> = Router()
 
                 public var uuid: String = UUID().uuidString
 
-                public var parent: CoordinatorType?
+                public var parent: (any CoordinatorType)?
 
-                public var children: [CoordinatorType] = []
+                public var children: [any CoordinatorType] = []
 
                 public var tagId: String?
 
