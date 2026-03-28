@@ -26,6 +26,7 @@ import XCTest
 import SwiftUI
 @testable import SUICoordinator
 
+@MainActor
 final class DefaultRouteTests: XCTestCase {
 
     // MARK: - init / presentationStyle
@@ -52,7 +53,7 @@ final class DefaultRouteTests: XCTestCase {
 
     // MARK: - content closure
 
-    @MainActor func test_content_returnsProvidedView() {
+    func test_content_returnsProvidedView() {
         let label = Text("hello")
         let sut = DefaultRoute(presentationStyle: .push, content: { label.asAnyView() })
         XCTAssertNotNil(sut.content())

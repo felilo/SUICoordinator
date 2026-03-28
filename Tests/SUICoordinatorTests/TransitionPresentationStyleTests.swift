@@ -26,6 +26,7 @@ import XCTest
 import SwiftUI
 @testable import SUICoordinator
 
+@MainActor
 final class TransitionPresentationStyleTests: XCTestCase {
 
     // MARK: - isCustom
