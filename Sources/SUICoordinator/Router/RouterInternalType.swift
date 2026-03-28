@@ -84,7 +84,6 @@ protocol RouterInternalType<Route>: RouterType {
     func setView(with view: Route?) async -> Void
 }
 
-
 @available(iOS 17.0, *)
 extension RouterInternalType {
     
