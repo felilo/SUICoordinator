@@ -42,7 +42,7 @@ public extension CoordinatorType {
     ///   being presented, or `nil` when no coordinator could be found.
     /// - Throws: Propagates errors thrown by `topCoordinator(pCoordinator:)`,
     ///   usually indicating an invalid or missing hierarchy.
-    func getCoordinatorPresented(customRootCoordinator: CoordinatorType? = nil) throws -> CoordinatorType? {
+    func getCoordinatorPresented(customRootCoordinator: AnyCoordinatorType? = nil) throws -> AnyCoordinatorType? {
         let topCoordinator = try topCoordinator(pCoordinator: customRootCoordinator)
         if let tabCoordinator = topCoordinator?.parent as? (any TabCoordinatable) {
             return try tabCoordinator.getCoordinatorSelected()
@@ -72,7 +72,7 @@ public extension CoordinatorType {
     /// )
     /// ```
     func navigate(
-        to coordinator: CoordinatorType,
+        to coordinator: AnyCoordinatorType,
         presentationStyle: TransitionPresentationStyle,
         animated: Bool = true
     ) async -> Void {
@@ -185,7 +185,7 @@ public extension CoordinatorType {
     func forcePresentation(
         animated: Bool = true,
         presentationStyle: TransitionPresentationStyle = .sheet,
-        rootCoordinator: CoordinatorType? = nil
+        rootCoordinator: AnyCoordinatorType? = nil
     ) async throws {
         let topCoordinator = try rootCoordinator?.topCoordinator()
         await topCoordinator?.navigate(to: self, presentationStyle: presentationStyle)

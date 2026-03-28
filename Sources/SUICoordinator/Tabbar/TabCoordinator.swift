@@ -34,10 +34,10 @@ open class TabCoordinator<Page: TabPage>: TabCoordinatable {
     // MARK: Properties
     // --------------------------------------------------------------------
 
-    public var router: RouterType<DefaultRoute> = Router()
+    public var router: any RouterType<DefaultRoute> = Router()
     public var pages: [Page] = []
-    public var parent: CoordinatorType?
-    public var children: [CoordinatorType] = []
+    public var parent: AnyCoordinatorType?
+    public var children: [AnyCoordinatorType] = []
     public var tagId: String?
     public var uuid: String = UUID().uuidString
 
@@ -116,11 +116,11 @@ open class TabCoordinator<Page: TabPage>: TabCoordinatable {
     // MARK: Helper funcs
     // ---------------------------------------------------------
 
-    public func getCoordinator(with page: Page) -> CoordinatorType? {
+    public func getCoordinator(with page: Page) -> AnyCoordinatorType? {
         children.first { $0.tagId == page.id }
     }
 
-    open func getCoordinatorSelected() throws -> CoordinatorType {
+    open func getCoordinatorSelected() throws -> AnyCoordinatorType {
         guard let index = children.firstIndex(where: { $0.tagId == "\(currentPage.id)" })
         else { throw TabCoordinatorError.coordinatorSelected }
         return children[index]

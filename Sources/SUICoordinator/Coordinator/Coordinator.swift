@@ -34,10 +34,10 @@ open class Coordinator<Route: RouteType>: CoordinatorType, Sendable {
     // MARK: Properties
     // --------------------------------------------------------------------
 
-    public var router: RouterType<Route> = Router()
+    public var router: any RouterType<Route> = Router()
     public var uuid: String = UUID().uuidString
-    public var parent: CoordinatorType?
-    public var children: [CoordinatorType] = []
+    public var parent: AnyCoordinatorType?
+    public var children: [AnyCoordinatorType] = []
     public var tagId: String?
 
     // --------------------------------------------------------------------

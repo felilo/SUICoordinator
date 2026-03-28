@@ -33,7 +33,7 @@ extension TabCoordinatorType {
     /// - Parameters:
     ///   - coordinator: The child coordinator whose corresponding page should be set as current.
     ///                  The coordinator's `tagId` should match the string representation of a page's position.
-    func setCurrentPage(with coordinator: CoordinatorType) {
+    func setCurrentPage(with coordinator: AnyCoordinatorType) {
         let page = pages.first(where: { "\($0.position)" == coordinator.tagId })
         
         setCurrentPage(page)

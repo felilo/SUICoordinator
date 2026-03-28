@@ -27,4 +27,5 @@ import SwiftUI
 
 @available(iOS 17.0, *)
 public typealias AnyCoordinatorType = (any CoordinatorType)
-public typealias AnyViewAlias = (View)
+@available(iOS 17.0, *)
+public typealias AnyRouterType = (any RouterType)

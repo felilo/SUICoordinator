@@ -32,7 +32,7 @@ struct RouterView<C: CoordinatorType>: View {
     // --------------------------------------------------------------------
     
     private var coordinator: C
-    private var viewModel: RouterType<C.Route> { coordinator.router }
+    private var viewModel: any RouterType<C.Route> { coordinator.router }
 
     // --------------------------------------------------------------------
     // MARK: Constructor

@@ -52,13 +52,13 @@ public protocol CoordinatorType<Route>: SCHashable, Observable, AnyObject {
     var tagId: String? { get set }
 
     /// The parent coordinator, if any, to which this coordinator is a child.
-    var parent: CoordinatorType? { get set }
+    var parent: AnyCoordinatorType? { get set }
 
     /// An array of child coordinators associated with this coordinator.
-    var children: [CoordinatorType] { get set }
+    var children: [AnyCoordinatorType] { get set }
 
     /// The router responsible for navigation within the coordinator.
-    var router: RouterType<Route> { get set }
+    var router: any RouterType<Route> { get set }
 
     // ---------------------------------------------------------
     // MARK: Helper Functions

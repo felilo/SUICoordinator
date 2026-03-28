@@ -37,7 +37,7 @@ extension CoordinatorType {
     }
     
     /// The root router associated with the coordinator.
-    var root: RouterType {
+    var root: AnyRouterType {
         return router
     }
     
@@ -75,7 +75,7 @@ extension CoordinatorType {
     ///   - value: An inout parameter containing the coordinator value.
     /// - Returns: An optional deep coordinator of type TCoordinatorType.
     /// - Throws: An error if the deep coordinator retrieval fails.
-    func getDeepCoordinator(from value: inout CoordinatorType?) throws -> CoordinatorType? {
+    func getDeepCoordinator(from value: inout AnyCoordinatorType?) throws -> AnyCoordinatorType? {
         if value?.children.last == nil {
             return value
         } else if let value = value, let tabCoordinator = getTabCoordinable(value) {
@@ -90,7 +90,7 @@ extension CoordinatorType {
     ///
     /// - Parameters:
     ///   - coordinator: The child coordinator to be removed.
-    func removeChild(coordinator : CoordinatorType) async {
+    func removeChild(coordinator : AnyCoordinatorType) async {
         guard let index = children.firstIndex(where: {$0.uuid == coordinator.uuid}) else {
             return
         }
@@ -118,7 +118,7 @@ extension CoordinatorType {
     /// - Parameters:
     ///   - coordinator: The coordinator for which to retrieve the tab-coordinable object.
     /// - Returns: An optional tab-coordinable object conforming to any TabCoordinatable.
-    func getTabCoordinable(_ coordinator: CoordinatorType) ->  (any TabCoordinatable)? {
+    func getTabCoordinable(_ coordinator: AnyCoordinatorType) ->  (any TabCoordinatable)? {
         coordinator as? (any TabCoordinatable)
     }
     
@@ -126,7 +126,7 @@ extension CoordinatorType {
     ///
     /// - Parameters:
     ///   - coordinator: The child coordinator to be started.
-    func startChildCoordinator(_ coordinator: CoordinatorType) {
+    func startChildCoordinator(_ coordinator: AnyCoordinatorType) {
         children.append(coordinator)
         coordinator.parent = self
     }
@@ -176,7 +176,7 @@ extension CoordinatorType {
     }
     
     /// Cleans up the coordinator.
-    func swipedAway(coordinator: CoordinatorType) async {
+    func swipedAway(coordinator: AnyCoordinatorType) async {
         let sheetCoordinator = router.sheetCoordinator
         let uuid = coordinator.uuid
         
@@ -202,7 +202,7 @@ extension CoordinatorType {
     ///   - animated: A Boolean value indicating whether the transition should be animated.
     /// - Returns: A `SheetItem` configured to present the target coordinator's view.
     func buildSheetItemForCoordinator(
-        _ coordinator: CoordinatorType,
+        _ coordinator: AnyCoordinatorType,
         presentationStyle: TransitionPresentationStyle,
         animated: Bool
     ) -> SheetItem<AnyViewAlias> {
@@ -250,7 +250,7 @@ extension CoordinatorType {
     ///     await topCoordinator.navigate(to: newCoordinator, presentationStyle: .sheet)
     /// }
     /// ```
-    func topCoordinator(pCoordinator: CoordinatorType? = nil) throws -> CoordinatorType? {
+    func topCoordinator(pCoordinator: AnyCoordinatorType? = nil) throws -> AnyCoordinatorType? {
         if let tabCoordinator = getTabCoordinable(self) {
             var coordinatorSelected = try? tabCoordinator.getCoordinatorSelected()
             
