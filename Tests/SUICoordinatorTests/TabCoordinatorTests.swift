@@ -89,10 +89,10 @@ final class TabCoordinatorTests: XCTestCase {
         
         await coordinatorSelected?.router.navigate(toRoute: .pushStep2, presentationStyle: nil, animated: animated)
         await coordinatorSelected?.router.navigate(toRoute: .pushStep3, presentationStyle: nil, animated: animated)
-        XCTAssertEqual(coordinatorSelected?.router.items.count, 2)
+        XCTAssertEqual(coordinatorSelected?.internalRouter?.items.count, 2)
         
         await sut.popToRoot()
-        XCTAssertEqual(coordinatorSelected?.router.items.count, 0)
+        XCTAssertEqual(coordinatorSelected?.internalRouter?.items.count, 0)
         await finishFlow(sut: sut)
     }
     
