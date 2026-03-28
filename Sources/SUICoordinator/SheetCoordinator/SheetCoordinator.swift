@@ -46,6 +46,8 @@ final class SheetCoordinator<T> {
     private var backUpItems: [Int: String]
     @ObservationIgnored
     var onRemoveItem: ((String) async -> Void)?
+    @ObservationIgnored
+    var onFinish: AsyncBroadcast<String> = .init()
 
     init(
         items: [Item?] = [],
@@ -82,22 +84,28 @@ final class SheetCoordinator<T> {
         guard !(await areEmptyItems),
               let totalItems = await itemManager.getAllItems().lastIndex(where: { $0 != nil })
         else { return await updateItems() }
-        self.animated = animated
-        
-        await updateLastPresentationStyle()
-        if lastPresentationStyle?.isCustom == true {
-            await itemManager.getItem(at: totalItems)?.willDismiss.send()
-        } else {
-            await itemManager.makeItemsNil(at: totalItems)
-        }
-        await updateItems()
+        await removeSheet(at: totalItems, animated: animated)
     }
 
-    func removeSheet(at index: [Int], animated: Bool) async -> Void {
+    func removeSheet(at index: Int, animated: Bool) async -> Void {
         self.animated = animated
         await updateLastPresentationStyle()
+        
+        if lastPresentationStyle?.isCustom == true {
+            await itemManager.getItem(at: index)?.willDismiss.send()
+        }
+        
         await itemManager.makeItemsNil(at: index)
         await updateItems()
+        
+        if !isCoordinator {
+            let stream = await onFinish.stream()
+            for await value in stream {
+                if let inComingIndex = Int(value), inComingIndex == index {
+                    break
+                }
+            }
+        }
     }
 
     func remove(at index: String) async {
@@ -121,26 +129,31 @@ final class SheetCoordinator<T> {
         await handleRemove(index: nextIndex)
         await updateLastPresentationStyle()
         await removeAllNilItems()
+        await onFinish.send("\(index)")
     }
 
     func clean(animated: Bool = true) async -> Void {
         let items = await itemManager.getAllItems()
-        var indexes = [0]
+        let paired = zip(items, [nil] + items)
 
-        if let firstFSIndex = items.firstIndex(where: { $0?.presentationStyle == .fullScreenCover }) {
-            indexes = [firstFSIndex]
-            if let firstSheetIndex = items.firstIndex(where: { $0 != nil && $0?.presentationStyle != .fullScreenCover }) {
-                indexes.append(firstSheetIndex)
-            }
+        var result = zip(items.indices, paired).compactMap { index, pair in
+            let (current, previous) = pair
+
+            return (
+                previous == nil ||
+                (current?.presentationStyle == .fullScreenCover && previous?.presentationStyle != .fullScreenCover) ||
+                (current?.presentationStyle != .fullScreenCover && previous?.presentationStyle == .fullScreenCover)
+            ) ? index : nil
+        }.reversed()
+
+        for index in result {
+            let animated = result.last == index ? animated : false
+            await removeSheet(at: index, animated: animated)
         }
-
-        await removeSheet(at: indexes, animated: animated)
-        try? await Task.sleep(for: .milliseconds(animated ? 50 : 0))
-
         await itemManager.removeAll()
-        await updateItems()
         lastPresentationStyle = nil
         backUpItems.removeAll()
+        await updateItems()
     }
 
     func getNextIndex(_ index: Int) -> Int {

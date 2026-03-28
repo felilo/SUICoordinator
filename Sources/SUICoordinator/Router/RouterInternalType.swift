@@ -49,6 +49,8 @@ protocol RouterInternalType<Route>: RouterType {
     /// to this stream. The signal is sent when the presented sheet or coordinator dismisses.
     var onFinish: AsyncBroadcast<Void> { get }
     
+    var onPop: AsyncBroadcast<Void> { get }
+    
     /// Enqueues a sheet item for modal presentation via the sheet coordinator.
     ///
     /// This is a low-level primitive used internally by the coordinator layer. Prefer

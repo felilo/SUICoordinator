@@ -33,6 +33,7 @@ struct RouterView<C: CoordinatorType>: View {
     
     private var coordinator: C
     private var viewModel: AnyRouterInternalType<C.Route>? { coordinator.router as? AnyRouterInternalType<C.Route> }
+    @State private var didPop = false
 
     // --------------------------------------------------------------------
     // MARK: Constructor
@@ -48,7 +49,6 @@ struct RouterView<C: CoordinatorType>: View {
     
     var body: some View {
         ZStack { buildBody() }
-            .clearModalBackground(coordinator.isTabCoordinable)
     }
     
     // --------------------------------------------------------------------
@@ -88,6 +88,8 @@ struct RouterView<C: CoordinatorType>: View {
                         if router.isCoordinator {
                             await router.onFinish.send(())
                             await router.removeItemFromSheetCoordinator(at: index)
+                        } else {
+                            await router.sheetCoordinator.onFinish.send(index)
                         }
                     }}
                 )
@@ -99,10 +101,18 @@ struct RouterView<C: CoordinatorType>: View {
         if let router = viewModel {
             NavigationStack(
                 path: Binding(get: { router.items }, set: { router.items = $0 }),
-                root: { rootView?.navigationDestination(for: C.Route.self) { $0 } }
+                root: { rootView?.navigationDestination(for: C.Route.self) {
+                    $0.onDisappear {
+                        if didPop { viewModel?.onPop.send(()) }
+                        didPop = false
+                    }
+                }}
             )
             .transaction { $0.disablesAnimations = !router.animated }
-            .onChange(of: router.items) { _, _ in onChangeItems() }
+            .onChange(of: router.items) { oldValue, newValue in
+                if newValue.count < oldValue.count { didPop = true }
+                onChangeItems()
+            }
         }
     }
     
