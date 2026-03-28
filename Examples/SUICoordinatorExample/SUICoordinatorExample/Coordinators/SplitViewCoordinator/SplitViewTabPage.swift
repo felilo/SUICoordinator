@@ -26,7 +26,7 @@ import SwiftUI
 import SUICoordinator
 
 /// Pages shown in the sidebar of the `NavigationSplitView` example.
-public enum SplitViewTabPage: TabPage, CaseIterable {
+enum SplitViewTabPage: TabPage, CaseIterable {
     
     case home
     case hub
@@ -35,21 +35,21 @@ public enum SplitViewTabPage: TabPage, CaseIterable {
     // MARK: TabPage
     // ---------------------------------------------------------
     
-    public var position: Int {
+    var position: Int {
         switch self {
         case .home: return 0
         case .hub:  return 1
         }
     }
     
-    public func coordinator() -> AnyCoordinatorType {
+    func coordinator() -> AnyCoordinatorType {
         switch self {
         case .home: return HomeCoordinator()
         case .hub:  return NavigationHubCoordinator()
         }
     }
     
-    public var dataSource: SplitViewTabPageDataSource {
+    var dataSource: SplitViewTabPageDataSource {
         .init(page: self)
     }
 }

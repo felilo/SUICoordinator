@@ -35,20 +35,20 @@ final class CoordinatorTests: XCTestCase {
     func test_finishFlow() async throws {
         let sut = makeSUT()
         
-        await sut.router.navigate(toRoute: .pushStep2, animated: animated )
-        await sut.router.navigate(toRoute: .sheetStep, animated: animated )
-        
+        await sut.router.navigate(toRoute: .pushStep2, presentationStyle: nil, animated: animated)
+        await sut.router.navigate(toRoute: .sheetStep, presentationStyle: nil, animated: animated)
+
         await finishFlow(sut: sut)
         XCTAssertEqual(sut.router.items.count, 0)
         XCTAssertEqual(sut.router.sheetCoordinator.items.count, 0)
     }
-    
+
     func test_CleanCoordinator() async throws {
         let sut = makeSUT()
-        
-        await sut.router.navigate(toRoute: .pushStep2, animated: animated )
-        await sut.router.navigate(toRoute: .sheetStep, animated: animated )
-        
+
+        await sut.router.navigate(toRoute: .pushStep2, presentationStyle: nil, animated: animated)
+        await sut.router.navigate(toRoute: .sheetStep, presentationStyle: nil, animated: animated)
+
         await finishFlow(sut: sut)
         XCTAssertEqual(sut.router.items.count, 0)
         XCTAssertEqual(sut.router.sheetCoordinator.items.count, 0)
@@ -72,7 +72,7 @@ final class CoordinatorTests: XCTestCase {
         let coordinator = OtherCoordinator()
         
         await sut.start()
-        await sut.router.navigate(toRoute: .pushStep2, animated: animated )
+        await sut.router.navigate(toRoute: .pushStep2, presentationStyle: nil, animated: animated)
         await navigateToCoordinator(coordinator, in: sut)
         
         await finishFlow(sut: sut)
@@ -192,8 +192,8 @@ final class CoordinatorTests: XCTestCase {
     func test_restartCoordinator() async throws {
         let sut = makeSUT()
         
-        await sut.router.navigate(toRoute: .pushStep2, animated: animated )
-        await sut.router.present(.fullScreenStep)
+        await sut.router.navigate(toRoute: .pushStep2, presentationStyle: nil, animated: animated)
+        await sut.router.present(.fullScreenStep, presentationStyle: nil, animated: animated)
         await sut.restart()
         
         XCTAssertEqual(sut.children.count, 0)
@@ -259,7 +259,7 @@ final class CoordinatorTests: XCTestCase {
     func test_close_popsLastPushedRoute() async {
         let sut = makeSUT()
         await sut.startFlow(route: .pushStep(1))
-        await sut.router.navigate(toRoute: .pushStep2, animated: animated)
+        await sut.router.navigate(toRoute: .pushStep2, presentationStyle: nil, animated: animated)
         XCTAssertEqual(sut.router.items.count, 1)
 
         await sut.close(animated: animated)
@@ -269,7 +269,7 @@ final class CoordinatorTests: XCTestCase {
     func test_close_dismissesLastSheet() async {
         let sut = makeSUT()
         await sut.startFlow(route: .pushStep(1))
-        await sut.router.navigate(toRoute: .sheetStep, animated: animated)
+        await sut.router.navigate(toRoute: .sheetStep, presentationStyle: nil, animated: animated)
         XCTAssertEqual(sut.router.sheetCoordinator.items.count, 1)
 
         await sut.close(animated: animated)

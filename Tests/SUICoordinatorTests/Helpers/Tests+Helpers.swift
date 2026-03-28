@@ -23,7 +23,7 @@
 //
 
 import XCTest
-import Combine
+@preconcurrency import Combine
 @testable import SUICoordinator
 
 extension XCTestCase {
@@ -54,7 +54,7 @@ extension XCTestCase {
         await sut.finishFlow(animated: animated)
     }
     
-    func asyncStream<T, E: Error>(_ stream: any Publisher<T, E> )  -> AsyncStream<T> {
+    func asyncStream<T: Sendable, E: Error>(_ stream: any Publisher<T, E>) -> AsyncStream<T> {
         AsyncStream { continuation in
             
             let cancellable = stream.sink { completion in

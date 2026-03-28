@@ -51,7 +51,7 @@ extension View {
 
 @available(iOS 17.0, *)
 struct CoordinatorKey: EnvironmentKey {
-    static let defaultValue: AnyCoordinatorType? = nil
+    static var defaultValue: AnyCoordinatorType? { nil }
 }
 
 @available(iOS 17.0, *)

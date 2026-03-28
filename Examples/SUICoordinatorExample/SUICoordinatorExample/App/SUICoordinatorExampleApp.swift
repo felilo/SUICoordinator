@@ -94,7 +94,7 @@ struct SUICoordinatorExampleApp: App {
     ///     used as a starting point to traverse and manipulate the coordinator tree.
     /// - Throws: Can throw errors from coordinator operations, such as `topCoordinator()` or `getCoordinatorSelected()`,
     ///           if the navigation path is invalid or a coordinator is not in the expected state.
-    @MainActor func handlePushNotificationDeepLink(
+    func handlePushNotificationDeepLink(
         path: DeepLinkPath,
         rootCoordinator: AnyCoordinatorType
     ) async throws {

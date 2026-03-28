@@ -26,6 +26,7 @@ import XCTest
 import SwiftUI
 @testable import SUICoordinator
 
+@MainActor
 final class DefaultRouteTests: XCTestCase {
 
     // MARK: - init / presentationStyle

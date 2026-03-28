@@ -40,8 +40,8 @@ public class Router<Route: RouteType>: RouterType {
     public var animated: Bool = true
     public var sheetCoordinator: SheetCoordinator<AnyViewAlias> = .init()
     public var items: [Route] = []
-    var mainView: Route?
-    var onFinish = AsyncBroadcast<Void>()
+    public var mainView: Route?
+    public var onFinish: AsyncBroadcast<Void> = .init()
 
     // --------------------------------------------------------------------
     // MARK: Constructor
@@ -106,6 +106,8 @@ public class Router<Route: RouteType>: RouterType {
     public func clean(animated: Bool, withMainView: Bool = true) async -> Void {
         await popToRoot(animated: false)
         await sheetCoordinator.clean()
+        await itemManager.removeAll()
+        await updateItems()
         if withMainView { setView(with: nil) }
         sheetCoordinator = .init()
     }
@@ -121,7 +123,7 @@ public class Router<Route: RouteType>: RouterType {
         }
     }
 
-    func presentSheet(item: SheetItem<AnyViewAlias>) async -> Void {
+    public func presentSheet(item: SheetItem<AnyViewAlias>) async -> Void {
         await sheetCoordinator.presentSheet(item)
     }
 
@@ -146,7 +148,7 @@ public class Router<Route: RouteType>: RouterType {
         }
     }
 
-    internal func close(animated: Bool, finishFlow: Bool) async -> Void {
+    public func close(animated: Bool, finishFlow: Bool) async -> Void {
         if !(await sheetCoordinator.areEmptyItems) {
             await dismiss(animated: animated)
             if finishFlow {

@@ -110,7 +110,7 @@ final class CoreTypesTests: XCTestCase {
     // MARK: - View+Helpers: asAnyView()
     // -------------------------------------------------------------------------
 
-    func test_asAnyView_returnsAnyView() {
+    @MainActor func test_asAnyView_returnsAnyView() {
         let view = Text("hello")
         let anyView = view.asAnyView()
         XCTAssert(type(of: anyView) == AnyView.self)
@@ -140,7 +140,7 @@ final class CoreTypesTests: XCTestCase {
     // -------------------------------------------------------------------------
 
     @available(iOS 17.0, *)
-    func test_hidden_true_collapseFrameAndOpacity() {
+    @MainActor func test_hidden_true_collapseFrameAndOpacity() {
         let base = Text("test")
         let hidden = base.hidden(true)
         let anyView = AnyView(hidden)
@@ -148,7 +148,7 @@ final class CoreTypesTests: XCTestCase {
     }
 
     @available(iOS 17.0, *)
-    func test_hidden_false_visibleFrameAndOpacity() {
+    @MainActor func test_hidden_false_visibleFrameAndOpacity() {
         let base = Text("test")
         let visible = base.hidden(false)
         let anyView = AnyView(visible)

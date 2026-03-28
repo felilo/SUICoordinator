@@ -32,7 +32,7 @@ struct RouterView<C: CoordinatorType>: View {
     // --------------------------------------------------------------------
     
     private var coordinator: C
-    private var viewModel: Router<C.Route> { coordinator.router }
+    private var viewModel: any RouterType<C.Route> { coordinator.router }
 
     // --------------------------------------------------------------------
     // MARK: Constructor
@@ -95,13 +95,13 @@ struct RouterView<C: CoordinatorType>: View {
     
     @ViewBuilder
     private func navigationStack(rootView: (some View)?) -> some View {
-        let router = viewModel
+        
         NavigationStack(
-            path: Binding(get: { router.items }, set: { router.items = $0 }),
+            path: Binding(get: { viewModel.items }, set: { viewModel.items = $0 }),
             root: { rootView?.navigationDestination(for: C.Route.self) { $0 } }
         )
-        .transaction { $0.disablesAnimations = !router.animated }
-        .onChange(of: router.items) { _, _ in onChangeItems() }
+        .transaction { $0.disablesAnimations = !viewModel.animated }
+        .onChange(of: viewModel.items) { _, _ in onChangeItems() }
     }
     
     // --------------------------------------------------------------------

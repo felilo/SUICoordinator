@@ -55,13 +55,13 @@ final class CoordinatorMacroTests: XCTestCase {
                     await startFlow(route: .main)
                 }
 
-                public var router: Router<HomeRoute> = .init()
+                public var router: any RouterType<HomeRoute> = Router()
 
-                public lazy var uuid: String = "\\(NSStringFromClass(type(of: self))) - \\(UUID().uuidString)"
+                public var uuid: String = UUID().uuidString
 
                 public var parent: (any CoordinatorType)?
 
-                public var children: [(any CoordinatorType)] = []
+                public var children: [any CoordinatorType] = []
 
                 public var tagId: String?
 
@@ -90,6 +90,9 @@ final class CoordinatorMacroTests: XCTestCase {
 
             extension HomeCoordinator: Observable {
             }
+
+            extension HomeCoordinator: @unchecked Sendable {
+            }
             """,
             macros: testMacros
         )
@@ -111,13 +114,13 @@ final class CoordinatorMacroTests: XCTestCase {
                 @MainActor
                 func start() async {}
 
-                public var router: Router<HomeRoute> = .init()
+                public var router: any RouterType<HomeRoute> = Router()
 
-                public lazy var uuid: String = "\\(NSStringFromClass(type(of: self))) - \\(UUID().uuidString)"
+                public var uuid: String = UUID().uuidString
 
                 public var parent: (any CoordinatorType)?
 
-                public var children: [(any CoordinatorType)] = []
+                public var children: [any CoordinatorType] = []
 
                 public var tagId: String?
 
@@ -142,6 +145,9 @@ final class CoordinatorMacroTests: XCTestCase {
             }
 
             extension HomeCoordinator: Observable {
+            }
+
+            extension HomeCoordinator: @unchecked Sendable {
             }
             """,
             macros: testMacros
@@ -170,13 +176,13 @@ final class CoordinatorMacroTests: XCTestCase {
                 @MainActor
                 func start() async {}
 
-                public var router: Router<HomeRoute> = .init()
+                public var router: any RouterType<HomeRoute> = Router()
 
-                public lazy var uuid: String = "\\(NSStringFromClass(type(of: self))) - \\(UUID().uuidString)"
+                public var uuid: String = UUID().uuidString
 
                 public var parent: (any CoordinatorType)?
 
-                public var children: [(any CoordinatorType)] = []
+                public var children: [any CoordinatorType] = []
 
                 public var tagId: String?
 
@@ -202,6 +208,9 @@ final class CoordinatorMacroTests: XCTestCase {
 
             extension HomeCoordinator: Observable {
             }
+
+            extension HomeCoordinator: @unchecked Sendable {
+            }
             """,
             macros: testMacros
         )
@@ -224,11 +233,11 @@ final class CoordinatorMacroTests: XCTestCase {
                 @MainActor
                 func start() async {}
 
-                public lazy var uuid: String = "\\(NSStringFromClass(type(of: self))) - \\(UUID().uuidString)"
+                public var uuid: String = UUID().uuidString
 
                 public var parent: (any CoordinatorType)?
 
-                public var children: [(any CoordinatorType)] = []
+                public var children: [any CoordinatorType] = []
 
                 public var tagId: String?
 
@@ -256,6 +265,9 @@ final class CoordinatorMacroTests: XCTestCase {
             }
 
             extension HomeCoordinator: Observable {
+            }
+
+            extension HomeCoordinator: @unchecked Sendable {
             }
             """,
             macros: testMacros
@@ -306,13 +318,13 @@ final class CoordinatorMacroTests: XCTestCase {
                 @MainActor
                 func start() async {}
 
-                public var router: Router<HomeRoute> = .init()
+                public var router: any RouterType<HomeRoute> = Router()
 
-                public lazy var uuid: String = "\\(NSStringFromClass(type(of: self))) - \\(UUID().uuidString)"
+                public var uuid: String = UUID().uuidString
 
                 public var parent: (any CoordinatorType)?
 
-                public var children: [(any CoordinatorType)] = []
+                public var children: [any CoordinatorType] = []
 
                 public var tagId: String?
 
@@ -340,6 +352,9 @@ final class CoordinatorMacroTests: XCTestCase {
             }
 
             extension HomeCoordinator: Observable {
+            }
+
+            extension HomeCoordinator: @unchecked Sendable {
             }
             """,
             macros: testMacros

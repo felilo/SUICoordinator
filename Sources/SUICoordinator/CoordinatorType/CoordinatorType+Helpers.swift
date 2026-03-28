@@ -37,7 +37,7 @@ extension CoordinatorType {
     }
     
     /// The root router associated with the coordinator.
-    var root: (any RouterType) {
+    var root: AnyRouterType {
         return router
     }
     
@@ -146,7 +146,7 @@ extension CoordinatorType {
     func emptyCoordinator(animated: Bool) async {
         guard let parent = parent else {
             await removeChildren()
-            return await router.clean(animated: animated)
+            return await router.clean(animated: animated, withMainView: true)
         }
         
         await parent.removeChild(coordinator: self)

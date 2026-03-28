@@ -154,7 +154,7 @@ public extension CoordinatorType {
     /// ```
     
     func startFlow(route: Route) async -> Void {
-        if !isRunning { router.setView(with: route) }
+        if !isRunning { await router.setView(with: route) }
     }
     
     /// Forces the presentation of the coordinator.
@@ -185,7 +185,7 @@ public extension CoordinatorType {
     func forcePresentation(
         animated: Bool = true,
         presentationStyle: TransitionPresentationStyle = .sheet,
-        rootCoordinator: (any CoordinatorType)? = nil
+        rootCoordinator: AnyCoordinatorType? = nil
     ) async throws {
         let topCoordinator = try rootCoordinator?.topCoordinator()
         await topCoordinator?.navigate(to: self, presentationStyle: presentationStyle)

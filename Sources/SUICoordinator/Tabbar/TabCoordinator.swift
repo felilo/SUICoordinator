@@ -34,11 +34,12 @@ open class TabCoordinator<Page: TabPage>: TabCoordinatable {
     // MARK: Properties
     // --------------------------------------------------------------------
 
-    public var router: Router<DefaultRoute> = .init()
+    public var router: any RouterType<DefaultRoute> = Router()
     public var pages: [Page] = []
-    public var parent: (any CoordinatorType)?
-    public var children: [(any CoordinatorType)] = []
+    public var parent: AnyCoordinatorType?
+    public var children: [AnyCoordinatorType] = []
     public var tagId: String?
+    public var uuid: String = UUID().uuidString
 
     // --------------------------------------------------------------------
     // MARK: TabCoordinatorType properties
@@ -53,7 +54,6 @@ open class TabCoordinator<Page: TabPage>: TabCoordinatable {
     /// Backing storage initialized once in `init`; `uuid`, `currentPage`, and `viewContainer`
     /// are exposed as computed properties so that the stored values are plain `let` constants,
     /// which Swift permits writing from a `nonisolated` context.
-    @ObservationIgnored private let _uuid: String
     @ObservationIgnored private let _presentationStyle: TransitionPresentationStyle
     @ObservationIgnored private let _initialPages: [Page]
     @ObservationIgnored private let _initialCurrentPage: Page
@@ -68,7 +68,7 @@ open class TabCoordinator<Page: TabPage>: TabCoordinatable {
     // MARK: TabCoordinatorType computed wrappers
     // ---------------------------------------------------------
 
-    public var uuid: String { _uuid }
+    
 
     public var currentPage: Page {
         get { _currentPage ?? _initialCurrentPage }
@@ -89,7 +89,6 @@ open class TabCoordinator<Page: TabPage>: TabCoordinatable {
         presentationStyle: TransitionPresentationStyle = .sheet,
         viewContainer: @escaping @MainActor @Sendable (TabCoordinator<Page>) -> Page.View
     ) {
-        self._uuid = "\(NSStringFromClass(type(of: self))) - \(UUID().uuidString)"
         self._presentationStyle = presentationStyle
         self._initialPages = pages
         self._initialCurrentPage = currentPage
@@ -121,7 +120,7 @@ open class TabCoordinator<Page: TabPage>: TabCoordinatable {
         children.first { $0.tagId == page.id }
     }
 
-    open func getCoordinatorSelected() throws -> (any CoordinatorType) {
+    open func getCoordinatorSelected() throws -> AnyCoordinatorType {
         guard let index = children.firstIndex(where: { $0.tagId == "\(currentPage.id)" })
         else { throw TabCoordinatorError.coordinatorSelected }
         return children[index]
@@ -133,7 +132,7 @@ open class TabCoordinator<Page: TabPage>: TabCoordinatable {
 
     public func clean() async {
         await setPages([], currentPage: nil)
-        await router.clean(animated: false)
+        await router.clean(animated: false, withMainView: true)
     }
 }
 

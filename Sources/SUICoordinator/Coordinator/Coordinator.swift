@@ -28,15 +28,16 @@ import Foundation
 @available(iOS 17.0, *)
 @Observable
 open class Coordinator<Route: RouteType>: CoordinatorType, Sendable {
+    
 
     // --------------------------------------------------------------------
     // MARK: Properties
     // --------------------------------------------------------------------
 
-    public var router: Router<Route> = .init()
+    public var router: any RouterType<Route> = Router()
     public var uuid: String = UUID().uuidString
-    public var parent: (any CoordinatorType)?
-    public var children: [(any CoordinatorType)] = []
+    public var parent: AnyCoordinatorType?
+    public var children: [AnyCoordinatorType] = []
     public var tagId: String?
 
     // --------------------------------------------------------------------

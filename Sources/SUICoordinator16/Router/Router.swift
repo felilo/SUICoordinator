@@ -44,7 +44,7 @@ public class Router<Route: RouteType>: RouterType {
     // MARK: Constructor
     // --------------------------------------------------------------------
 
-    public nonisolated init() { }
+    public init() { }
 
     // --------------------------------------------------------------------
     // MARK: RouterType

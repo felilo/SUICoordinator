@@ -28,7 +28,7 @@ import SUICoordinator
 @Coordinator(DefaultRoute.self)
 class NavigationHubCoordinator {
     
-    init() {}
+    nonisolated init() {}
     
     // ---------------------------------------------------------------------
     // MARK: CoordinatorType

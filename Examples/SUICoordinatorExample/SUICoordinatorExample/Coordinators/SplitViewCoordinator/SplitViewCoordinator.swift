@@ -36,7 +36,7 @@ class SplitViewCoordinator: TabCoordinator<SplitViewTabPage> {
     // MARK: Init
     // ---------------------------------------------------------------------
     
-    init(currentPage: SplitViewTabPage = .home) {
+    nonisolated init(currentPage: SplitViewTabPage = .home) {
         super.init(
             pages: Page.allCases,
             currentPage: currentPage,

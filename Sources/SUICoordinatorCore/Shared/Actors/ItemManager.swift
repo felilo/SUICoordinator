@@ -26,7 +26,7 @@ import Foundation
 
 /// An actor that manages a collection of items of generic type `T`.
 /// It provides thread-safe CRUD (Create, Read, Update, Delete) operations.
-public actor ItemManager<T> {
+public actor ItemManager<T: Sendable> {
 
     private var items: [T] = []
 

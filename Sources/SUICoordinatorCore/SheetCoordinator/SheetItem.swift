@@ -39,7 +39,7 @@ import Combine
 /// - Configurable presentation styles and animation
 /// - Built-in dismissal lifecycle management
 /// - Type-safe view/coordinator handling
-public struct SheetItem<T>:SCEquatable, SheetItemType {
+public struct SheetItem<T>: SCEquatable, SheetItemType, @unchecked Sendable {
     
     // ---------------------------------------------------------
     // MARK: Properties

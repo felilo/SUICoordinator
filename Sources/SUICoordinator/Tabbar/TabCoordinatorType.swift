@@ -136,7 +136,7 @@ public protocol TabCoordinatorType: Observable, AnyObject {
     ///
     /// - Returns: The coordinator that corresponds to the currently selected tab.
     /// - Throws: An error if the selected coordinator cannot be determined or found.
-    func getCoordinatorSelected() throws -> (any CoordinatorType)
+    func getCoordinatorSelected() throws -> AnyCoordinatorType
 
     /// Performs cleanup operations for the coordinator.
     ///
