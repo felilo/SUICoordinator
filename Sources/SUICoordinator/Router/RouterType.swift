@@ -102,3 +102,50 @@ public protocol RouterType<Route>: Observable, SCIdentifiable, AnyObject {
     /// - Parameter animated: Whether to animate the reset.
     func restart(animated: Bool) async -> Void
 }
+
+@available(iOS 17.0, *)
+public extension RouterType {
+    
+    // --------------------------------------------------------------------
+    // MARK: Helpers func
+    // --------------------------------------------------------------------
+    
+    /// Removes a specific item at the given index from the sheet coordinator.
+    ///
+    /// - Parameter index: The index of the item to remove.
+    func navigate(toRoute route: Route, presentationStyle: TransitionPresentationStyle? = nil, animated: Bool = true) async {
+        await navigate(toRoute: route, presentationStyle: presentationStyle, animated: animated)
+    }
+    
+    func present(_ view: Route, presentationStyle: TransitionPresentationStyle? = nil, animated: Bool = true) async {
+        await present(view, presentationStyle: presentationStyle, animated: animated)
+    }
+    
+    /// Pops the top view from the navigation stack.
+    ///
+    /// - Parameter animated: Whether to animate the transition.
+    func pop(animated: Bool = true) async {
+        await pop(animated: animated)
+    }
+    
+    /// Pops all views back to the root of the navigation stack.
+    ///
+    /// - Parameter animated: Whether to animate the transition.
+    func popToRoot(animated: Bool = true) async {
+        await popToRoot(animated: animated)
+    }
+    
+    /// Dismisses the currently presented modal.
+    ///
+    /// - Parameter animated: Whether to animate the dismissal.
+    func dismiss(animated: Bool = true) async {
+        await dismiss(animated: animated)
+    }
+    
+    /// Closes the current flow, dismissing the coordinator's presentation.
+    ///
+    /// - Parameter animated: Whether to animate the dismissal.
+    func close(animated: Bool = true) async -> Void {
+        await close(animated: animated)
+    }
+}
