@@ -102,11 +102,11 @@ struct RouterView<C: CoordinatorType>: View {
             NavigationStack(
                 path: Binding(get: { router.items }, set: { router.items = $0 }),
                 root: { rootView?.navigationDestination(for: C.Route.self) {
-                    $0.onDisappear {
-                        if didPop { viewModel?.onPop.send(()) }
+                    $0.onDisappear { Task{
+                        if didPop { await viewModel?.onPop.send(()) }
                         didPop = false
                     }
-                }}
+                    }}}
             )
             .transaction { $0.disablesAnimations = !router.animated }
             .onChange(of: router.items) { oldValue, newValue in
