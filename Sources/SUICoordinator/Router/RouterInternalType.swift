@@ -1,5 +1,5 @@
 //
-//  RouterType.swift
+//  RouterInternalType.swift
 //
 //  Copyright (c) Andres F. Lozano
 //
