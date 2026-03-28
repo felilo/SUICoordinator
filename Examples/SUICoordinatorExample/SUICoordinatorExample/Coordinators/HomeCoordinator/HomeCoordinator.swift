@@ -132,3 +132,11 @@ struct HomeCoordinatorConfig {
         case detents(title: String)
     }
 }
+
+class TestCoordinator: Coordinator<HomeRoute> {
+    
+    
+    override func start() async {
+        
+    }
+}
