@@ -40,3 +40,59 @@ extension RouterType {
         sheetCoordinator.isCoordinator
     }
 }
+
+@available(iOS 17.0, *)
+public extension RouterType {
+    
+    // --------------------------------------------------------------------
+    // MARK: Helpers func
+    // --------------------------------------------------------------------
+    
+    /// Removes a specific item at the given index from the sheet coordinator.
+    ///
+    /// - Parameter index: The index of the item to remove.
+    func navigate(toRoute route: Route, presentationStyle: TransitionPresentationStyle? = nil, animated: Bool = true) async {
+        await navigate(toRoute: route, presentationStyle: presentationStyle, animated: animated)
+    }
+    
+    func present(_ view: Route, presentationStyle: TransitionPresentationStyle? = nil, animated: Bool = true) async {
+        await present(view, presentationStyle: presentationStyle, animated: animated)
+    }
+    
+    /// Pops the top view from the navigation stack.
+    ///
+    /// - Parameter animated: Whether to animate the transition.
+    func pop(animated: Bool = true) async {
+        await pop(animated: animated)
+    }
+    
+    /// Pops all views back to the root of the navigation stack.
+    ///
+    /// - Parameter animated: Whether to animate the transition.
+    func popToRoot(animated: Bool = true) async {
+        await popToRoot(animated: animated)
+    }
+    
+    /// Dismisses the currently presented modal.
+    ///
+    /// - Parameter animated: Whether to animate the dismissal.
+    func dismiss(animated: Bool = true) async {
+        await dismiss(animated: animated)
+    }
+    
+    /// Clears the navigation stack and optionally removes the main view.
+    ///
+    /// - Parameters:
+    ///   - animated: Whether to animate the operation.
+    ///   - withMainView: Whether to also remove the main view from the stack.
+    func clean(animated: Bool = true) async -> Void {
+        await clean(animated: animated, withMainView: false)
+    }
+    
+    /// Closes the current flow, dismissing the coordinator's presentation.
+    ///
+    /// - Parameter animated: Whether to animate the dismissal.
+    func close(animated: Bool = true) async -> Void {
+        await close(animated: animated)
+    }
+}
