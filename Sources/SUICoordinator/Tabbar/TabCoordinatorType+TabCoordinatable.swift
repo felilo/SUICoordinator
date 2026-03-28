@@ -77,4 +77,8 @@ extension TabCoordinatorType where Self : TabCoordinatable {
         pages = value
         setCurrentPage(currentPage)
     }
+    
+    var routerInternalType: AnyRouterInternalType<Route>? {
+        router as? AnyRouterInternalType
+    }
 }

@@ -24,7 +24,7 @@
 
 import Foundation
 
-public actor AsyncBroadcast<Value: Sendable> {
+actor AsyncBroadcast<Value: Sendable> {
 
     private var continuations: [UUID: AsyncStream<Value>.Continuation] = [:]
 

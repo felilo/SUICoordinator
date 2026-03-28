@@ -33,13 +33,18 @@ extension CoordinatorType {
     /// signifies that the coordinator's `start()` method has been called and has set up
     /// its initial view.
     var isRunning: Bool {
-        router.mainView != nil
+        rootInternal?.mainView != nil
     }
     
     /// The root router associated with the coordinator.
     var root: AnyRouterType {
         return router
     }
+    
+    var rootInternal: AnyRouterInternalType<Route>? {
+        router as? AnyRouterInternalType
+    }
+    
     
     /// A boolean value indicating whether the coordinator is tab-coordinable.
     var isTabCoordinable: Bool {
@@ -49,9 +54,9 @@ extension CoordinatorType {
     /// A boolean value indicating whether the coordinator is empty.
     var isEmptyCoordinator: Bool {
         parent == nil &&
-        router.items.isEmpty &&
-        router.sheetCoordinator.items.isEmpty &&
-        router.mainView == nil
+        rootInternal?.items.isEmpty == true &&
+        rootInternal?.sheetCoordinator.items.isEmpty == true &&
+        rootInternal?.mainView == nil
     }
     
     /// Cleans the view associated with the coordinator.
@@ -63,7 +68,7 @@ extension CoordinatorType {
         if let coordinator = self as? (any TabCoordinatable) {
             await coordinator.clean()
         } else {
-            await router.clean(animated: animated, withMainView: withMainView)
+            await rootInternal?.clean(animated: animated, withMainView: withMainView)
         }
         
         parent = nil
@@ -136,7 +141,7 @@ extension CoordinatorType {
     /// - Parameters:
     ///   - animated: A boolean value indicating whether to animate the dismissal.
     func closeLastSheet(animated: Bool = true, finishFlow: Bool = false) async {
-        await router.close(animated: animated, finishFlow: finishFlow)
+        await rootInternal?.close(animated: animated, finishFlow: finishFlow)
     }
     
     /// Cleans up the coordinator, preparing it for dismissal.
@@ -146,7 +151,8 @@ extension CoordinatorType {
     func emptyCoordinator(animated: Bool) async {
         guard let parent = parent else {
             await removeChildren()
-            return await router.clean(animated: animated, withMainView: true)
+            await rootInternal?.clean(animated: animated, withMainView: true)
+            return
         }
         
         await parent.removeChild(coordinator: self)
@@ -177,10 +183,10 @@ extension CoordinatorType {
     
     /// Cleans up the coordinator.
     func swipedAway(coordinator: AnyCoordinatorType) async {
-        let sheetCoordinator = router.sheetCoordinator
+        let sheetCoordinator = rootInternal?.sheetCoordinator
         let uuid = coordinator.uuid
         
-        sheetCoordinator.onRemoveItem = { [weak sheetCoordinator, weak coordinator] id in
+        sheetCoordinator?.onRemoveItem = { [weak sheetCoordinator, weak coordinator] id in
             if id.contains(uuid) {
                 await coordinator?.finish(animated: false, withDismiss: false)
                 sheetCoordinator?.onRemoveItem = nil

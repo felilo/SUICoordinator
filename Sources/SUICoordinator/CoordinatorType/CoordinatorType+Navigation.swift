@@ -81,7 +81,7 @@ public extension CoordinatorType {
         let item = buildSheetItemForCoordinator(coordinator, presentationStyle: presentationStyle, animated: animated)
         
         await swipedAway(coordinator: coordinator)
-        await router.presentSheet(item: item)
+        await rootInternal?.presentSheet(item: item)
     }
     
     
@@ -154,7 +154,7 @@ public extension CoordinatorType {
     /// ```
     
     func startFlow(route: Route) async -> Void {
-        if !isRunning { await router.setView(with: route) }
+        if !isRunning { await rootInternal?.setView(with: route) }
     }
     
     /// Forces the presentation of the coordinator.

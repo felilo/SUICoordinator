@@ -54,29 +54,8 @@ public protocol RouterType<Route>: Observable, SCIdentifiable, AnyObject {
     // MARK: Properties
     // --------------------------------------------------------------------
 
-    /// The sheet coordinator that manages modal presentations for this router.
-    var sheetCoordinator: SheetCoordinator<AnyViewAlias> { get }
-
     /// A Boolean indicating whether navigation transitions are animated.
     var animated: Bool { get }
-
-    /// The root view of the navigation stack, or `nil` if none has been set.
-    ///
-    /// This is the first route displayed when the coordinator starts. Setting it to `nil`
-    /// clears the coordinator's view hierarchy.
-    var mainView: Route? { get }
-
-    /// The current push-navigation stack, mirroring the path of the active `NavigationStack`.
-    ///
-    /// Mutating this array drives the `NavigationStack` path directly. Appending a route pushes
-    /// it onto the stack; removing the last element pops back.
-    var items: [Route] { get set }
-
-    /// A broadcast channel that fires once when the router's flow finishes.
-    ///
-    /// Callers waiting on `close(animated:finishFlow:)` with `finishFlow: true` subscribe
-    /// to this stream. The signal is sent when the presented sheet or coordinator dismisses.
-    var onFinish: AsyncBroadcast<Void> { get }
 
     // --------------------------------------------------------------------
     // MARK: Functions
@@ -113,13 +92,6 @@ public protocol RouterType<Route>: Observable, SCIdentifiable, AnyObject {
     /// - Parameter animated: Whether to animate the dismissal.
     func dismiss(animated: Bool) async
 
-    /// Clears the navigation stack and optionally removes the main view.
-    ///
-    /// - Parameters:
-    ///   - animated: Whether to animate the operation.
-    ///   - withMainView: Whether to also remove the main view from the stack.
-    func clean(animated: Bool, withMainView: Bool) async -> Void
-
     /// Closes the current flow, dismissing the coordinator's presentation.
     ///
     /// - Parameter animated: Whether to animate the dismissal.
@@ -129,31 +101,4 @@ public protocol RouterType<Route>: Observable, SCIdentifiable, AnyObject {
     ///
     /// - Parameter animated: Whether to animate the reset.
     func restart(animated: Bool) async -> Void
-
-    /// Synchronises the router's items with the current navigation state.
-    func syncItems() async -> Void
-
-    /// Sets the main view of the router to the specified route.
-    ///
-    /// - Parameter view: The route to set as the main view, or `nil` to clear it.
-    func setView(with view: Route?) async -> Void
-
-    /// Enqueues a sheet item for modal presentation via the sheet coordinator.
-    ///
-    /// This is a low-level primitive used internally by the coordinator layer. Prefer
-    /// higher-level navigation methods on `CoordinatorType` instead of calling this directly.
-    ///
-    /// - Parameter item: The `SheetItem` describing the view and presentation style.
-    func presentSheet(item: SheetItem<AnyViewAlias>) async -> Void
-
-    /// Dismisses the current presentation and optionally waits for the flow to finish.
-    ///
-    /// When `finishFlow` is `true`, the method subscribes to `onFinish` and suspends
-    /// until the coordinator signals completion — ensuring callers don't proceed before
-    /// the dismissal animation and cleanup are fully done.
-    ///
-    /// - Parameters:
-    ///   - animated: Whether to animate the dismissal.
-    ///   - finishFlow: If `true`, waits for the `onFinish` broadcast before returning.
-    func close(animated: Bool, finishFlow: Bool) async -> Void
 }

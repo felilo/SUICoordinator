@@ -28,7 +28,7 @@ import Foundation
 @available(iOS 17.0, *)
 
 @Observable
-public class Router<Route: RouteType>: RouterType {
+public class Router<Route: RouteType>: RouterInternalType {
 
     // --------------------------------------------------------------------
     // MARK: Properties
@@ -38,10 +38,10 @@ public class Router<Route: RouteType>: RouterType {
     private var itemManager = ItemManager<Route>()
     @ObservationIgnored
     public var animated: Bool = true
-    public var sheetCoordinator: SheetCoordinator<AnyViewAlias> = .init()
+    var sheetCoordinator: SheetCoordinator<AnyViewAlias> = .init()
     public var items: [Route] = []
     public var mainView: Route?
-    public var onFinish: AsyncBroadcast<Void> = .init()
+    var onFinish: AsyncBroadcast<Void> = .init()
 
     // --------------------------------------------------------------------
     // MARK: Constructor

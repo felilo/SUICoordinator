@@ -32,7 +32,7 @@ struct RouterView<C: CoordinatorType>: View {
     // --------------------------------------------------------------------
     
     private var coordinator: C
-    private var viewModel: any RouterType<C.Route> { coordinator.router }
+    private var viewModel: AnyRouterInternalType<C.Route>? { coordinator.router as? AnyRouterInternalType<C.Route> }
 
     // --------------------------------------------------------------------
     // MARK: Constructor
@@ -58,7 +58,7 @@ struct RouterView<C: CoordinatorType>: View {
     @ViewBuilder
     private func buildBody() -> some View {
         Group {
-            if let view = viewModel.mainView {
+            if let view = viewModel?.mainView {
                 if coordinator.isTabCoordinable == true {
                     view
                 } else {
@@ -73,35 +73,37 @@ struct RouterView<C: CoordinatorType>: View {
     
     @ViewBuilder
     private func addSheetTo(view: (some View)?) -> some View {
-        let router = viewModel
-        view.environment(\.coordinator, coordinator)
-            .sheetCoordinator(
-            coordinator: router.sheetCoordinator,
-            onDissmis: { index in Task { @MainActor [weak router] in
-                guard let router else { return }
-                if !router.isCoordinator {
-                    await router.removeItemFromSheetCoordinator(at: index)
-                }
-            }},
-            onDisappear: { index in Task { @MainActor [weak router] in
-                guard let router else { return }
-                if router.isCoordinator {
-                    await router.onFinish.send(())
-                    await router.removeItemFromSheetCoordinator(at: index)
-                }
-            }}
-        )
+        if let router = viewModel {
+            view.environment(\.coordinator, coordinator)
+                .sheetCoordinator(
+                    coordinator: router.sheetCoordinator,
+                    onDissmis: { index in Task { @MainActor [weak router] in
+                        guard let router else { return }
+                        if !router.isCoordinator {
+                            await router.removeItemFromSheetCoordinator(at: index)
+                        }
+                    }},
+                    onDisappear: { index in Task { @MainActor [weak router] in
+                        guard let router else { return }
+                        if router.isCoordinator {
+                            await router.onFinish.send(())
+                            await router.removeItemFromSheetCoordinator(at: index)
+                        }
+                    }}
+                )
+        }
     }
     
     @ViewBuilder
     private func navigationStack(rootView: (some View)?) -> some View {
-        
-        NavigationStack(
-            path: Binding(get: { viewModel.items }, set: { viewModel.items = $0 }),
-            root: { rootView?.navigationDestination(for: C.Route.self) { $0 } }
-        )
-        .transaction { $0.disablesAnimations = !viewModel.animated }
-        .onChange(of: viewModel.items) { _, _ in onChangeItems() }
+        if let router = viewModel {
+            NavigationStack(
+                path: Binding(get: { router.items }, set: { router.items = $0 }),
+                root: { rootView?.navigationDestination(for: C.Route.self) { $0 } }
+            )
+            .transaction { $0.disablesAnimations = !router.animated }
+            .onChange(of: router.items) { _, _ in onChangeItems() }
+        }
     }
     
     // --------------------------------------------------------------------
@@ -109,6 +111,6 @@ struct RouterView<C: CoordinatorType>: View {
     // --------------------------------------------------------------------
     
     private func onChangeItems() {
-        Task { await viewModel.syncItems() }
+        Task { await viewModel?.syncItems() }
     }
 }

@@ -29,7 +29,7 @@ import SUICoordinatorCore
 @available(iOS 17.0, *)
 @MainActor
 @Observable
-final public class SheetCoordinator<T> {
+final class SheetCoordinator<T> {
 
     public typealias Item = SheetItem<T>
 
