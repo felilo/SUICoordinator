@@ -52,7 +52,7 @@ final class DefaultRouteTests: XCTestCase {
 
     // MARK: - content closure
 
-    func test_content_returnsProvidedView() {
+    @MainActor func test_content_returnsProvidedView() {
         let label = Text("hello")
         let sut = DefaultRoute(presentationStyle: .push, content: { label.asAnyView() })
         XCTAssertNotNil(sut.content())
