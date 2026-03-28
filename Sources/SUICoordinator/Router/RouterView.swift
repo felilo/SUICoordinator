@@ -106,8 +106,8 @@ struct RouterView<C: CoordinatorType>: View {
                         if didPop { await viewModel?.onPop.send(()) }
                         didPop = false
                     }
-                    }}}
-            )
+                    }}
+                })
             .transaction { $0.disablesAnimations = !router.animated }
             .onChange(of: router.items) { oldValue, newValue in
                 if newValue.count < oldValue.count { didPop = true }
