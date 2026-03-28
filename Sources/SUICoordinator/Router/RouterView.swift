@@ -105,8 +105,7 @@ struct RouterView<C: CoordinatorType>: View {
                     $0.onDisappear { Task{
                         if didPop { await viewModel?.onPop.send(()) }
                         didPop = false
-                    }
-                    }}
+                    }}}
                 })
             .transaction { $0.disablesAnimations = !router.animated }
             .onChange(of: router.items) { oldValue, newValue in
