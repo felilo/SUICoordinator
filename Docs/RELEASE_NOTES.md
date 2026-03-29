@@ -1,5 +1,37 @@
 # Release Notes — v1.5.0
 
+## Bug Fixes
+
+### `pop` and `popToRoot` no longer use `Task.sleep` — replaced with event-driven wait
+`pop(animated:)` and `popToRoot(animated:)` previously fell through immediately after updating the navigation stack, relying on `Task.sleep` to approximate when the pop animation had completed. They now subscribe to a `didPop` broadcast channel and resume only after `RouterView` fires the signal from `.onDisappear` — the point at which SwiftUI confirms the transition has finished. This eliminates all timing guesswork from pop sequences.
+
+### `removeSheet(at:animated:)` no longer uses `Task.sleep` — replaced with event-driven wait
+`removeSheet(at:animated:)` previously used `Task.sleep` to wait for the sheet dismissal animation. It now awaits a signal on the `SheetCoordinator.onFinish` broadcast channel, which `RouterView` fires inside `.onDisappear` once the sheet actually disappears. Dismissal sequencing is now deterministic regardless of device speed or animation duration.
+
+### `updateItems(animated:)` delay removed
+`updateItems` previously ended with an unconditional `Task.sleep(for: .milliseconds(250))` after syncing the navigation stack. This delay has been removed entirely; synchronization is now handled by the `didPop` broadcast described above.
+
+### `SheetCoordinator.clean()` — correct boundary-group algorithm for mixed stacks
+`clean()` previously used hardcoded index lookups to decide which sheets to remove, producing incorrect results when `.sheet` and `.fullScreenCover` layers were interleaved arbitrarily. It now computes removal indices using a boundary-group scan: consecutive items sharing the same presentation style are treated as one group, and only the boundary items (where style changes) are targeted for removal. This correctly handles all stack configurations without special-casing.
+
+### `Router.restart()` no longer calls `clean()` twice
+`restart()` was invoking `sheetCoordinator.clean()` twice in sequence. The duplicate call has been removed and the remaining `popToRoot` + `clean()` calls now run concurrently with `async let`, reducing restart time.
+
+## Improvements
+
+### Internal `Router` members hidden behind `RouterInternalType`
+All internal-only router requirements (`sheetCoordinator`, `itemManager`, `sheetDidDismiss`, `didPop`, `addSheetItem`, etc.) have been moved from `RouterType` to a new internal protocol `RouterInternalType`. The public `RouterType` protocol now exposes only the navigation API that library consumers are intended to use. This change has no impact on existing coordinator code — the `Router` class conforms to both protocols.
+
+### Default-parameter overloads added to `RouterType`
+`navigate(to:)`, `pop()`, `popToRoot()`, `dismiss()`, `close()`, and `finishFlow()` now have default-parameter overloads on `RouterType`. Call sites that previously had to pass `animated: true` explicitly can now omit the parameter.
+
+### Internal router accessors renamed to `anyRouter` / `internalRouter`
+The coordinator internal accessors previously named `root` / `rootInternal` have been renamed to `anyRouter` / `internalRouter`. These are implementation details not part of the public API; the rename makes their purpose clearer in coordinator source.
+
+---
+
+# Release Notes — v1.4.3
+
 ## New Features
 
 ### Primary associated types on `CoordinatorType` and `TabCoordinatorType`

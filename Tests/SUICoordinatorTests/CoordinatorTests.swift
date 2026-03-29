@@ -37,10 +37,14 @@ final class CoordinatorTests: XCTestCase {
         
         await sut.router.navigate(toRoute: .pushStep2, presentationStyle: nil, animated: animated)
         await sut.router.navigate(toRoute: .sheetStep, presentationStyle: nil, animated: animated)
-
-        await finishFlow(sut: sut)
-        XCTAssertEqual(sut.router.items.count, 0)
-        XCTAssertEqual(sut.router.sheetCoordinator.items.count, 0)
+        
+        let sheetCoordinator = sut.internalRouter!.sheetCoordinator
+        await simulateSheetDismissal(sheetCoordinator) {
+            async let _ = await self.finishFlow(sut: sut)
+        }
+        
+        XCTAssertEqual(sut.internalRouter?.items.count, 0)
+        XCTAssertEqual(sut.internalRouter?.sheetCoordinator.items.count, 0)
     }
 
     func test_CleanCoordinator() async throws {
@@ -49,9 +53,13 @@ final class CoordinatorTests: XCTestCase {
         await sut.router.navigate(toRoute: .pushStep2, presentationStyle: nil, animated: animated)
         await sut.router.navigate(toRoute: .sheetStep, presentationStyle: nil, animated: animated)
 
-        await finishFlow(sut: sut)
-        XCTAssertEqual(sut.router.items.count, 0)
-        XCTAssertEqual(sut.router.sheetCoordinator.items.count, 0)
+        let sheetCoordinator = sut.internalRouter!.sheetCoordinator
+        await simulateSheetDismissal(sheetCoordinator) {
+            async let _ = await self.finishFlow(sut: sut)
+        }
+        
+        XCTAssertEqual(sut.internalRouter?.items.count, 0)
+        XCTAssertEqual(sut.internalRouter?.sheetCoordinator.items.count, 0)
     }
     
     func test_finishFlow_swipedAway() async throws {
@@ -59,12 +67,12 @@ final class CoordinatorTests: XCTestCase {
         let anyCoordinator = AnyCoordinator()
         
         await sut.navigate(to: anyCoordinator, presentationStyle: .sheet)
-        await sut.router.sheetCoordinator.remove(at: "\(0)")
+        await sut.internalRouter?.sheetCoordinator.remove(at: "\(0)")
         
         try await Task.sleep(for: .seconds(0.5))
         
-        XCTAssertEqual(anyCoordinator.router.items.count, 0)
-        XCTAssertEqual(anyCoordinator.router.sheetCoordinator.items.count, 0)
+        XCTAssertEqual(anyCoordinator.internalRouter?.items.count, 0)
+        XCTAssertEqual(anyCoordinator.internalRouter?.sheetCoordinator.items.count, 0)
     }
     
     func test_finishFlow_mainCoordinator() async throws {
@@ -76,9 +84,9 @@ final class CoordinatorTests: XCTestCase {
         await navigateToCoordinator(coordinator, in: sut)
         
         await finishFlow(sut: sut)
-        XCTAssertEqual(sut.router.items.count, 0)
+        XCTAssertEqual(sut.internalRouter?.items.count, 0)
         XCTAssertTrue(sut.children.isEmpty)
-        XCTAssertEqual(sut.router.sheetCoordinator.items.count, 0)
+        XCTAssertEqual(sut.internalRouter?.sheetCoordinator.items.count, 0)
     }
     
     func test_finishFlow_childCoordinator() async throws {
@@ -92,12 +100,12 @@ final class CoordinatorTests: XCTestCase {
         // Router.close(finishFlow:true) waits on onFinish, which only fires from
         // the SwiftUI view layer. Clearing the sheet first makes close() take the
         // empty-sheet branch (pop), which does not block on onFinish.
-        await coordinator.router.sheetCoordinator.clean(animated: false)
+        await coordinator.internalRouter?.sheetCoordinator.clean(animated: false)
 
         await finishFlow(sut: sut)
-        XCTAssertEqual(sut.router.items.count, 0)
+        XCTAssertEqual(sut.internalRouter?.items.count, 0)
         XCTAssertTrue(sut.children.isEmpty)
-        XCTAssertEqual(sut.router.sheetCoordinator.items.count, 0)
+        XCTAssertEqual(sut.internalRouter?.sheetCoordinator.items.count, 0)
     }
     
     func test_starFlow() async throws {
@@ -105,7 +113,7 @@ final class CoordinatorTests: XCTestCase {
         let route = AnyEnumRoute.fullScreenStep
 
         await sut.startFlow(route: route)
-        let mainView = try XCTUnwrap(sut.router.mainView)
+        let mainView = try XCTUnwrap(sut.internalRouter?.mainView)
         
         XCTAssertEqual(mainView, route)
         XCTAssertTrue(sut.isRunning)
@@ -185,8 +193,8 @@ final class CoordinatorTests: XCTestCase {
         await finishFlow(sut: sut)
         
         XCTAssertTrue(sut.children.isEmpty)
-        XCTAssertTrue(sut.router.items.isEmpty)
-        XCTAssertTrue(sut.router.sheetCoordinator.items.isEmpty)
+        XCTAssertEqual(sut.internalRouter?.items.isEmpty, true)
+        XCTAssertEqual(sut.internalRouter?.sheetCoordinator.items.isEmpty, true)
     }
     
     func test_restartCoordinator() async throws {
@@ -194,11 +202,15 @@ final class CoordinatorTests: XCTestCase {
         
         await sut.router.navigate(toRoute: .pushStep2, presentationStyle: nil, animated: animated)
         await sut.router.present(.fullScreenStep, presentationStyle: nil, animated: animated)
-        await sut.restart()
+        
+        let sheetCoordinator = sut.internalRouter!.sheetCoordinator
+        await simulateSheetDismissal(sheetCoordinator) {
+            async let _ = await sut.restart()
+        }
         
         XCTAssertEqual(sut.children.count, 0)
-        XCTAssertEqual(sut.router.items.count, 0)
-        XCTAssertEqual(sut.router.sheetCoordinator.items.count, 0)
+        XCTAssertEqual(sut.internalRouter?.items.count, 0)
+        XCTAssertEqual(sut.internalRouter?.sheetCoordinator.items.count, 0)
     }
     
     // MARK: - isRunning
@@ -260,21 +272,24 @@ final class CoordinatorTests: XCTestCase {
         let sut = makeSUT()
         await sut.startFlow(route: .pushStep(1))
         await sut.router.navigate(toRoute: .pushStep2, presentationStyle: nil, animated: animated)
-        XCTAssertEqual(sut.router.items.count, 1)
+        XCTAssertEqual(sut.internalRouter?.items.count, 1)
 
         await sut.close(animated: animated)
-        XCTAssertEqual(sut.router.items.count, 0)
+        XCTAssertEqual(sut.internalRouter?.items.count, 0)
     }
 
     func test_close_dismissesLastSheet() async {
         let sut = makeSUT()
         await sut.startFlow(route: .pushStep(1))
         await sut.router.navigate(toRoute: .sheetStep, presentationStyle: nil, animated: animated)
-        XCTAssertEqual(sut.router.sheetCoordinator.items.count, 1)
+        XCTAssertEqual(sut.internalRouter?.sheetCoordinator.items.count, 1)
 
-        await sut.close(animated: animated)
-        await sut.router.sheetCoordinator.removeAllNilItems()
-        XCTAssertEqual(sut.router.sheetCoordinator.items.count, 0)
+        let sheetCoordinator = sut.internalRouter!.sheetCoordinator
+        await simulateSheetDismissal(sheetCoordinator) {
+            async let _ = await sut.close(animated: true)
+        }
+        await sut.internalRouter?.sheetCoordinator.removeAllNilItems()
+        XCTAssertEqual(sut.internalRouter?.sheetCoordinator.items.count, 0)
     }
 
     // MARK: - getCoordinatorPresented
@@ -306,15 +321,15 @@ final class CoordinatorTests: XCTestCase {
         let sut = makeSUT()
         await sut.startFlow(route: .pushStep(1))
         await sut.navigate(toRoute: .sheetStep, animated: animated)
-        XCTAssertEqual(sut.router.sheetCoordinator.items.count, 1)
-        await finishFlow(sut: sut)
+        XCTAssertEqual(sut.internalRouter?.sheetCoordinator.items.count, 1)
+        async let _ = await finishFlow(sut: sut)
     }
 
     func test_navigateToRoute_push_addsToItems() async {
         let sut = makeSUT()
         await sut.startFlow(route: .pushStep(1))
         await sut.navigate(toRoute: .pushStep2, animated: animated)
-        XCTAssertEqual(sut.router.items.count, 1)
+        XCTAssertEqual(sut.internalRouter?.items.count, 1)
         await finishFlow(sut: sut)
     }
 
@@ -322,8 +337,8 @@ final class CoordinatorTests: XCTestCase {
         let sut = makeSUT()
         await sut.startFlow(route: .pushStep(1))
         await sut.navigate(toRoute: .detentsStep, animated: animated)
-        XCTAssertEqual(sut.router.sheetCoordinator.items.count, 1)
-        await finishFlow(sut: sut)
+        XCTAssertEqual(sut.internalRouter?.sheetCoordinator.items.count, 1)
+        async let _ = await finishFlow(sut: sut)
     }
 
     // MARK: - children / parent relationship

@@ -64,6 +64,6 @@ extension TabCoordinatorType {
     /// - Note: This method will attempt to get the currently selected coordinator and pop to its root.
     ///         If the selected coordinator cannot be determined, the operation will fail silently.
     public func popToRoot() async {
-        try? await getCoordinatorSelected().root.popToRoot(animated: true)
+        try? await getCoordinatorSelected().anyRouter.popToRoot(animated: true)
     }
 }

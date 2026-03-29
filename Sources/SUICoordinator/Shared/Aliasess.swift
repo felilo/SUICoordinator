@@ -29,3 +29,5 @@ import SwiftUI
 public typealias AnyCoordinatorType = (any CoordinatorType)
 @available(iOS 17.0, *)
 public typealias AnyRouterType = (any RouterType)
+@available(iOS 17.0, *)
+typealias AnyRouterInternalType<T> = (any RouterInternalType<T>)

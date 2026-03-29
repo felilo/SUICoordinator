@@ -24,10 +24,29 @@
 
 import Foundation
 
-public actor AsyncBroadcast<Value: Sendable> {
+/// A lightweight actor-based broadcast channel that fans a single sent value out
+/// to all active `AsyncStream` subscribers.
+///
+/// Each call to `stream()` registers a new subscriber and returns a dedicated
+/// `AsyncStream`. When `send(_:)` is called, every registered stream receives the
+/// value. Subscribers are automatically deregistered when their stream terminates
+/// (e.g. the `for await` loop is cancelled or the consuming task ends).
+///
+/// `AsyncBroadcast` is an actor, so all mutations to the subscriber table are
+/// serialised without external locking.
+actor AsyncBroadcast<Value: Sendable> {
 
+    /// Active subscriber continuations, keyed by a unique identifier assigned at
+    /// subscription time.
     private var continuations: [UUID: AsyncStream<Value>.Continuation] = [:]
 
+    /// Creates a new `AsyncStream` and registers it as a subscriber.
+    ///
+    /// The stream stays active until the caller's `for await` loop exits or the
+    /// enclosing task is cancelled, at which point the continuation's `onTermination`
+    /// handler removes it from the active set.
+    ///
+    /// - Returns: An `AsyncStream` that yields every value passed to `send(_:)`.
     func stream() -> AsyncStream<Value> {
         let id = UUID()
 
@@ -39,12 +58,26 @@ public actor AsyncBroadcast<Value: Sendable> {
         }
     }
 
+    /// The number of currently active subscribers.
+    var subscriberCount: Int {
+        continuations.count
+    }
+
+    /// Broadcasts `value` to all active subscribers.
+    ///
+    /// - Parameter value: The value to deliver to every registered stream.
     func send(_ value: Value) {
         for continuation in continuations.values {
             continuation.yield(value)
         }
     }
 
+    /// Removes the continuation identified by `id` from the active subscriber table.
+    ///
+    /// Called automatically via the stream's `onTermination` handler when a subscriber
+    /// cancels or finishes iterating.
+    ///
+    /// - Parameter id: The identifier of the continuation to remove.
     private func removeContinuation(_ id: UUID) {
         continuations.removeValue(forKey: id)
     }

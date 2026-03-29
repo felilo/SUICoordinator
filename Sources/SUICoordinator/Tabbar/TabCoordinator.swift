@@ -132,7 +132,7 @@ open class TabCoordinator<Page: TabPage>: TabCoordinatable {
 
     public func clean() async {
         await setPages([], currentPage: nil)
-        await router.clean(animated: false, withMainView: true)
+        await routerInternalType?.clean(animated: false, withMainView: true)
     }
 }
 
