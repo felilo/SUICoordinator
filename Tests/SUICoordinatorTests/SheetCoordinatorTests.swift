@@ -59,7 +59,9 @@ final class SheetCoordinatorTests: XCTestCase {
         await presentSheet(item, with: sut)
         XCTAssertEqual(sut.items.count, 1)
         
-        await sut.removeLastSheet(animated: false)
+        await simulateSheetDismissal(sut) {
+            await sut.removeLastSheet(animated: false)
+        }
         await sut.removeAllNilItems()
         
         XCTAssertEqual(sut.items.count, 0)
@@ -73,7 +75,9 @@ final class SheetCoordinatorTests: XCTestCase {
         XCTAssertEqual(sut.items.count, 1)
         var willDismissAsync = asyncStream(item.willDismiss).makeAsyncIterator()
         
-        await sut.removeLastSheet(animated: false)
+        await simulateSheetDismissal(sut) {
+            await sut.removeLastSheet(animated: false)
+        }
         let event: Void? = await willDismissAsync.next()
         
         XCTAssertNotNil(event)
@@ -112,11 +116,22 @@ final class SheetCoordinatorTests: XCTestCase {
     
     func test_cleanCoordinator() async throws {
         let sut = makeSUT()
+        let finishedSheetBroadcast = sut.onFinish
 
         await presentSheet(makeSheetItem("First Item", presentationStyle: .fullScreenCover), with: sut)
         await presentSheet(makeSheetItem("Second Item"), with: sut)
         await presentSheet(makeSheetItem("Third Item"), with: sut)
         XCTAssertEqual(sut.items.count, 3)
+        
+        await simulateDismissal([
+            DismissalStringItem(broadcast: finishedSheetBroadcast, events: [
+                { await finishedSheetBroadcast.send("\(1)") },
+                { await finishedSheetBroadcast.send("\(0)") },
+            ])
+            
+        ]) {
+            async let _ = await sut.clean(animated: false)
+        }
 
         await sut.clean(animated: false)
         XCTAssertNil(sut.items.first??.view)
@@ -171,7 +186,9 @@ final class SheetCoordinatorTests: XCTestCase {
         await presentSheet(makeSheetItem("Item"), with: sut)
         XCTAssertEqual(sut.items.count, 1)
 
-        await sut.removeSheet(at: [0], animated: false)
+        await simulateSheetDismissal(sut) {
+            await sut.removeSheet(at: 0, animated: false)
+        }
         XCTAssertNil(sut.items.first ?? nil)
     }
 
@@ -181,7 +198,9 @@ final class SheetCoordinatorTests: XCTestCase {
         await presentSheet(makeSheetItem("Second"), with: sut)
         await presentSheet(makeSheetItem("Third"), with: sut)
 
-        await sut.removeSheet(at: [1], animated: false)
+        await simulateSheetDismissal(sut, at: 1) {
+            await sut.removeSheet(at: 1, animated: false)
+        }
         XCTAssertNil(sut.items[1])
     }
 

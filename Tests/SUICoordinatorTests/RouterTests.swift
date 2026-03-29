@@ -68,20 +68,42 @@ final class RouterTests: XCTestCase {
         XCTAssertEqual(sut.items.count, 0)
         
         await sut.navigate(toRoute: .sheetStep, animated: false)
-        await sut.close(animated: false)
+        await simulateSheetDismissal(sut.sheetCoordinator) {
+            await sut.close(animated: false)
+        }
         await sut.sheetCoordinator.removeAllNilItems()
         XCTAssertEqual(sut.sheetCoordinator.items.count, 0)
     }
     
     func test_cleanRouter() async throws {
         let sut = makeSUT()
+        let finishedSheetBroadcast = sut.sheetCoordinator.onFinish
+        let popBroadcast = sut.sheetCoordinator.onFinish
         
         await sut.navigate(toRoute: .pushStep(1), animated: false)
         await sut.navigate(toRoute: .pushStep2, animated: false)
         await sut.navigate(toRoute: .sheetStep, animated: false)
         await sut.navigate(toRoute: .fullScreenStep, animated: false)
-        await sut.clean(animated: false)
-        await sut.restart(animated: false)
+        
+        
+        await simulateDismissal([
+            DismissalStringItem(broadcast: finishedSheetBroadcast, events: [
+                { await finishedSheetBroadcast.send("\(1)") },
+                { await finishedSheetBroadcast.send("\(0)") },
+            ]),
+            DismissalStringItem(broadcast: popBroadcast, events: [{ await popBroadcast.send("\(0)") }]),
+            
+        ]) {
+            async let _ = await sut.clean(animated: false)
+        }
+        
+        
+        
+        
+        
+        
+        
+        
         
         XCTAssertEqual(sut.items.count, 0)
         XCTAssertEqual(sut.sheetCoordinator.items.count, 0)
@@ -89,14 +111,26 @@ final class RouterTests: XCTestCase {
     
     func test_cleanRouter_with_customTransitionView() async throws {
         let sut = makeSUT()
+        let finishedSheetBroadcast = sut.sheetCoordinator.onFinish
+        let popBroadcast = sut.sheetCoordinator.onFinish
         
         await sut.navigate(toRoute: .pushStep(1), animated: false)
         await sut.navigate(toRoute: .pushStep2, animated: false)
         await sut.navigate(toRoute: .sheetStep, animated: false)
         await sut.navigate(toRoute: .fullScreenStep, animated: false)
         await sut.navigate(toRoute: .customTransition(fullScreen: true), animated: false)
-        await sut.clean(animated: false)
-        await sut.restart(animated: false)
+        
+        await simulateDismissal([
+            DismissalStringItem(broadcast: finishedSheetBroadcast, events: [
+                { await finishedSheetBroadcast.send("\(2)") },
+                { await finishedSheetBroadcast.send("\(1)") },
+                { await finishedSheetBroadcast.send("\(0)") },
+            ]),
+            DismissalStringItem(broadcast: popBroadcast, events: [{ await popBroadcast.send("\(0)") }]),
+            
+        ]) {
+            async let _ = await sut.clean(animated: false)
+        }
         
         XCTAssertEqual(sut.items.count, 0)
         XCTAssertEqual(sut.sheetCoordinator.items.count, 0)
@@ -104,12 +138,24 @@ final class RouterTests: XCTestCase {
     
     func test_restartRouter() async throws {
         let sut = makeSUT()
+        let finishedSheetBroadcast = sut.sheetCoordinator.onFinish
+        let popBroadcast = sut.sheetCoordinator.onFinish
         
         await sut.navigate(toRoute: .pushStep(1), animated: false)
         await sut.navigate(toRoute: .pushStep2, animated: false)
         await sut.navigate(toRoute: .sheetStep, animated: false)
         await sut.present(.fullScreenStep)
-        await sut.restart(animated: false)
+        
+        await simulateDismissal([
+            DismissalStringItem(broadcast: finishedSheetBroadcast, events: [
+                { await finishedSheetBroadcast.send("\(1)") },
+                { await finishedSheetBroadcast.send("\(0)") },
+            ]),
+            DismissalStringItem(broadcast: popBroadcast, events: [{ await popBroadcast.send("\(0)") }]),
+            
+        ]) {
+            async let _ = await sut.restart(animated: false)
+        }
         
         XCTAssertEqual(sut.items.count, 0)
         XCTAssertEqual(sut.sheetCoordinator.items.count, 0)
@@ -168,7 +214,9 @@ final class RouterTests: XCTestCase {
         await sut.navigate(toRoute: .sheetStep, animated: false)
         XCTAssertEqual(sut.sheetCoordinator.items.count, 1)
 
-        await sut.dismiss(animated: false)
+        await simulateSheetDismissal(sut.sheetCoordinator) {
+            await sut.dismiss(animated: false)
+        }
         await sut.sheetCoordinator.removeAllNilItems()
         XCTAssertEqual(sut.sheetCoordinator.items.count, 0)
     }
@@ -222,12 +270,24 @@ final class RouterTests: XCTestCase {
 
     func test_multipleSheets_cleanRemovesAll() async throws {
         let sut = makeSUT()
+        let finishedSheetBroadcast = sut.sheetCoordinator.onFinish
+        let popBroadcast = sut.sheetCoordinator.onFinish
+        
         await sut.navigate(toRoute: .sheetStep, animated: false)
         await sut.navigate(toRoute: .fullScreenStep, animated: false)
         XCTAssertEqual(sut.sheetCoordinator.items.count, 2)
-
-        await sut.clean(animated: false)
-        await sut.restart(animated: false)
+        
+        await simulateDismissal([
+            DismissalStringItem(broadcast: finishedSheetBroadcast, events: [
+                { await finishedSheetBroadcast.send("\(1)") },
+                { await finishedSheetBroadcast.send("\(0)") },
+            ]),
+            DismissalStringItem(broadcast: popBroadcast, events: [{ await popBroadcast.send("\(0)") }]),
+            
+        ]) {
+            async let _ = await sut.clean(animated: false)
+        }
+        
         XCTAssertEqual(sut.sheetCoordinator.items.count, 0)
     }
 

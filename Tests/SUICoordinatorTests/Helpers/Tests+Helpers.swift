@@ -54,6 +54,41 @@ extension XCTestCase {
         await sut.finishFlow(animated: animated)
     }
     
+    /// Fires a `SheetCoordinator`'s `onFinish` signal at `index` once `removeSheet`
+    /// starts listening, then awaits the given operation. Used in unit tests to
+    /// unblock `removeSheet` calls that wait for the view-layer dismissal confirmation.
+    @available(iOS 17.0, *)
+    @MainActor func simulateSheetDismissal<T>(
+        _ sheetCoordinator: SheetCoordinator<T>,
+        at index: Int = 0,
+        performing operation: @escaping () async -> Void
+    ) async {
+        
+        await simulateDismissal([DismissalStringItem(broadcast: sheetCoordinator.onFinish, events: [{
+            await sheetCoordinator.onFinish.send("\(index)")
+        }])], performing: operation)
+    }
+    
+    @available(iOS 17.0, *)
+    @MainActor func simulateDismissal(
+        _ items: [any DismissalItemProtocol],
+        performing operation: @escaping () async -> Void
+    ) async {
+        
+        await withTaskGroup(of: Void.self) { group in
+            // Run main operation
+            group.addTask { await operation() }
+            
+            // Handle each item concurrently
+            for item in items {
+                group.addTask {
+                    while await item.getSubscriberCount() == 0 { await Task.yield() }
+                    for event in item.events { await event() }
+                }
+            }
+        }
+    }
+
     func asyncStream<T: Sendable, E: Error>(_ stream: any Publisher<T, E>) -> AsyncStream<T> {
         AsyncStream { continuation in
             
@@ -67,5 +102,28 @@ extension XCTestCase {
                 cancellable.cancel()
             }
         }
+    }
+}
+
+struct DismissalVoidItem: DismissalItemProtocol {
+    let broadcast: AsyncBroadcast<Void>
+    let events: [() async -> Void]
+}
+
+struct DismissalStringItem: DismissalItemProtocol {
+    let broadcast: AsyncBroadcast<String>
+    let events: [() async -> Void]
+}
+
+protocol DismissalItemProtocol {
+    associatedtype E: Sendable
+    
+    var broadcast: AsyncBroadcast<E> { get }
+    var events: [() async -> Void] { get }
+}
+
+extension DismissalItemProtocol {
+    func getSubscriberCount() async ->  Int {
+        await broadcast.subscriberCount
     }
 }
