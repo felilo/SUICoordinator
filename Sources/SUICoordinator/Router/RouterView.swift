@@ -33,7 +33,7 @@ struct RouterView<C: CoordinatorType>: View {
     
     private var coordinator: C
     private var viewModel: AnyRouterInternalType<C.Route>? { coordinator.router as? AnyRouterInternalType<C.Route> }
-    @State private var didPop = false
+    @State private var popOccurred = false
 
     // --------------------------------------------------------------------
     // MARK: Constructor
@@ -86,7 +86,7 @@ struct RouterView<C: CoordinatorType>: View {
                     onDisappear: { index in Task { @MainActor [weak router] in
                         guard let router else { return }
                         if router.isCoordinator {
-                            await router.onFinish.send(())
+                            await router.sheetDidDismiss.send(())
                             await router.removeItemFromSheetCoordinator(at: index)
                         } else {
                             await router.sheetCoordinator.onFinish.send(index)
@@ -103,13 +103,13 @@ struct RouterView<C: CoordinatorType>: View {
                 path: Binding(get: { router.items }, set: { router.items = $0 }),
                 root: { rootView?.navigationDestination(for: C.Route.self) {
                     $0.onDisappear { Task{
-                        if didPop { await viewModel?.onPop.send(()) }
-                        didPop = false
+                        if popOccurred { await viewModel?.didPop.send(()) }
+                        popOccurred = false
                     }}}
                 })
             .transaction { $0.disablesAnimations = !router.animated }
             .onChange(of: router.items) { oldValue, newValue in
-                if newValue.count < oldValue.count { didPop = true }
+                if newValue.count < oldValue.count { popOccurred = true }
                 onChangeItems()
             }
         }

@@ -106,7 +106,7 @@ final class AsyncBroadcastTests: XCTestCase {
         XCTAssertEqual(v2, 2)
     }
 
-    // MARK: - Void value type (matches Router.onFinish usage)
+    // MARK: - Void value type (matches Router.sheetDidDismiss / didPop usage)
 
     func test_send_void_unblocksSuspendedConsumer() async {
         let sut = AsyncBroadcast<Void>()

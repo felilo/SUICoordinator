@@ -43,13 +43,17 @@ protocol RouterInternalType<Route>: RouterType {
     /// it onto the stack; removing the last element pops back.
     var items: [Route] { get set }
 
-    /// A broadcast channel that fires once when the router's flow finishes.
+    /// Broadcast fired by `RouterView` after a coordinator sheet finishes dismissing.
     ///
     /// Callers waiting on `close(animated:finishFlow:)` with `finishFlow: true` subscribe
-    /// to this stream. The signal is sent when the presented sheet or coordinator dismisses.
-    var onFinish: AsyncBroadcast<Void> { get }
-    
-    var onPop: AsyncBroadcast<Void> { get }
+    /// to this stream. The signal is sent when the presented coordinator sheet disappears.
+    var sheetDidDismiss: AsyncBroadcast<Void> { get }
+
+    /// Broadcast fired by `RouterView` after a push-pop animation completes.
+    ///
+    /// `pop` and `popToRoot` await this signal when items remain after the removal,
+    /// ensuring they return only once the navigation animation has finished.
+    var didPop: AsyncBroadcast<Void> { get }
     
     /// Enqueues a sheet item for modal presentation via the sheet coordinator.
     ///
