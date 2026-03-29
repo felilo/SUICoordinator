@@ -1,3 +1,20 @@
+# Release Notes — v1.5.0
+
+## New Features
+
+### Primary associated types on `CoordinatorType` and `TabCoordinatorType`
+`CoordinatorType` and `TabCoordinatorType` now declare primary associated types (`CoordinatorType<Route>`, `TabCoordinatorType<Page>`). This removes the need for the `any` keyword when referencing these protocols in generic constraints and `some` return positions, resulting in cleaner, more expressive API call sites.
+
+### Full Swift 6 compliance
+All library targets (`SUICoordinator`, `SUICoordinator16`, `SUICoordinatorCore`, `SUICoordinatorMacros`) and test targets now compile cleanly under Swift 6 strict concurrency. The swift-tools-version has been bumped to `6.0`.
+
+## Improvements
+
+### `@Coordinator` macro updated for new type constraints
+The `@Coordinator` macro has been updated to align with the primary associated type changes on `RouterType` and `CoordinatorType`, ensuring generated code remains compatible with Swift 6 strict concurrency checks.
+
+---
+
 # Release Notes — v1.4.2
 
 ## New Features
