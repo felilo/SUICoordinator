@@ -443,7 +443,6 @@ The `Router` is available as `coordinator.router` and manages the navigation sta
 
 | Method / Property | Description |
 |-------------------|-------------|
-| `items: [Route]` | The current navigation stack (push items). |
 | `navigate(toRoute:presentationStyle:animated:)` | Navigates to the given route. `.push` appends to the stack; all other styles present modally. |
 | `present(_:presentationStyle:animated:)` | Presents a view modally. Defaults to `.sheet` if no style is provided. |
 | `pop(animated:)` | Pops the top view from the navigation stack. |
