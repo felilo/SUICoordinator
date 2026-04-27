@@ -34,6 +34,7 @@ struct SheetCoordinatorView: ViewModifier {
     @State var index = 0
     
     public var isLast: Bool
+    let coordinatorType: AnyCoordinatorType?
     public var onDissmis: ActionClosure?
     public var onDidLoad: ActionClosure?
     public var onDisappear: ActionClosure?
@@ -61,12 +62,15 @@ struct SheetCoordinatorView: ViewModifier {
         with index: Int,
         item: SheetItem<Value>
     ) -> some View {
-        let view = item.view()?.asAnyView()
+        let view = item.view()?
+            .environment(\.coordinator, item.isCoordinator ? nil : coordinatorType)
+            .asAnyView()
             .onDisappear { onDisappear?("\(index)")}
             .sheetCoordinator(
                 coordinator: coordinator,
                 index: coordinator.getNextIndex(index),
                 isLast: coordinator.isLastIndex(index),
+                coordinatorType: coordinatorType,
                 onDissmis: onDissmis,
                 onDidLoad: onDidLoad
             )
