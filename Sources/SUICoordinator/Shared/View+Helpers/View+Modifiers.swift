@@ -31,6 +31,7 @@ extension View {
         coordinator: SheetCoordinator<AnyViewAlias>,
         index: Int = 0,
         isLast: Bool = false,
+        coordinatorType: AnyCoordinatorType?,
         onDissmis: ActionClosure? = nil,
         onDidLoad: ActionClosure? = nil,
         onDisappear: ActionClosure? = nil
@@ -40,6 +41,7 @@ extension View {
                 coordinator: coordinator,
                 index: index,
                 isLast: isLast,
+                coordinatorType: coordinatorType,
                 onDissmis: onDissmis,
                 onDidLoad: onDidLoad,
                 onDisappear: onDisappear

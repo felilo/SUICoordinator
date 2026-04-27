@@ -77,6 +77,7 @@ struct RouterView<C: CoordinatorType>: View {
             view.environment(\.coordinator, coordinator)
                 .sheetCoordinator(
                     coordinator: router.sheetCoordinator,
+                    coordinatorType: coordinator,
                     onDissmis: { index in Task { @MainActor [weak router] in
                         guard let router else { return }
                         if !router.isCoordinator {
