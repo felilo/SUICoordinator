@@ -348,7 +348,9 @@ final class RouterTests: XCTestCase {
         let sut = makeSUT()
         await sut.navigate(toRoute: .sheetStep, animated: false)
 
-        await sut.dismiss()
+        await simulateSheetDismissal(sut.sheetCoordinator) {
+            await sut.dismiss()
+        }
         await sut.sheetCoordinator.removeAllNilItems()
 
         XCTAssertEqual(sut.sheetCoordinator.items.count, 0)
@@ -356,12 +358,18 @@ final class RouterTests: XCTestCase {
 
     func test_clean_defaultParameters_preservesMainView() async throws {
         let sut = makeSUT()
+        let finishedSheetBroadcast = sut.sheetCoordinator.onFinish
+
         await sut.navigate(toRoute: .pushStep(1), animated: false)
         await sut.navigate(toRoute: .sheetStep, animated: false)
 
-        // clean() delegates to clean(animated:withMainView:false) — mainView must survive
-        await sut.clean()
-        await sut.restart(animated: false)
+        await simulateDismissal([
+            DismissalStringItem(broadcast: finishedSheetBroadcast, events: [
+                { await finishedSheetBroadcast.send("\(0)") },
+            ]),
+        ]) {
+            await sut.clean(animated: false, withMainView: false)
+        }
 
         XCTAssertEqual(sut.items.count, 0)
         XCTAssertEqual(sut.sheetCoordinator.items.count, 0)
