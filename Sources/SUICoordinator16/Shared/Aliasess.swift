@@ -23,6 +23,7 @@
 //
 
 @_exported import SUICoordinatorCore
+@_exported import Foundation
 import SwiftUI
 
 public typealias AnyCoordinatorType = (any CoordinatorType)
