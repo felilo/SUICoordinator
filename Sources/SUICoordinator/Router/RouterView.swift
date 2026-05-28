@@ -74,26 +74,25 @@ struct RouterView<C: CoordinatorType>: View {
     @ViewBuilder
     private func addSheetTo(view: (some View)?) -> some View {
         if let router = viewModel {
-            view.environment(\.coordinator, coordinator)
-                .sheetCoordinator(
-                    coordinator: router.sheetCoordinator,
-                    coordinatorType: coordinator,
-                    onDissmis: { index in Task { @MainActor [weak router] in
-                        guard let router else { return }
-                        if !router.isCoordinator {
-                            await router.removeItemFromSheetCoordinator(at: index)
-                        }
-                    }},
-                    onDisappear: { index in Task { @MainActor [weak router] in
-                        guard let router else { return }
-                        if router.isCoordinator {
-                            await router.sheetDidDismiss.send(())
-                            await router.removeItemFromSheetCoordinator(at: index)
-                        } else {
-                            await router.sheetCoordinator.onFinish.send(index)
-                        }
-                    }}
-                )
+            view.sheetCoordinator(
+                coordinator: router.sheetCoordinator,
+                coordinatorType: { [weak coordinator] in return coordinator },
+                onDissmis: { index in Task { @MainActor [weak router] in
+                    guard let router else { return }
+                    if !router.isCoordinator {
+                        await router.removeItemFromSheetCoordinator(at: index)
+                    }
+                }},
+                onDisappear: { index in Task { @MainActor [weak router] in
+                    guard let router else { return }
+                    if router.isCoordinator {
+                        await router.sheetDidDismiss.send(())
+                        await router.removeItemFromSheetCoordinator(at: index)
+                    } else {
+                        await router.sheetCoordinator.onFinish.send(index)
+                    }
+                }}
+            )
         }
     }
     
@@ -102,11 +101,15 @@ struct RouterView<C: CoordinatorType>: View {
         if let router = viewModel {
             NavigationStack(
                 path: Binding(get: { router.items }, set: { router.items = $0 }),
-                root: { rootView?.navigationDestination(for: C.Route.self) {
-                    $0.onDisappear { Task{
-                        if popOccurred { await viewModel?.didPop.send(()) }
-                        popOccurred = false
-                    }}}
+                root: {
+                    rootView?
+                        .environment(\.coordinator, coordinator)
+                        .navigationDestination(for: C.Route.self) {
+                            $0.onDisappear { Task{
+                                if popOccurred { await viewModel?.didPop.send(()) }
+                                popOccurred = false
+                            }}.environment(\.coordinator, coordinator)
+                        }
                 })
             .transaction { $0.disablesAnimations = !router.animated }
             .onChange(of: router.items) { oldValue, newValue in
