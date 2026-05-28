@@ -1,5 +1,6 @@
 Package.resolved
 .build/
+.DS_Store
 Examples/SUICoordinatorExample/build/
 .swiftpm/
 Examples/SUICoordinatorExample/SUICoordinatorExample.xcodeproj/project.xcworkspace/xcuserdata/
