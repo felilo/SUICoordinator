@@ -237,7 +237,9 @@ final public class SheetCoordinator<T>: ObservableObject {
             return await updateItems()
         }
         
-        await handleRemove(index: index - 1)
+        // BOL patch: after `remove(at:)` the sheets that sat above the removed one start at `index`.
+        // `index - 1` also fired cleanup for the still-presented coordinator below it.
+        await handleRemove(index: index)
         await updateLastPresentationStyle()
         await removeAllNilItems()
     }

@@ -176,15 +176,12 @@ extension CoordinatorType {
     
     /// Cleans up the coordinator.
     func swipedAway(coordinator: AnyCoordinatorType) async {
-        let sheetCoordinator = router.sheetCoordinator
-        let uuid = coordinator.uuid
-        
-        sheetCoordinator.onRemoveItem = { [weak sheetCoordinator, weak coordinator] id in
-            if id.contains(uuid) {
-                try? await Task.sleep(for: .seconds(0.2))
-                await coordinator?.finish(animated: false, withDismiss: false)
-                sheetCoordinator?.onRemoveItem = nil
-            }
+        // BOL patch: onRemoveItem is a single slot, so it must clean up whichever child the removed
+        // sheet belongs to. Previously each navigate overwrote it and earlier children were orphaned.
+        router.sheetCoordinator.onRemoveItem = { [weak self] id in
+            guard let child = self?.children.first(where: { id.contains($0.uuid) }) else { return }
+            try? await Task.sleep(for: .seconds(0.2))
+            await child.finish(animated: false, withDismiss: false)
         }
     }
 

@@ -135,15 +135,10 @@ public class Router<Route: RouteType>: ObservableObject, RouterType {
         presentationStyle: TransitionPresentationStyle? = nil,
         animated: Bool = true
     ) async -> Void {
-        self.animated = animated
-        if (presentationStyle ?? route.presentationStyle) == .push {
-            await itemManager.addItem(route)
-            return await updateItems()
-        }
-        await present(
-            route,
-            presentationStyle: presentationStyle,
-            animated: animated)
+        // BOL patch: drop concurrent navigations (rapid taps) instead of stacking them.
+        guard beginTransition() else { return }
+        defer { endTransition() }
+        await performNavigate(toRoute: route, presentationStyle: presentationStyle, animated: animated)
     }
     
     /// Presents a view or coordinator with optional presentation style and animation.
@@ -159,14 +154,66 @@ public class Router<Route: RouteType>: ObservableObject, RouterType {
     ///
     /// - Note: If the presentation style is `.push`, this method delegates to `navigate(toRoute:)`.
     @MainActor public func present(_ view: Route, presentationStyle: TransitionPresentationStyle? = .sheet, animated: Bool = true) async -> Void {
+        // BOL patch: drop concurrent navigations (rapid taps) instead of stacking them.
+        guard beginTransition() else { return }
+        defer { endTransition() }
+        await performPresent(view, presentationStyle: presentationStyle, animated: animated)
+    }
+    
+    // --------------------------------------------------------------------
+    // MARK: BOL patch - navigation guard
+    // --------------------------------------------------------------------
+    
+    /// True while a forward navigation on this router is in flight.
+    @MainActor private(set) var isTransitioning = false
+    
+    /// Claims the router for one forward navigation. Returns `false` if another one is in flight.
+    /// Repeated taps that arrive after it returns are caught by the duplicate-on-top checks.
+    @MainActor func beginTransition() -> Bool {
+        guard !isTransitioning else { return false }
+        isTransitioning = true
+        return true
+    }
+    
+    @MainActor func endTransition() {
+        isTransitioning = false
+    }
+    
+    /// True if `id` is the item currently on top of the modal stack (a route or a coordinator's sheet).
+    @MainActor func isTopSheet(idPrefix: String) -> Bool {
+        sheetCoordinator.items.last(where: { $0 != nil })??.id.hasPrefix(idPrefix) ?? false
+    }
+    
+    @MainActor private func performNavigate(
+        toRoute route: Route,
+        presentationStyle: TransitionPresentationStyle?,
+        animated: Bool
+    ) async -> Void {
+        self.animated = animated
+        if (presentationStyle ?? route.presentationStyle) == .push {
+            // BOL patch: a late tap must not push the screen that is already on top.
+            guard items.last?.id != route.id else { return }
+            await itemManager.addItem(route)
+            return await updateItems()
+        }
+        await performPresent(
+            route,
+            presentationStyle: presentationStyle,
+            animated: animated)
+    }
+    
+    @MainActor private func performPresent(_ view: Route, presentationStyle: TransitionPresentationStyle?, animated: Bool) async -> Void {
         self.animated = animated
         
         if (presentationStyle ?? view.presentationStyle) == .push {
-            return await navigate(
+            return await performNavigate(
                 toRoute: view,
                 presentationStyle: presentationStyle,
                 animated: animated)
         }
+        
+        // BOL patch: a late tap must not present the modal that is already on top.
+        guard !isTopSheet(idPrefix: "\(view.id) - ") else { return }
         
         let item = SheetItem(
             id: "\(view.id) - \(UUID())",

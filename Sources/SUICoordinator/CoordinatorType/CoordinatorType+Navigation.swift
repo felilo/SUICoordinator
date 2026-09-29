@@ -81,6 +81,12 @@ public extension CoordinatorType {
         presentationStyle: TransitionPresentationStyle,
         animated: Bool = true
     ) async -> Void {
+        // BOL patch: drop concurrent navigations, and never stack a second coordinator of the
+        // same type on top of itself (late taps after an API call). Only accepted children are added.
+        guard router.beginTransition() else { return }
+        defer { router.endTransition() }
+        guard !router.isTopSheet(idPrefix: "\(NSStringFromClass(type(of: coordinator))) - ") else { return }
+        
         startChildCoordinator(coordinator)
         
         let item = buildSheetItemForCoordinator(coordinator, presentationStyle: presentationStyle, animated: animated)
